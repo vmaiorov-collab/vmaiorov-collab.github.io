@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Neon Snake: Rearview Phase</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+    <style>
+      * {
+        user-select: none;
+        -webkit-user-select: none;
+        touch-action: manipulation;
+      }
+
+      body {
+        font-family: 'Rajdhani', sans-serif;
+        background-color: #080914;
+        color: #f0f4f8;
+        overflow-x: hidden;
+      }
+
+      .font-orbitron {
+        font-family: 'Orbitron', sans-serif;
+      }
+
+      .neon-box {
+        box-shadow: 0 0 15px rgba(0, 243, 255, 0.2), inset 0 0 15px rgba(0, 243, 255, 0.1);
+        border: 1px solid rgba(0, 243, 255, 0.4);
+      }
+
+      .neon-box-purple {
+        box-shadow: 0 0 15px rgba(189, 0, 255, 0.3), inset 0 0 15px rgba(189, 0, 255, 0.15);
+        border: 1px solid rgba(189, 0, 255, 0.5);
+      }
+
+      .neon-text-cyan {
+        text-shadow: 0 0 8px rgba(0, 243, 255, 0.8), 0 0 20px rgba(0, 243, 255, 0.4);
+      }
+
+      .neon-text-purple {
+        text-shadow: 0 0 8px rgba(236, 72, 153, 0.8), 0 0 20px rgba(189, 0, 255, 0.5);
+      }
+
+      .mirror-viewport {
+        perspective: 600px;
+        transform-style: preserve-3d;
+      }
+
+      .mirror-content {
+        transform: scaleX(-1);
+        /* Rearview reflection flip */
+        filter: contrast(1.2) brightness(1.1);
+      }
+
+      /* Custom animated scanline effect for rear view */
+      .scanlines {
+        background: linear-gradient(rgba(18, 16, 16, 0) 50%,
+            rgba(0, 243, 255, 0.15) 50%);
+        background-size: 100% 4px;
+      }
+
+      @keyframes pulse-glow {
+
+        0%,
+        100% {
+          opacity: 0.8;
+          transform: scale(1);
+        }
+
+        50% {
+          opacity: 1;
+          transform: scale(1.05);
+        }
+      }
+
+      .pulse-anim {
+        animation: pulse-glow 2s infinite ease-in-out;
+      }
+    </style>
+  </head>
+  <body class="min-h-screen flex flex-col items-center justify-between p-2 sm:p-4 bg-slate-950 text-slate-100">
+    <!-- Navigation / Header -->
+    <header class="w-full max-w-4xl flex flex-wrap justify-between items-center px-4 py-2 my-1 rounded-xl bg-slate-900/80 backdrop-blur border border-slate-800">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-lg bg-cyan-500/20 border border-cyan-400 flex items-center justify-center text-cyan-400 text-xl font-bold">
+          <i class="fa-solid fa-eye"></i>
+        </div>
+        <div>
+          <h1 class="font-orbitron font-extrabold text-lg sm:text-2xl tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-500"> REARVIEW PHASE </h1>
+          <p class="text-xs text-slate-400">Jump through walls by looking behind you!</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-4 mt-2 sm:mt-0">
+        <button id="btn-sound" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-semibold text-slate-300 flex items-center gap-2 transition">
+          <i class="fa-solid fa-volume-high text-cyan-400" id="sound-icon"></i>
+          <span id="sound-text">AUDIO ON</span>
+        </button>
+        <button id="btn-help" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-semibold text-slate-300 flex items-center gap-2 transition">
+          <i class="fa-solid fa-circle-question text-purple-400"></i>
+          <span>HOW TO PLAY</span>
+        </button>
+      </div>
+    </header>
+    <!-- Main Dashboard Bar -->
+    <div class="w-full max-w-4xl grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3 my-2">
+      <!-- Score Card -->
+      <div class="bg-slate-900/70 border border-slate-800 p-2.5 rounded-xl flex items-center justify-between">
+        <div class="text-slate-400 text-xs uppercase font-semibold">Score</div>
+        <div id="score-val" class="font-orbitron text-xl sm:text-2xl font-bold text-cyan-400 neon-text-cyan">0</div>
+      </div>
+      <!-- High Score Card -->
+      <div class="bg-slate-900/70 border border-slate-800 p-2.5 rounded-xl flex items-center justify-between">
+        <div class="text-slate-400 text-xs uppercase font-semibold">Best</div>
+        <div id="high-score-val" class="font-orbitron text-xl sm:text-2xl font-bold text-amber-400">0</div>
+      </div>
+      <!-- Rear Focus / Mirror Energy Bar -->
+      <div class="col-span-2 bg-slate-900/70 border border-slate-800 p-2.5 rounded-xl flex flex-col justify-center">
+        <div class="flex justify-between items-center mb-1 text-xs">
+          <span class="text-purple-300 font-bold flex items-center gap-1.5">
+            <i class="fa-solid fa-ghost text-purple-400"></i> REAR-VISION FOCUS </span>
+          <span id="energy-text" class="text-purple-400 font-mono font-bold">100%</span>
+        </div>
+        <div class="w-full bg-slate-800 rounded-full h-3 p-0.5 border border-purple-900/50">
+          <div id="energy-bar" class="bg-gradient-to-r from-purple-600 via-pink-500 to-cyan-400 h-full rounded-full w-full transition-all duration-100 shadow-[0_0_10px_rgba(189,0,255,0.5)]"></div>
+        </div>
+      </div>
+    </div>
+    <!-- Interactive Game Canvas & Rearview Mirror Section -->
+    <main class="w-full max-w-4xl relative flex flex-col md:flex-row gap-3 items-center justify-center my-auto">
+      <!-- Game Screen -->
+      <div class="relative w-full aspect-square max-w-[520px] rounded-2xl overflow-hidden neon-box bg-slate-950 flex items-center justify-center">
+        <!-- Canvas -->
+        <canvas id="game-canvas" class="w-full h-full block cursor-crosshair"></canvas>
+        <!-- Rearview Status Banner Overlay -->
+        <div id="rearview-indicator" class="absolute top-3 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full bg-purple-950/90 border border-purple-500 text-purple-200 text-xs font-bold font-orbitron tracking-widest uppercase flex items-center gap-2 shadow-[0_0_15px_rgba(189,0,255,0.6)] opacity-0 transition-opacity duration-150 pointer-events-none">
+          <span class="w-2.5 h-2.5 rounded-full bg-pink-500 animate-ping"></span>
+          <span>
+            <i class="fa-solid fa-eye-low-vision"></i> REARVIEW ACTIVE - WALL PHASE READY! </span>
+        </div>
+        <!-- Start / Pause / Game Over Overlay -->
+        <div id="game-overlay" class="absolute inset-0 bg-slate-950/85 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center z-20">
+          <div id="overlay-icon" class="w-16 h-16 rounded-2xl bg-cyan-500/20 border border-cyan-400 flex items-center justify-center text-cyan-400 text-3xl mb-4 pulse-anim">
+            <i class="fa-solid fa-play"></i>
+          </div>
+          <h2 id="overlay-title" class="font-orbitron text-2xl sm:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400 mb-2"> REARVIEW SNAKE </h2>
+          <p id="overlay-msg" class="text-sm text-slate-300 max-w-sm mb-6 leading-relaxed"> Look behind yourself to gain the quantum ability to <span class="text-purple-400 font-bold">PHASE & JUMP THROUGH WALLS</span>! </p>
+          <button id="btn-start" class="px-8 py-3.5 rounded-xl bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-400 hover:to-purple-500 text-slate-950 font-orbitron font-extrabold text-base tracking-wider shadow-lg shadow-cyan-500/30 active:scale-95 transition transform"> START GAME </button>
+        </div>
+      </div>
+      <!-- Sidebar / Rearview Dashboard Widget -->
+      <div class="w-full md:w-64 flex flex-col gap-3">
+        <!-- Dynamic Rearview Camera Viewport HUD -->
+        <div class="bg-slate-900/90 border border-purple-500/40 rounded-xl p-3 flex flex-col items-center neon-box-purple relative overflow-hidden">
+          <div class="w-full flex justify-between items-center mb-2">
+            <span class="text-xs font-orbitron text-purple-300 font-bold flex items-center gap-1.5">
+              <i class="fa-solid fa-video text-pink-400"></i> REAR CAM MIRROR </span>
+            <span id="rear-status-tag" class="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-400">NORMAL</span>
+          </div>
+          <!-- Mirror View Canvas Screen -->
+          <div class="relative w-full aspect-video bg-black rounded-lg border border-purple-900/60 overflow-hidden flex items-center justify-center scanlines">
+            <canvas id="mirror-canvas" class="w-full h-full mirror-content opacity-75"></canvas>
+            <div id="mirror-blur" class="absolute inset-0 bg-slate-950/70 backdrop-blur-[2px] flex flex-col items-center justify-center text-center p-2">
+              <i class="fa-solid fa-eye-slash text-purple-400/60 text-xl mb-1"></i>
+              <span class="text-[11px] text-purple-300/80 font-semibold">HOLD LOOK BEHIND KEY TO ACTIVATE MIRROR</span>
+            </div>
+          </div>
+        </div>
+        <!-- On-Screen Action Controls Info -->
+        <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-3 text-xs text-slate-300 space-y-2">
+          <div class="font-bold text-slate-200 border-b border-slate-800 pb-1 flex items-center justify-between">
+            <span>KEYBOARD CONTROLS</span>
+            <i class="fa-solid fa-keyboard text-cyan-400"></i>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-slate-400">Move Snake:</span>
+            <span class="font-mono bg-slate-800 px-2 py-0.5 rounded text-cyan-300">W A S D / Arrow Keys</span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-slate-400">Look Behind / Phase:</span>
+            <span class="font-mono bg-slate-800 px-2 py-0.5 rounded text-purple-300 font-bold">SPACEBAR (Hold)</span>
+          </div>
+        </div>
+        <!-- Touch / Mobile Hold Button for Look Behind -->
+        <button id="btn-mobile-rear" class="w-full py-4 rounded-xl bg-gradient-to-r from-purple-700 via-pink-600 to-purple-700 text-white font-orbitron font-bold text-sm tracking-widest shadow-lg border border-pink-400/40 active:scale-95 transition flex items-center justify-center gap-2">
+          <i class="fa-solid fa-ghost text-lg animate-pulse"></i>
+          <span>HOLD: LOOK BEHIND (PHASE)</span>
+        </button>
+      </div>
+    </main>
+    <!-- Mobile D-Pad Control Wheel -->
+    <div class="w-full max-w-xs my-2 md:hidden flex flex-col items-center gap-1">
+      <button id="pad-up" class="w-12 h-12 rounded-xl bg-slate-800 border border-slate-700 text-cyan-400 text-lg active:bg-cyan-500 active:text-slate-950 transition flex items-center justify-center">
+        <i class="fa-solid fa-chevron-up"></i>
+      </button>
+      <div class="flex gap-4">
+        <button id="pad-left" class="w-12 h-12 rounded-xl bg-slate-800 border border-slate-700 text-cyan-400 text-lg active:bg-cyan-500 active:text-slate-950 transition flex items-center justify-center">
+          <i class="fa-solid fa-chevron-left"></i>
+        </button>
+        <div class="w-12 h-12 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-600">
+          <i class="fa-solid fa-compass"></i>
+        </div>
+        <button id="pad-right" class="w-12 h-12 rounded-xl bg-slate-800 border border-slate-700 text-cyan-400 text-lg active:bg-cyan-500 active:text-slate-950 transition flex items-center justify-center">
+          <i class="fa-solid fa-chevron-right"></i>
+        </button>
+      </div>
+      <button id="pad-down" class="w-12 h-12 rounded-xl bg-slate-800 border border-slate-700 text-cyan-400 text-lg active:bg-cyan-500 active:text-slate-950 transition flex items-center justify-center">
+        <i class="fa-solid fa-chevron-down"></i>
+      </button>
+    </div>
+    <!-- Help / Instructions Modal -->
+    <div id="modal-help" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md hidden items-center justify-center p-4 z-50">
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 text-slate-200 relative shadow-2xl">
+        <button id="btn-close-modal" class="absolute top-4 right-4 text-slate-400 hover:text-white text-lg">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+        <h3 class="font-orbitron font-bold text-xl text-cyan-400 mb-4 flex items-center gap-2">
+          <i class="fa-solid fa-circle-info"></i> Mechanics & Rules
+        </h3>
+        <div class="space-y-3 text-sm text-slate-300 leading-relaxed">
+          <p>
+            <strong class="text-cyan-300">1. Classic Snake Movement:</strong> Collect glowing energetic food orbs to grow longer and score points.
+          </p>
+          <div class="p-3 bg-purple-950/50 border border-purple-500/40 rounded-xl">
+            <strong class="text-pink-300 flex items-center gap-1.5 mb-1 font-orbitron">
+              <i class="fa-solid fa-ghost"></i> The Rearview Wall-Phase Twist: </strong> When you face a wall or obstacle, press and hold <span class="text-purple-300 font-bold">SPACEBAR</span> (or Mobile Look Behind button) to look backward!
+          </div>
+          <p>
+            <strong class="text-purple-300">2. Quantum Wall Jumping:</strong> While looking behind you, colliding with any wall or barrier will <span class="text-cyan-300 font-bold">JUMP/PHASE STRAIGHT THROUGH IT</span> to the opposite side!
+          </p>
+          <p>
+            <strong class="text-amber-300">3. Focus Energy Limit:</strong> Looking behind uses <span class="text-pink-300">Rear Focus Energy</span>. Consume blue focus orbs or wait for it to recharge before wall jumping again!
+          </p>
+        </div>
+        <button id="btn-modal-ok" class="mt-6 w-full py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold font-orbitron transition"> GOT IT, LET'S PLAY! </button>
+      </div>
+    </div>
+    <script>
+      // Web Audio Synthesizer for Retro Sound FX
+      class SoundFX {
+        constructor() {
+          this.ctx = null;
+          this.muted = false;
+        }
+        init() {
+          if (!this.ctx) {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            this.ctx = new AudioContext();
+          }
+        }
+        playEat() {
+          if (this.muted || !this.ctx) return;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(523.25, this.ctx.currentTime); // C5
+          osc.frequency.exponentialRampToValueAtTime(880, this.ctx.currentTime + 0.1); // A5
+          gain.gain.setValueAtTime(0.15, this.ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.1);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start();
+          osc.stop(this.ctx.currentTime + 0.1);
+        }
+        playPhase() {
+          if (this.muted || !this.ctx) return;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(150, this.ctx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(600, this.ctx.currentTime + 0.25);
+          gain.gain.setValueAtTime(0.2, this.ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.25);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start();
+          osc.stop(this.ctx.currentTime + 0.25);
+        }
+        playCrash() {
+          if (this.muted || !this.ctx) return;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'square';
+          osc.frequency.setValueAtTime(180, this.ctx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(40, this.ctx.currentTime + 0.3);
+          gain.gain.setValueAtTime(0.3, this.ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.3);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start();
+          osc.stop(this.ctx.currentTime + 0.3);
+        }
+        playLookBehind() {
+          if (this.muted || !this.ctx) return;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(400, this.ctx.currentTime);
+          osc.frequency.linearRampToValueAtTime(300, this.ctx.currentTime + 0.08);
+          gain.gain.setValueAtTime(0.1, this.ctx.currentTime);
+          gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.08);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start();
+          osc.stop(this.ctx.currentTime + 0.08);
+        }
+      }
+      const canvas = document.getElementById('game-canvas');
+      const ctx = canvas.getContext('2d');
+      const mirrorCanvas = document.getElementById('mirror-canvas');
+      const mirrorCtx = mirrorCanvas.getContext('2d');
+      const sound = new SoundFX();
+      // Game Configuration & Variables
+      const GRID_SIZE = 22;
+      let tileSize = 20;
+      let snake = [];
+      let dir = {
+        x: 1,
+        y: 0
+      };
+      let nextDir = {
+        x: 1,
+        y: 0
+      };
+      let food = {
+        x: 5,
+        y: 5,
+        type: 'normal'
+      }; // 'normal', 'energy'
+      let obstacles = [];
+      let particles = [];
+      let floatingTexts = [];
+      let score = 0;
+      let highScore = localStorage.getItem('rearview_snake_hi') || 0;
+      let energy = 100; // Focus meter
+      let isLookingBehind = false;
+      let isGameOver = false;
+      let isPaused = true;
+      let gameLoopInterval = null;
+      const BASE_SPEED = 110; // ms per frame
+      function resizeCanvas() {
+        const container = canvas.parentElement;
+        const size = container.clientWidth;
+        canvas.width = size;
+        canvas.height = size;
+        tileSize = size / GRID_SIZE;
+        mirrorCanvas.width = 240;
+        mirrorCanvas.height = 135;
+      }
+      window.addEventListener('resize', resizeCanvas);
+
+      function initGame() {
+        // Position snake at center
+        const startX = Math.floor(GRID_SIZE / 2);
+        const startY = Math.floor(GRID_SIZE / 2);
+        snake = [{
+          x: startX,
+          y: startY
+        }, {
+          x: startX - 1,
+          y: startY
+        }, {
+          x: startX - 2,
+          y: startY
+        }];
+        dir = {
+          x: 1,
+          y: 0
+        };
+        nextDir = {
+          x: 1,
+          y: 0
+        };
+        score = 0;
+        energy = 100;
+        isGameOver = false;
+        particles = [];
+        floatingTexts = [];
+        generateObstacles();
+        spawnFood();
+        updateUI();
+      }
+
+      function generateObstacles() {
+        obstacles = [];
+        // Spawn a few interior cyber barrier blocks
+        const barrierCenters = [{
+          x: 5,
+          y: 5
+        }, {
+          x: 5,
+          y: 16
+        }, {
+          x: 16,
+          y: 5
+        }, {
+          x: 16,
+          y: 16
+        }];
+        barrierCenters.forEach(c => {
+          obstacles.push({
+            x: c.x,
+            y: c.y
+          });
+          obstacles.push({
+            x: c.x + 1,
+            y: c.y
+          });
+        });
+      }
+
+      function spawnFood() {
+        let valid = false;
+        while (!valid) {
+          const fx = Math.floor(Math.random() * GRID_SIZE);
+          const fy = Math.floor(Math.random() * GRID_SIZE);
+          const onSnake = snake.some(seg => seg.x === fx && seg.y === fy);
+          const onObs = obstacles.some(obs => obs.x === fx && obs.y === fy);
+          if (!onSnake && !onObs) {
+            const isEnergyOrb = Math.random() < 0.3;
+            food = {
+              x: fx,
+              y: fy,
+              type: isEnergyOrb ? 'energy' : 'normal'
+            };
+            valid = true;
+          }
+        }
+      }
+
+      function addParticles(x, y, color, count = 10) {
+        for (let i = 0; i < count; i++) {
+          particles.push({
+            x: (x + 0.5) * tileSize,
+            y: (y + 0.5) * tileSize,
+            vx: (Math.random() - 0.5) * 6,
+            vy: (Math.random() - 0.5) * 6,
+            life: 1.0,
+            color: color,
+            size: Math.random() * 4 + 2
+          });
+        }
+      }
+
+      function addFloatingText(x, y, text, color) {
+        floatingTexts.push({
+          x: (x + 0.5) * tileSize,
+          y: y * tileSize,
+          text: text,
+          color: color,
+          life: 1.0
+        });
+      }
+
+      function gameTick() {
+        if (isPaused || isGameOver) return;
+        // Handle Rearview focus energy drain/regen
+        if (isLookingBehind) {
+          if (energy > 0) {
+            energy = Math.max(0, energy - 3.5);
+          } else {
+            isLookingBehind = false; // Out of energy
+            updateRearviewUI();
+          }
+        } else {
+          energy = Math.min(100, energy + 0.8);
+        }
+        updateEnergyBar();
+        // Update Direction
+        dir = {
+          ...nextDir
+        };
+        // Calculate Target Head Position
+        let headPos = {
+          x: snake[0].x + dir.x,
+          y: snake[0].y + dir.y
+        };
+        // Check if head hit outer perimeter wall or interior obstacle
+        const hitBorder = headPos.x < 0 || headPos.x >= GRID_SIZE || headPos.y < 0 || headPos.y >= GRID_SIZE;
+        const hitObstacle = obstacles.some(obs => obs.x === headPos.x && obs.y === headPos.y);
+        if (hitBorder || hitObstacle) {
+          // CORE MECHANIC: Can jump through walls IF looking behind you and have focus!
+          if (isLookingBehind && energy > 10) {
+            // WALL JUMP / PHASE ACTIVATED!
+            if (hitBorder) {
+              // Wrap around outer perimeter
+              if (headPos.x < 0) headPos.x = GRID_SIZE - 1;
+              else if (headPos.x >= GRID_SIZE) headPos.x = 0;
+              if (headPos.y < 0) headPos.y = GRID_SIZE - 1;
+              else if (headPos.y >= GRID_SIZE) headPos.y = 0;
+            } else if (hitObstacle) {
+              // Phase straight through interior obstacle
+              headPos.x += dir.x;
+              headPos.y += dir.y;
+            }
+            // Consume focus energy bonus cost & add rewards
+            energy = Math.max(0, energy - 15);
+            score += 250;
+            sound.playPhase();
+            addParticles(headPos.x, headPos.y, '#ec4899', 20);
+            addFloatingText(headPos.x, headPos.y, '+250 WALL PHASE!', '#f472b6');
+          } else {
+            // CRASH / GAME OVER
+            triggerGameOver();
+            return;
+          }
+        }
+        // Check Self Collision
+        if (snake.some(seg => seg.x === headPos.x && seg.y === headPos.y)) {
+          triggerGameOver();
+          return;
+        }
+        // Move Snake Head
+        snake.unshift(headPos);
+        // Check Food Collision
+        if (headPos.x === food.x && headPos.y === food.y) {
+          sound.playEat();
+          if (food.type === 'energy') {
+            energy = Math.min(100, energy + 40);
+            score += 150;
+            addParticles(food.x, food.y, '#a855f7', 15);
+            addFloatingText(food.x, food.y, '+150 FOCUS BOOST!', '#c084fc');
+          } else {
+            score += 100;
+            addParticles(food.x, food.y, '#00f3ff', 12);
+            addFloatingText(food.x, food.y, '+100', '#38bdf8');
+          }
+          if (score > highScore) {
+            highScore = score;
+            localStorage.setItem('rearview_snake_hi', highScore);
+          }
+          spawnFood();
+        } else {
+          snake.pop(); // Remove tail
+        }
+        updateUI();
+        render();
+        renderMirrorView();
+      }
+
+      function triggerGameOver() {
+        sound.playCrash();
+        isGameOver = true;
+        isPaused = true;
+        clearInterval(gameLoopInterval);
+        addParticles(snake[0].x, snake[0].y, '#ef4444', 30);
+        const overlay = document.getElementById('game-overlay');
+        const title = document.getElementById('overlay-title');
+        const msg = document.getElementById('overlay-msg');
+        const btn = document.getElementById('btn-start');
+        const icon = document.getElementById('overlay-icon');
+        icon.className = "w-16 h-16 rounded-2xl bg-red-500/20 border border-red-400 flex items-center justify-center text-red-400 text-3xl mb-4";
+        icon.innerHTML = `
+							<i class="fa-solid fa-skull"></i>`;
+        title.innerText = "GAME OVER";
+        title.className = "font-orbitron text-2xl sm:text-3xl font-black text-red-400 mb-2";
+        msg.innerHTML = `Final Score: 
+							<span class="text-cyan-400 font-bold font-orbitron">${score}</span>
+							<br>` + (score >= highScore && score > 0 ? `
+								<span class="text-amber-400 font-bold">NEW HIGH SCORE!</span>` : `Tip: Hold Spacebar to Phase through walls!`);
+        btn.innerText = "PLAY AGAIN";
+        overlay.classList.remove('hidden');
+      }
+
+      function render() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        // Draw Cyber Grid Lines
+        ctx.strokeStyle = 'rgba(30, 41, 59, 0.4)';
+        ctx.lineWidth = 1;
+        for (let i = 0; i <= GRID_SIZE; i++) {
+          ctx.beginPath();
+          ctx.moveTo(i * tileSize, 0);
+          ctx.lineTo(i * tileSize, canvas.height);
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.moveTo(0, i * tileSize);
+          ctx.lineTo(canvas.width, i * tileSize);
+          ctx.stroke();
+        }
+        // Draw Interior Barrier Obstacles
+        obstacles.forEach(obs => {
+          ctx.fillStyle = '#1e1b4b';
+          ctx.strokeStyle = '#6366f1';
+          ctx.lineWidth = 2;
+          ctx.shadowColor = '#4338ca';
+          ctx.shadowBlur = 8;
+          ctx.fillRect(obs.x * tileSize + 2, obs.y * tileSize + 2, tileSize - 4, tileSize - 4);
+          ctx.strokeRect(obs.x * tileSize + 2, obs.y * tileSize + 2, tileSize - 4, tileSize - 4);
+        });
+        ctx.shadowBlur = 0;
+        // Draw Food Orb
+        const foodX = (food.x + 0.5) * tileSize;
+        const foodY = (food.y + 0.5) * tileSize;
+        ctx.beginPath();
+        ctx.arc(foodX, foodY, tileSize * 0.38, 0, Math.PI * 2);
+        if (food.type === 'energy') {
+          ctx.fillStyle = '#c084fc';
+          ctx.shadowColor = '#bd00ff';
+        } else {
+          ctx.fillStyle = '#00f3ff';
+          ctx.shadowColor = '#00f3ff';
+        }
+        ctx.shadowBlur = 12;
+        ctx.fill();
+        ctx.shadowBlur = 0;
+        // Draw Snake Segments
+        snake.forEach((seg, index) => {
+          const isHead = index === 0;
+          const px = seg.x * tileSize;
+          const py = seg.y * tileSize;
+          ctx.beginPath();
+          ctx.roundRect(px + 1.5, py + 1.5, tileSize - 3, tileSize - 3, isHead ? 6 : 4);
+          if (isLookingBehind) {
+            // Rearview Quantum Spectral Aura
+            ctx.fillStyle = isHead ? '#f472b6' : 'rgba(236, 72, 153, 0.7)';
+            ctx.shadowColor = '#ec4899';
+            ctx.shadowBlur = 14;
+          } else {
+            // Normal Neon Cyan Style
+            ctx.fillStyle = isHead ? '#22d3ee' : '#0284c7';
+            ctx.shadowColor = '#00f3ff';
+            ctx.shadowBlur = isHead ? 10 : 4;
+          }
+          ctx.fill();
+          ctx.shadowBlur = 0;
+          // Draw Head Eyes / Rearview Indicator Eyes
+          if (isHead) {
+            ctx.fillStyle = '#020617';
+            const eyeOffset = tileSize * 0.25;
+            const eyeSize = tileSize * 0.15;
+            // If looking behind, draw eyes facing backwards!
+            const lookX = isLookingBehind ? -dir.x : dir.x;
+            const lookY = isLookingBehind ? -dir.y : dir.y;
+            const eye1X = px + tileSize / 2 + (lookY !== 0 ? eyeOffset : lookX * eyeOffset);
+            const eye1Y = py + tileSize / 2 + (lookX !== 0 ? eyeOffset : lookY * eyeOffset);
+            const eye2X = px + tileSize / 2 + (lookY !== 0 ? -eyeOffset : lookX * eyeOffset);
+            const eye2Y = py + tileSize / 2 + (lookX !== 0 ? -eyeOffset : lookY * eyeOffset);
+            ctx.beginPath();
+            ctx.arc(eye1X, eye1Y, eyeSize, 0, Math.PI * 2);
+            ctx.arc(eye2X, eye2Y, eyeSize, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        });
+        // Update & Render Particles
+        particles.forEach((p, idx) => {
+          p.x += p.vx;
+          p.y += p.vy;
+          p.life -= 0.04;
+          if (p.life <= 0) {
+            particles.splice(idx, 1);
+          } else {
+            ctx.fillStyle = p.color;
+            ctx.globalAlpha = p.life;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.globalAlpha = 1.0;
+          }
+        });
+        // Update & Render Floating Text
+        floatingTexts.forEach((ft, idx) => {
+          ft.y -= 0.8;
+          ft.life -= 0.03;
+          if (ft.life <= 0) {
+            floatingTexts.splice(idx, 1);
+          } else {
+            ctx.font = 'bold 12px Orbitron';
+            ctx.fillStyle = ft.color;
+            ctx.globalAlpha = ft.life;
+            ctx.textAlign = 'center';
+            ctx.fillText(ft.text, ft.x, ft.y);
+            ctx.globalAlpha = 1.0;
+          }
+        });
+      }
+
+      function renderMirrorView() {
+        if (!mirrorCtx) return;
+        mirrorCtx.fillStyle = '#05050a';
+        mirrorCtx.fillRect(0, 0, mirrorCanvas.width, mirrorCanvas.height);
+        if (!isLookingBehind || snake.length === 0) return;
+        // Render a localized "rear camera" view looking directly behind the head
+        const head = snake[0];
+        const rearX = head.x - dir.x;
+        const rearY = head.y - dir.y;
+        const scale = mirrorCanvas.width / (GRID_SIZE * 0.4);
+        mirrorCtx.save();
+        mirrorCtx.translate(mirrorCanvas.width / 2, mirrorCanvas.height / 2);
+        // Draw items near the rear of the head
+        for (let dx = -4; dx <= 4; dx++) {
+          for (let dy = -4; dy <= 4; dy++) {
+            const gx = rearX + dx;
+            const gy = rearY + dy;
+            const screenX = dx * 16;
+            const screenY = dy * 16;
+            // Wall / Out of bounds check
+            if (gx < 0 || gx >= GRID_SIZE || gy < 0 || gy >= GRID_SIZE || obstacles.some(o => o.x === gx && o.y === gy)) {
+              mirrorCtx.fillStyle = '#ec4899';
+              mirrorCtx.fillRect(screenX, screenY, 14, 14);
+            } else if (food.x === gx && food.y === gy) {
+              mirrorCtx.fillStyle = '#00f3ff';
+              mirrorCtx.beginPath();
+              mirrorCtx.arc(screenX + 7, screenY + 7, 6, 0, Math.PI * 2);
+              mirrorCtx.fill();
+            } else if (snake.some(s => s.x === gx && s.y === gy)) {
+              mirrorCtx.fillStyle = '#a855f7';
+              mirrorCtx.fillRect(screenX + 2, screenY + 2, 12, 12);
+            }
+          }
+        }
+        mirrorCtx.restore();
+      }
+
+      function updateUI() {
+        document.getElementById('score-val').innerText = score;
+        document.getElementById('high-score-val').innerText = highScore;
+      }
+
+      function updateEnergyBar() {
+        const bar = document.getElementById('energy-bar');
+        const txt = document.getElementById('energy-text');
+        bar.style.width = `${Math.floor(energy)}%`;
+        txt.innerText = `${Math.floor(energy)}%`;
+      }
+
+      function setRearviewState(active) {
+        if (isGameOver || isPaused) return;
+        if (active && energy <= 5) return;
+        if (isLookingBehind !== active) {
+          isLookingBehind = active;
+          if (active) sound.playLookBehind();
+          updateRearviewUI();
+        }
+      }
+
+      function updateRearviewUI() {
+        const tag = document.getElementById('rear-status-tag');
+        const indicator = document.getElementById('rearview-indicator');
+        const blur = document.getElementById('mirror-blur');
+        if (isLookingBehind) {
+          tag.innerText = "ACTIVE (PHASE)";
+          tag.className = "text-[10px] font-mono px-2 py-0.5 rounded bg-pink-500/20 text-pink-300 border border-pink-500/40 font-bold";
+          indicator.classList.remove('opacity-0');
+          blur.classList.add('hidden');
+        } else {
+          tag.innerText = "NORMAL";
+          tag.className = "text-[10px] font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-400";
+          indicator.classList.add('opacity-0');
+          blur.classList.remove('hidden');
+        }
+      }
+
+      function bindInputs() {
+        window.addEventListener('keydown', (e) => {
+          sound.init();
+          if (e.code === 'Space') {
+            e.preventDefault();
+            setRearviewState(true);
+            return;
+          }
+          if (['ArrowUp', 'KeyW'].includes(e.code) && dir.y === 0) {
+            nextDir = {
+              x: 0,
+              y: -1
+            };
+          } else if (['ArrowDown', 'KeyS'].includes(e.code) && dir.y === 0) {
+            nextDir = {
+              x: 0,
+              y: 1
+            };
+          } else if (['ArrowLeft', 'KeyA'].includes(e.code) && dir.x === 0) {
+            nextDir = {
+              x: -1,
+              y: 0
+            };
+          } else if (['ArrowRight', 'KeyD'].includes(e.code) && dir.x === 0) {
+            nextDir = {
+              x: 1,
+              y: 0
+            };
+          }
+        });
+        window.addEventListener('keyup', (e) => {
+          if (e.code === 'Space') {
+            setRearviewState(false);
+          }
+        });
+        // Mobile Look Behind Hold Controls
+        const btnRear = document.getElementById('btn-mobile-rear');
+        const startRear = (e) => {
+          e.preventDefault();
+          sound.init();
+          setRearviewState(true);
+        };
+        const endRear = (e) => {
+          e.preventDefault();
+          setRearviewState(false);
+        };
+        btnRear.addEventListener('touchstart', startRear);
+        btnRear.addEventListener('touchend', endRear);
+        btnRear.addEventListener('mousedown', startRear);
+        btnRear.addEventListener('mouseup', endRear);
+        // D-Pad Touch Listeners
+        document.getElementById('pad-up').addEventListener('click', () => {
+          if (dir.y === 0) nextDir = {
+            x: 0,
+            y: -1
+          };
+        });
+        document.getElementById('pad-down').addEventListener('click', () => {
+          if (dir.y === 0) nextDir = {
+            x: 0,
+            y: 1
+          };
+        });
+        document.getElementById('pad-left').addEventListener('click', () => {
+          if (dir.x === 0) nextDir = {
+            x: -1,
+            y: 0
+          };
+        });
+        document.getElementById('pad-right').addEventListener('click', () => {
+          if (dir.x === 0) nextDir = {
+            x: 1,
+            y: 0
+          };
+        });
+        // UI Button Listeners
+        document.getElementById('btn-start').addEventListener('click', startGame);
+        document.getElementById('btn-sound').addEventListener('click', () => {
+          sound.muted = !sound.muted;
+          document.getElementById('sound-text').innerText = sound.muted ? 'AUDIO OFF' : 'AUDIO ON';
+          document.getElementById('sound-icon').className = sound.muted ? 'fa-solid fa-volume-xmark text-slate-500' : 'fa-solid fa-volume-high text-cyan-400';
+        });
+        const modalHelp = document.getElementById('modal-help');
+        document.getElementById('btn-help').addEventListener('click', () => modalHelp.classList.remove('hidden'));
+        document.getElementById('btn-close-modal').addEventListener('click', () => modalHelp.classList.add('hidden'));
+        document.getElementById('btn-modal-ok').addEventListener('click', () => modalHelp.classList.add('hidden'));
+      }
+
+      function startGame() {
+        sound.init();
+        document.getElementById('game-overlay').classList.add('hidden');
+        initGame();
+        isPaused = false;
+        if (gameLoopInterval) clearInterval(gameLoopInterval);
+        gameLoopInterval = setInterval(gameTick, BASE_SPEED);
+      }
+      window.onload = () => {
+        resizeCanvas();
+        bindInputs();
+        render();
+      };
+    </script>
+  </body>
+</html>
