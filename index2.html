@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3-Piece Infinite Tic Tac Toe</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .cell {
+            transition: all 0.3s ease;
+        }
+        .cell.fading {
+            opacity: 0.35;
+            animation: pulse-fade 1.5s infinite alternate;
+        }
+        @keyframes pulse-fade {
+            from { opacity: 0.45; transform: scale(0.98); }
+            to { opacity: 0.20; transform: scale(0.93); }
+        }
+        .cell.winner {
+            background-color: #10b981 !important;
+            color: #ffffff !important;
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.6);
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col items-center justify-center p-4 font-sans select-none">
+
+    <div class="w-full max-w-md bg-slate-800 p-6 rounded-2xl shadow-2xl border border-slate-700">
+        <!-- Header -->
+        <div class="text-center mb-6">
+            <h1 class="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-rose-400">
+                Tic Tac Toe
+            </h1>
+            <p class="text-xs text-slate-400 mt-1">3-Piece Limit • Oldest piece disappears on 4th move</p>
+        </div>
+
+        <!-- Scoreboard -->
+        <div class="flex justify-between items-center bg-slate-900/60 p-4 rounded-xl mb-6 border border-slate-700/50">
+            <div class="text-center">
+                <div class="text-sm font-semibold text-sky-400">Player X</div>
+                <div id="score-x" class="text-2xl font-bold text-slate-100">0</div>
+            </div>
+            <div class="text-slate-500 font-bold text-lg">VS</div>
+            <div class="text-center">
+                <div class="text-sm font-semibold text-rose-400">Player O</div>
+                <div id="score-o" class="text-2xl font-bold text-slate-100">0</div>
+            </div>
+        </div>
+
+        <!-- Status Message -->
+        <div id="status" class="text-center text-lg font-medium mb-4 text-slate-200 h-8 flex items-center justify-center">
+            Player <span class="text-sky-400 font-bold mx-1">X</span>'s Turn
+        </div>
+
+        <div class="grid grid-cols-3 gap-3 mb-6">
+            <button class="cell bg-slate-700 hover:bg-slate-600 h-24 rounded-xl text-4xl font-black flex items-center justify-center text-sky-400 transition cursor-pointer" data-index="0"></button>
+            <button class="cell bg-slate-700 hover:bg-slate-600 h-24 rounded-xl text-4xl font-black flex items-center justify-center text-sky-400 transition cursor-pointer" data-index="1"></button>
+            <button class="cell bg-slate-700 hover:bg-slate-600 h-24 rounded-xl text-4xl font-black flex items-center justify-center text-sky-400 transition cursor-pointer" data-index="2"></button>
+
+            <button class="cell bg-slate-700 hover:bg-slate-600 h-24 rounded-xl text-4xl font-black flex items-center justify-center text-sky-400 transition cursor-pointer" data-index="3"></button>
+            <button class="cell bg-slate-700 hover:bg-slate-600 h-24 rounded-xl text-4xl font-black flex items-center justify-center text-sky-400 transition cursor-pointer" data-index="4"></button>
+            <button class="cell bg-slate-700 hover:bg-slate-600 h-24 rounded-xl text-4xl font-black flex items-center justify-center text-sky-400 transition cursor-pointer" data-index="5"></button>
+
+            <button class="cell bg-slate-700 hover:bg-slate-600 h-24 rounded-xl text-4xl font-black flex items-center justify-center text-sky-400 transition cursor-pointer" data-index="6"></button>
+            <button class="cell bg-slate-700 hover:bg-slate-600 h-24 rounded-xl text-4xl font-black flex items-center justify-center text-sky-400 transition cursor-pointer" data-index="7"></button>
+            <button class="cell bg-slate-700 hover:bg-slate-600 h-24 rounded-xl text-4xl font-black flex items-center justify-center text-sky-400 transition cursor-pointer" data-index="8"></button>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex gap-3">
+            <button id="reset-btn" class="w-full bg-slate-700 hover:bg-slate-600 text-slate-200 font-semibold py-3 rounded-xl transition cursor-pointer">
+                Reset Board
+            </button>
+            <button id="clear-scores-btn" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-slate-200 border border-slate-700 font-semibold py-3 rounded-xl transition cursor-pointer">
+                Reset Scores
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Game State Variables
+        let board = ['', '', '', '', '', '', '', '', ''];
+        let movesX = []; // Stores cell indices of X moves (max 3)
+        let movesO = []; // Stores cell indices of O moves (max 3)
+        let currentPlayer = 'X';
+        let gameActive = true;
+        let scores = { X: 0, O: 0 };
+
+        const winningConditions = [
+            [0, 1, 2], [3, 4, 5], [6, 7, 8], // Rows
+            [0, 3, 6], [1, 4, 7], [2, 5, 8], // Columns
+            [0, 4, 8], [2, 4, 6]             // Diagonals
+        ];
+
+        // DOM Elements
+        const cells = document.querySelectorAll('.cell');
+        const statusText = document.getElementById('status');
+        const scoreXEl = document.getElementById('score-x');
+        const scoreOEl = document.getElementById('score-o');
+        const resetBtn = document.getElementById('reset-btn');
+        const clearScoresBtn = document.getElementById('clear-scores-btn');
+
+        cells.forEach(cell => cell.addEventListener('click', handleCellClick));
+        resetBtn.addEventListener('click', resetBoard);
+        clearScoresBtn.addEventListener('click', resetScores);
+
+        function handleCellClick(e) {
+            const clickedCell = e.target;
+            const index = parseInt(clickedCell.getAttribute('data-index'));
+
+            if (board[index] !== '' || !gameActive) return;
+
+            // Handle piece fading/removal when 4th move is played
+            if (currentPlayer === 'X') {
+                if (movesX.length === 3) {
+                    const oldestIndex = movesX.shift();
+                    board[oldestIndex] = '';
+                    const oldestCell = cells[oldestIndex];
+                    oldestCell.textContent = '';
+                    oldestCell.className = 'cell bg-slate-700 hover:bg-slate-600 h-24 rounded-xl text-4xl font-black flex items-center justify-center text-sky-400 transition cursor-pointer';
+                }
+                movesX.push(index);
+            } else {
+                if (movesO.length === 3) {
+                    const oldestIndex = movesO.shift();
+                    board[oldestIndex] = '';
+                    const oldestCell = cells[oldestIndex];
+                    oldestCell.textContent = '';
+                    oldestCell.className = 'cell bg-slate-700 hover:bg-slate-600 h-24 rounded-xl text-4xl font-black flex items-center justify-center text-rose-400 transition cursor-pointer';
+                }
+                movesO.push(index);
+            }
+
+            // Record new move
+            board[index] = currentPlayer;
+            clickedCell.textContent = currentPlayer;
+            const colorClass = currentPlayer === 'X' ? 'text-sky-400' : 'text-rose-400';
+            clickedCell.className = `cell bg-slate-700 hover:bg-slate-600 h-24 rounded-xl text-4xl font-black flex items-center justify-center ${colorClass} transition cursor-pointer`;
+
+            checkWin();
+        }
+
+        function updateFadingIndicators() {
+            // Remove fading from all cells
+            cells.forEach(cell => cell.classList.remove('fading'));
+
+            // Show fading ONLY for the active player whose turn it is
+            if (currentPlayer === 'X' && movesX.length === 3) {
+                cells[movesX[0]].classList.add('fading');
+            } else if (currentPlayer === 'O' && movesO.length === 3) {
+                cells[movesO[0]].classList.add('fading');
+            }
+        }
+
+        function checkWin() {
+            let roundWon = false;
+            let winningCells = [];
+
+            for (let i = 0; i < winningConditions.length; i++) {
+                const [a, b, c] = winningConditions[i];
+                if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+                    roundWon = true;
+                    winningCells = [a, b, c];
+                    break;
+                }
+            }
+
+            if (roundWon) {
+                gameActive = false;
+                cells.forEach(cell => cell.classList.remove('fading'));
+
+                winningCells.forEach(idx => {
+                    cells[idx].classList.add('winner');
+                });
+
+                scores[currentPlayer]++;
+                updateScoreboard();
+
+                const winnerColor = currentPlayer === 'X' ? 'text-sky-400' : 'text-rose-400';
+                statusText.innerHTML = `Player <span class="${winnerColor} font-bold mx-1">${currentPlayer}</span> Wins! 🎉`;
+                return;
+            }
+
+            // Switch Player Turn
+            currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+
+            const playerColor = currentPlayer === 'X' ? 'text-sky-400' : 'text-rose-400';
+            statusText.innerHTML = `Player <span class="${playerColor} font-bold mx-1">${currentPlayer}</span>'s Turn`;
+
+            // Update fading indicator for active player only
+            updateFadingIndicators();
+        }
+
+        function updateScoreboard() {
+            scoreXEl.textContent = scores.X;
+            scoreOEl.textContent = scores.O;
+        }
+
+        function resetBoard() {
+            board = ['', '', '', '', '', '', '', '', ''];
+            movesX = [];
+            movesO = [];
+            gameActive = true;
+            currentPlayer = 'X';
+
+            cells.forEach(cell => {
+                cell.textContent = '';
+                cell.className = 'cell bg-slate-700 hover:bg-slate-600 h-24 rounded-xl text-4xl font-black flex items-center justify-center text-sky-400 transition cursor-pointer';
+            });
+
+            statusText.innerHTML = `Player <span class="text-sky-400 font-bold mx-1">X</span>'s Turn`;
+        }
+
+        function resetScores() {
+            scores = { X: 0, O: 0 };
+            updateScoreboard();
+            resetBoard();
+        }
+    </script>
+</body>
+</html>
