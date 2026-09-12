@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student App Hub | Planner & Games</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .card-hover {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col antialiased selection:bg-indigo-500 selection:text-white">
+
+    <!-- Navigation Header -->
+    <header class="sticky top-0 z-50 glass-panel border-b border-slate-800/80 bg-slate-900/80">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3 cursor-pointer" onclick="switchView('hub')">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-500 to-sky-400 flex items-center justify-center text-white shadow-lg shadow-indigo-500/20">
+                    <i class="ph-bold ph-squares-four text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg leading-none bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">
+                        Student Hub
+                    </h1>
+                    <span class="text-xs text-slate-400">ManageBac & Entertainment</span>
+                </div>
+            </div>
+
+            <!-- Navigation Bar Buttons -->
+            <nav class="flex items-center gap-2">
+                <button onclick="switchView('hub')" id="nav-hub" class="nav-btn px-3.5 py-1.5 rounded-lg text-sm font-semibold transition bg-slate-800 text-white border border-slate-700/60 flex items-center gap-2">
+                    <i class="ph-bold ph-house"></i>
+                    <span class="hidden sm:inline">Hub</span>
+                </button>
+                <button onclick="launchApp('planner')" id="nav-planner" class="nav-btn px-3.5 py-1.5 rounded-lg text-sm font-medium transition text-slate-300 hover:text-white hover:bg-slate-800 flex items-center gap-2">
+                    <i class="ph-bold ph-calendar-check text-indigo-400"></i>
+                    <span class="hidden sm:inline">Planner</span>
+                </button>
+                <button onclick="launchApp('game')" id="nav-game" class="nav-btn px-3.5 py-1.5 rounded-lg text-sm font-medium transition text-slate-300 hover:text-white hover:bg-slate-800 flex items-center gap-2">
+                    <i class="ph-bold ph-game-controller text-sky-400"></i>
+                    <span class="hidden sm:inline">Tic Tac Toe</span>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 flex flex-col">
+        
+        <!-- HUB DASHBOARD VIEW -->
+        <div id="view-hub" class="space-y-8 animate-fadeIn">
+            <!-- Hero Banner -->
+            <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-indigo-900/60 via-slate-900 to-sky-950/60 p-6 sm:p-10 border border-slate-800 shadow-2xl">
+                <div class="absolute -top-24 -right-24 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+                <div class="absolute -bottom-24 -left-24 w-96 h-96 bg-sky-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+                <div class="relative z-10 max-w-2xl">
+                    <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-xs font-medium mb-4">
+                        <span class="w-2 h-2 rounded-full bg-indigo-400 animate-pulse"></span>
+                        Quick Access Dashboard
+                    </span>
+                    <h2 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight mb-3">
+                        Stay Organized. Take Breaks.
+                    </h2>
+                    <p class="text-slate-300 text-sm sm:text-base leading-relaxed mb-6">
+                        Access your ManageBac assignments, track IB coursework deadlines, or jump into a strategic game of 3-Piece Tic Tac Toe.
+                    </p>
+                    <div class="flex flex-wrap gap-3">
+                        <button onclick="launchApp('planner')" class="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm transition shadow-lg shadow-indigo-600/30 flex items-center gap-2">
+                            <i class="ph-bold ph-calendar-blank text-lg"></i>
+                            Open ManageBac Planner
+                        </button>
+                        <button onclick="launchApp('game')" class="px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-semibold text-sm transition flex items-center gap-2">
+                            <i class="ph-bold ph-game-controller text-lg text-sky-400"></i>
+                            Play Tic Tac Toe
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Apps Launcher Grid -->
+            <div>
+                <h3 class="text-xl font-bold text-slate-200 mb-4 flex items-center gap-2">
+                    <i class="ph-bold ph-grid-four text-indigo-400"></i> Your Applications
+                </h3>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    
+                    <!-- App Card 1: ManageBac Planner -->
+                    <div class="glass-panel card-hover rounded-2xl p-6 flex flex-col justify-between border border-slate-800 hover:border-indigo-500/40 relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition text-indigo-400">
+                            <i class="ph-bold ph-calendar-check text-8xl"></i>
+                        </div>
+
+                        <div>
+                            <div class="w-12 h-12 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center text-2xl mb-4">
+                                <i class="ph-bold ph-list-checks"></i>
+                            </div>
+                            <div class="flex items-center gap-2 mb-2">
+                                <h4 class="text-xl font-bold text-white">ManageBac Planner</h4>
+                                <span class="text-xs font-semibold px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">index1.html</span>
+                            </div>
+                            <p class="text-slate-400 text-sm mb-6 leading-relaxed">
+                                Sync your school ManageBac iCal calendar feed, track upcoming deadlines, tick off completed assignments, and organize subtasks.
+                            </p>
+
+                            <ul class="text-xs text-slate-300 space-y-2 mb-6">
+                                <li class="flex items-center gap-2">
+                                    <i class="ph-bold ph-check-circle text-indigo-400"></i> iCal Calendar Integration
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <i class="ph-bold ph-check-circle text-indigo-400"></i> Interactive Task Completion Checkbox
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <i class="ph-bold ph-check-circle text-indigo-400"></i> Automatic Local Storage Saving
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="flex items-center gap-3 pt-4 border-t border-slate-800/80">
+                            <button onclick="launchApp('planner')" class="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white font-medium py-2.5 px-4 rounded-xl text-sm transition flex items-center justify-center gap-2 shadow-md shadow-indigo-600/20">
+                                <i class="ph-bold ph-play"></i> Launch inside Hub
+                            </button>
+                            <a href="index1.html" class="p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 transition" title="Open index1.html directly in full window" target="_blank">
+                                <i class="ph-bold ph-arrow-square-out text-lg"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- App Card 2: Tic Tac Toe -->
+                    <div class="glass-panel card-hover rounded-2xl p-6 flex flex-col justify-between border border-slate-800 hover:border-sky-500/40 relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition text-sky-400">
+                            <i class="ph-bold ph-game-controller text-8xl"></i>
+                        </div>
+
+                        <div>
+                            <div class="w-12 h-12 rounded-xl bg-sky-500/10 border border-sky-500/20 text-sky-400 flex items-center justify-center text-2xl mb-4">
+                                <i class="ph-bold ph-hash"></i>
+                            </div>
+                            <div class="flex items-center gap-2 mb-2">
+                                <h4 class="text-xl font-bold text-white">3-Piece Infinite Tic Tac Toe</h4>
+                                <span class="text-xs font-semibold px-2 py-0.5 rounded bg-sky-500/20 text-sky-300 border border-sky-500/30">index2.html</span>
+                            </div>
+                            <p class="text-slate-400 text-sm mb-6 leading-relaxed">
+                                A strategic variant of Tic Tac Toe where each player can only have 3 active pieces on the board. 4th move replaces the oldest piece!
+                            </p>
+
+                            <ul class="text-xs text-slate-300 space-y-2 mb-6">
+                                <li class="flex items-center gap-2">
+                                    <i class="ph-bold ph-check-circle text-sky-400"></i> 3-Piece Piece Limit System
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <i class="ph-bold ph-check-circle text-sky-400"></i> Active Player Fading Indicator
+                                </li>
+                                <li class="flex items-center gap-2">
+                                    <i class="ph-bold ph-check-circle text-sky-400"></i> Scoreboard & Win Tracking
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="flex items-center gap-3 pt-4 border-t border-slate-800/80">
+                            <button onclick="launchApp('game')" class="flex-1 bg-sky-600 hover:bg-sky-500 text-white font-medium py-2.5 px-4 rounded-xl text-sm transition flex items-center justify-center gap-2 shadow-md shadow-sky-600/20">
+                                <i class="ph-bold ph-play"></i> Launch inside Hub
+                            </button>
+                            <a href="index2.html" class="p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 transition" title="Open index2.html directly in full window" target="_blank">
+                                <i class="ph-bold ph-arrow-square-out text-lg"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- EMBEDDED APP VIEWER (IFRAME FRAMEWORK) -->
+        <div id="view-app" class="hidden flex-1 flex flex-col bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden shadow-2xl h-[calc(100vh-8rem)]">
+            
+            <!-- App Frame Header -->
+            <div class="bg-slate-950 px-4 py-3 border-b border-slate-800 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <button onclick="switchView('hub')" class="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition flex items-center gap-1.5 text-xs font-semibold">
+                        <i class="ph-bold ph-arrow-left"></i> Hub
+                    </button>
+                    <span id="app-title" class="text-sm font-bold text-white flex items-center gap-2">
+                        <!-- Dynamic Title -->
+                    </span>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <button onclick="reloadAppFrame()" class="p-2 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-400 hover:text-slate-100 transition" title="Reload App">
+                        <i class="ph-bold ph-arrows-clockwise"></i>
+                    </button>
+                    <a id="app-external-link" href="#" target="_blank" class="p-2 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-400 hover:text-slate-100 transition" title="Open in new window">
+                        <i class="ph-bold ph-arrows-out-simple"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Frame Container -->
+            <div class="flex-1 relative w-full h-full bg-slate-950">
+                <iframe id="app-iframe" src="" class="w-full h-full border-0" title="Application Viewer"></iframe>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        // DOM Elements
+        const viewHub = document.getElementById('view-hub');
+        const viewApp = document.getElementById('view-app');
+        const appIframe = document.getElementById('app-iframe');
+        const appTitle = document.getElementById('app-title');
+        const appExternalLink = document.getElementById('app-external-link');
+
+        const navHub = document.getElementById('nav-hub');
+        const navPlanner = document.getElementById('nav-planner');
+        const navGame = document.getElementById('nav-game');
+
+        // Apps Configurations
+        const apps = {
+            planner: {
+                title: 'ManageBac Connected Planner',
+                url: 'index1.html',
+                icon: '<i class="ph-bold ph-calendar-check text-indigo-400"></i>'
+            },
+            game: {
+                title: '3-Piece Infinite Tic Tac Toe',
+                url: 'index2.html',
+                icon: '<i class="ph-bold ph-game-controller text-sky-400"></i>'
+            }
+        };
+
+        let currentActiveApp = null;
+
+        function switchView(target) {
+            if (target === 'hub') {
+                viewHub.classList.remove('hidden');
+                viewApp.classList.add('hidden');
+                appIframe.src = ''; // Unload iframe to save memory
+                currentActiveApp = null;
+                updateNavStyles('hub');
+            }
+        }
+
+        function launchApp(appKey) {
+            const app = apps[appKey];
+            if (!app) return;
+
+            currentActiveApp = appKey;
+            appTitle.innerHTML = `${app.icon} <span>${app.title}</span>`;
+            appExternalLink.href = app.url;
+            appIframe.src = app.url;
+
+            viewHub.classList.add('hidden');
+            viewApp.classList.remove('hidden');
+
+            updateNavStyles(appKey);
+        }
+
+        function reloadAppFrame() {
+            if (appIframe.src) {
+                appIframe.contentWindow.location.reload();
+            }
+        }
+
+        function updateNavStyles(active) {
+            const allNavs = [
+                { id: 'hub', el: navHub },
+                { id: 'planner', el: navPlanner },
+                { id: 'game', el: navGame }
+            ];
+
+            allNavs.forEach(item => {
+                if (item.id === active) {
+                    item.el.className = "nav-btn px-3.5 py-1.5 rounded-lg text-sm font-semibold transition bg-slate-800 text-white border border-slate-700/60 flex items-center gap-2";
+                } else {
+                    item.el.className = "nav-btn px-3.5 py-1.5 rounded-lg text-sm font-medium transition text-slate-300 hover:text-white hover:bg-slate-800 flex items-center gap-2";
+                }
+            });
+        }
+    </script>
+</body>
+</html>
