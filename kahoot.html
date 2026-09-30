@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vocabulary Kahoot</title>
+<style>
+  :root {
+    --red: #e21b3c; --blue: #1368ce; --yellow: #d89e00; --green: #26890c;
+    --bg: #46178f; --card: #ffffff; --ink: #333333;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    min-height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    padding: 1.5rem;
+    overflow-x: hidden;
+  }
+  .wrap { width: 100%; max-width: 560px; }
+
+  .start { background: var(--card); border-radius: 10px; padding: 2rem; text-align: center; animation: pop .4s ease; }
+  .start h1 { font-size: 1.7rem; color: var(--ink); margin-bottom: .5rem; }
+  .start p { color: #666; margin-bottom: 1.5rem; }
+  .start button {
+    background: var(--ink); color: #fff; border: none; padding: .9rem 2.5rem;
+    font-size: 1.1rem; font-weight: 700; border-radius: 8px; cursor: pointer;
+  }
+  .start button:hover { filter: brightness(1.15); }
+
+  .quiz { display: none; }
+  .qnum {
+    display: inline-block; background: rgba(0,0,0,.2); color: #fff;
+    padding: .3rem .8rem; border-radius: 20px; font-weight: 700; font-size: .85rem; margin-bottom: .75rem;
+  }
+  .timerbar { height: 8px; background: rgba(0,0,0,.25); border-radius: 4px; overflow: hidden; margin-bottom: 1.25rem; }
+  .timerbar .fill { height: 100%; background: #fff; width: 100%; will-change: width; }
+
+  .question {
+    background: var(--card); border-radius: 10px; padding: 2rem 1.5rem;
+    text-align: center; font-size: 1.6rem; font-weight: 700; color: var(--ink);
+    margin-bottom: 1.25rem; box-shadow: 0 4px 0 rgba(0,0,0,.15);
+    animation: slideDown .35s ease;
+  }
+  .think {
+    text-align: center; color: #fff; font-weight: 800; font-size: 1rem;
+    margin: 1rem 0; min-height: 3rem; letter-spacing: .5px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .think.big { animation: countPop .9s ease; font-size: 2.4rem; }
+
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; }
+  .opt {
+    border: none; border-radius: 8px; padding: 1rem .75rem; min-height: 88px;
+    font-size: 1.05rem; font-weight: 700; color: #fff; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; text-align: center;
+    box-shadow: 0 4px 0 rgba(0,0,0,.2);
+    opacity: 0; transform: translateY(18px);
+    will-change: transform, opacity;
+  }
+  .opt.show { animation: popIn .3s ease forwards; }
+  .opt.press { transform: translateY(2px); box-shadow: 0 2px 0 rgba(0,0,0,.2); }
+  .opt .shape { margin-right: .6rem; font-size: 1.3rem; width: 1.6rem; display: inline-block; text-align: center; }
+  .opt.red { background: var(--red); }
+  .opt.blue { background: var(--blue); }
+  .opt.yellow { background: var(--yellow); }
+  .opt.green { background: var(--green); }
+  .opt.disabled { cursor: default; pointer-events: none; }
+  .opt.dim { opacity: .4 !important; }
+  .opt.correct { opacity: 1 !important; animation: correctPulse .5s ease; }
+
+  .status { text-align: center; margin-top: 1.25rem; min-height: 3.5rem; }
+  .msg { display: inline-block; padding: .6rem 1.4rem; border-radius: 8px; font-weight: 800; font-size: 1.1rem; color: #fff; }
+  .msg.good { background: var(--green); animation: pop .3s ease; }
+  .msg.bad { background: var(--red); animation: shake .4s ease; }
+  .scoreline { color: #fff; font-weight: 700; margin-top: .75rem; font-size: 1rem; }
+  .scoreline.bump { animation: pop .3s ease; display: inline-block; }
+  .nextbtn {
+    display: block; margin: .75rem auto 0; background: var(--ink); color: #fff;
+    border: none; padding: .8rem 2.5rem; font-size: 1rem; font-weight: 700; border-radius: 8px; cursor: pointer;
+    animation: pop .3s ease;
+  }
+  .nextbtn:hover { filter: brightness(1.15); }
+
+  .results { display: none; background: var(--card); border-radius: 10px; padding: 2rem; text-align: center; animation: pop .4s ease; }
+  .results h2 { font-size: 1.8rem; color: var(--ink); margin-bottom: .75rem; }
+  .scoreBig { font-size: 4rem; font-weight: 800; color: var(--blue); }
+  .results .sub { color: #666; margin-bottom: 1.5rem; }
+  .results button { background: var(--ink); color: #fff; border: none; padding: .9rem 2.5rem; font-size: 1.1rem; font-weight: 700; border-radius: 8px; cursor: pointer; }
+  .results button:hover { filter: brightness(1.15); }
+
+  .hidden { display: none !important; }
+
+  @keyframes slideDown { from { opacity: 0; transform: translateY(-16px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes popIn { from { opacity: 0; transform: translateY(18px) scale(.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
+  @keyframes pop { from { opacity: 0; transform: scale(.85); } to { opacity: 1; transform: scale(1); } }
+  @keyframes shake { 0%,100% { transform: translateX(0); } 20% { transform: translateX(-6px); } 40% { transform: translateX(6px); } 60% { transform: translateX(-4px); } 80% { transform: translateX(4px); } }
+  @keyframes correctPulse { 0% { transform: scale(1); } 50% { transform: scale(1.06); } 100% { transform: scale(1); } }
+  @keyframes floatUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes countPop { 0% { opacity: 0; transform: scale(1.6); } 30% { opacity: 1; transform: scale(1); } 100% { transform: scale(.9); } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="start" id="start">
+    <h1>Vocabulary Kahoot</h1>
+    <p>See the word, pick the correct explanation!</p>
+    <button onclick="startGame()">Play</button>
+  </div>
+
+  <div class="quiz" id="quiz">
+    <span class="qnum" id="qnum"></span>
+    <div class="timerbar"><div class="fill" id="fill"></div></div>
+    <div class="question" id="question"></div>
+    <div class="think" id="think"></div>
+    <div class="grid" id="grid"></div>
+    <div class="status">
+      <span class="msg hidden" id="msg"></span>
+      <div class="scoreline" id="scoreline"></div>
+      <button class="nextbtn hidden" id="nextbtn" onclick="nextQ()">Next</button>
+    </div>
+  </div>
+
+  <div class="results" id="results">
+    <h2>Game Over!</h2>
+    <div class="scoreBig" id="finalScore"></div>
+    <div class="sub" id="finalSub"></div>
+    <button onclick="restart()">Play Again</button>
+  </div>
+
+</div>
+
+<script>
+const QUESTIONS = [
+  { word: "Topic sentence", answer: 0, options: [
+    "The sentence that states the main idea of a paragraph",
+    "A sentence that introduces a new character",
+    "The last sentence of an essay",
+    "A sentence with no punctuation"] },
+  { word: "Chronologically", answer: 1, options: [
+    "In order of importance",
+    "In order of time",
+    "In alphabetical order",
+    "In random order"] },
+  { word: "Flashback", answer: 1, options: [
+    "A sudden bright light in a story",
+    "A scene set in a time earlier than the main story",
+    "A scene set in the future",
+    "A camera effect used in films"] },
+  { word: "Infer", answer: 2, options: [
+    "To state something directly",
+    "To copy someone's words",
+    "To figure out meaning that is not directly stated",
+    "To summarize a text"] },
+  { word: "Synonyms", answer: 3, options: [
+    "Words with opposite meanings",
+    "Words that sound the same",
+    "Words that rhyme",
+    "Words with similar meanings"] },
+  { word: "Connotation", answer: 1, options: [
+    "The dictionary definition of a word",
+    "The emotional or implied meaning of a word",
+    "The number of syllables in a word",
+    "The spelling of a word"] },
+  { word: "Quotations", answer: 0, options: [
+    "Exact words taken from a text",
+    "A summary of a text",
+    "A made-up dialogue",
+    "The title of a book"] },
+  { word: "Quotation marks", answer: 1, options: [
+    "Marks used to show a pause",
+    "Punctuation used around exact spoken or written words",
+    "Marks that show a new paragraph",
+    "Punctuation used at the end of a question"] },
+  { word: "Direct speech", answer: 2, options: [
+    "Reporting what someone said in your own words",
+    "Talking to yourself",
+    "The exact words someone said, shown with quotation marks",
+    "A conversation between two characters"] },
+  { word: "Protagonist", answer: 3, options: [
+    "The villain of a story",
+    "The narrator of a story",
+    "A minor character in a story",
+    "The main character of a story"] },
+  { word: "Intention", answer: 1, options: [
+    "The length of a text",
+    "What the author aims to achieve with a text",
+    "The genre of a text",
+    "The audience of a text"] },
+  { word: "Rhetorical device", answer: 0, options: [
+    "A technique used to persuade or create effect in language",
+    "A type of punctuation",
+    "A spelling mistake",
+    "A part of speech"] },
+  { word: "Bias", answer: 0, options: [
+    "An unfair preference or prejudice for or against something",
+    "A factual statement with evidence",
+    "A balanced, neutral opinion",
+    "A list of sources"] },
+  { word: "Emotive language", answer: 0, options: [
+    "Words chosen to stir up strong feelings or emotions",
+    "Words used in formal reports",
+    "Technical or scientific terms",
+    "Words that state plain facts"] }
+];
+
+// Reverse questions: see a definition, pick the correct word.
+function buildReverseQuestions() {
+  const words = QUESTIONS.map(q => q.word);
+  const rev = [];
+  QUESTIONS.forEach(q => {
+    const others = words.filter(w => w !== q.word);
+    const distractors = shuffle(others).slice(0, 3);
+    const options = shuffle([q.word, ...distractors]);
+    rev.push({
+      word: q.options[q.answer],
+      options: options,
+      answer: options.indexOf(q.word)
+    });
+  });
+  return rev;
+}
+
+const COLORS = ['red', 'blue', 'yellow', 'green'];
+const SHAPES = ['▲', '◆', '●', '■'];
+
+const THINK_MS = 2000;   // time to read the word before answers appear
+const ANSWER_MS = 15000; // time to answer
+
+let idx = 0, score = 0, streak = 0;
+let order = [];
+let phase = 'think';   // 'think' | 'answer' | 'done'
+let rafId = null;
+let thinkTimer = null;
+let phaseStart = 0;
+let answered = false;
+
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function startGame() {
+  idx = 0; score = 0; streak = 0;
+  order = shuffle(buildReverseQuestions());
+  document.getElementById('start').style.display = 'none';
+  document.getElementById('results').style.display = 'none';
+  document.getElementById('quiz').style.display = 'block';
+  showQuestion();
+}
+
+function showQuestion() {
+  const q = order[idx];
+  phase = 'think'; answered = false;
+  document.getElementById('qnum').textContent = `Question ${idx + 1} of ${order.length}`;
+  document.getElementById('question').textContent = q.word;
+  document.getElementById('msg').classList.add('hidden');
+  document.getElementById('nextbtn').classList.add('hidden');
+  document.getElementById('scoreline').classList.remove('bump');
+  document.getElementById('scoreline').textContent = `Score: ${score}`;
+  document.getElementById('think').textContent = '';
+
+  const grid = document.getElementById('grid');
+  grid.innerHTML = '';
+  const optIdx = shuffle([0,1,2,3]);
+  optIdx.forEach((oi, pos) => {
+    const b = document.createElement('button');
+    b.className = `opt ${COLORS[pos]}`;
+    b.innerHTML = `<span class="shape">${SHAPES[pos]}</span><span>${q.options[oi]}</span>`;
+    b.dataset.oi = oi;
+    b.onclick = () => choose(b, oi);
+    grid.appendChild(b);
+  });
+
+  stopTimer();
+  document.getElementById('fill').style.width = '100%';
+  // countdown for the "think" phase
+  const thinkEl = document.getElementById('think');
+  let count = Math.round(THINK_MS / 1000);
+  const tick = () => {
+    thinkEl.textContent = count > 0 ? count : 'Go!';
+    thinkEl.classList.remove('big');
+    void thinkEl.offsetWidth; // restart animation
+    thinkEl.classList.add('big');
+    count--;
+    if (count >= 0) thinkTimer = setTimeout(tick, 1000);
+  };
+  tick();
+  phaseStart = Date.now();
+  setTimeout(revealAnswers, THINK_MS);
+}
+
+function revealAnswers() {
+  if (answered || phase !== 'think') return;
+  phase = 'answer';
+  const buttons = document.querySelectorAll('.opt');
+  buttons.forEach((b, i) => {
+    b.style.animationDelay = (i * 0.06) + 's';
+    b.classList.add('show');
+  });
+  document.getElementById('think').textContent = '';
+  phaseStart = Date.now();
+  startTimer();
+}
+
+function stopTimer() {
+  if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+}
+
+function startTimer() {
+  const fill = document.getElementById('fill');
+  const total = ANSWER_MS;
+  const start = performance.now();
+  function step(now) {
+    const elapsed = now - start;
+    const frac = Math.max(0, 1 - elapsed / total);
+    fill.style.width = (frac * 100) + '%';
+    if (elapsed < total && !answered) {
+      rafId = requestAnimationFrame(step);
+    } else if (!answered) {
+      timeUp();
+    }
+  }
+  rafId = requestAnimationFrame(step);
+}
+
+function remainingMs() {
+  const elapsed = Date.now() - phaseStart;
+  return Math.max(0, ANSWER_MS - elapsed);
+}
+
+function timeUp() {
+  answered = true;
+  stopTimer();
+  const q = order[idx];
+  const buttons = document.querySelectorAll('.opt');
+  buttons.forEach(b => {
+    b.classList.add('disabled');
+    if (+b.dataset.oi === q.answer) b.classList.add('correct');
+    else b.classList.add('dim');
+  });
+  reveal('bad', "Time's up!", q);
+}
+
+function choose(btn, oi) {
+  if (answered || phase !== 'answer') return;
+  answered = true;
+  stopTimer();
+  const q = order[idx];
+  btn.classList.add('press');
+  const buttons = document.querySelectorAll('.opt');
+  buttons.forEach(b => {
+    b.classList.add('disabled');
+    if (+b.dataset.oi === q.answer) b.classList.add('correct');
+    else if (b !== btn) b.classList.add('dim');
+  });
+
+  const correct = oi === q.answer;
+  if (correct) {
+    streak++;
+    const timeFrac = remainingMs() / ANSWER_MS;
+    const pts = Math.round((500 + 500 * timeFrac) / 50) * 50; // 500..1000 by speed
+    score += pts;
+    reveal('good', `Correct! +${pts}`, q);
+  } else {
+    streak = 0;
+    reveal('bad', 'Wrong!', q);
+  }
+}
+
+function reveal(kind, text, q) {
+  const msg = document.getElementById('msg');
+  msg.className = `msg ${kind}`;
+  msg.textContent = text;
+  msg.classList.remove('hidden');
+  const sl = document.getElementById('scoreline');
+  sl.textContent = `Score: ${score}`;
+  sl.classList.add('bump');
+  const nb = document.getElementById('nextbtn');
+  nb.textContent = idx === order.length - 1 ? 'See Results' : 'Next';
+  nb.classList.remove('hidden');
+}
+
+function nextQ() {
+  idx++;
+  if (idx >= order.length) { endGame(); return; }
+  showQuestion();
+}
+
+function endGame() {
+  document.getElementById('quiz').style.display = 'none';
+  document.getElementById('results').style.display = 'block';
+  document.getElementById('finalScore').textContent = score;
+  document.getElementById('finalSub').textContent = `${order.length} questions answered`;
+}
+
+function restart() {
+  startGame();
+}
+</script>
+</body>
+</html>
