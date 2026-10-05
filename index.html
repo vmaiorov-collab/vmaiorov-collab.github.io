@@ -17,6 +17,7 @@
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body { height: 100%; }
+  html { touch-action: manipulation; }
   body {
     font-family: 'Montserrat', "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     background: var(--bg);
@@ -24,6 +25,11 @@
     display: flex; flex-direction: column; align-items: center;
     padding: 1rem;
     overflow-x: hidden;
+  }
+  button {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-user-select: none; user-select: none;
   }
 
   :focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
@@ -453,8 +459,7 @@ function showQuestion() {
   const tick = () => {
     thinkEl.textContent = count > 0 ? count : 'Go!';
     thinkEl.classList.remove('big');
-    void thinkEl.offsetWidth; // restart animation
-    thinkEl.classList.add('big');
+    requestAnimationFrame(() => thinkEl.classList.add('big')); // restart animation, no forced reflow
     count--;
     if (count >= 0) thinkTimer = setTimeout(tick, 1000);
   };
@@ -488,12 +493,15 @@ function startTimer() {
   fg.style.strokeDasharray = `${c} ${c}`;
   const total = ANSWER_MS;
   const start = performance.now();
+  let lastSec = -1, lastZone = '';
   function step(now) {
     const elapsed = now - start;
     const frac = Math.max(0, 1 - elapsed / total);
     fg.style.strokeDashoffset = c - c * frac;
-    fg.style.stroke = frac <= .25 ? 'var(--red)' : frac <= .5 ? 'var(--yellow)' : 'var(--green)';
-    numEl.textContent = Math.ceil(frac * total / 1000);
+    const zone = frac <= .25 ? 'var(--red)' : frac <= .5 ? 'var(--yellow)' : 'var(--green)';
+    if (zone !== lastZone) { fg.style.stroke = zone; lastZone = zone; }
+    const sec = Math.ceil(frac * total / 1000);
+    if (sec !== lastSec) { numEl.textContent = sec; lastSec = sec; }
     if (elapsed < total && !answered) {
       rafId = requestAnimationFrame(step);
     } else if (!answered) {
