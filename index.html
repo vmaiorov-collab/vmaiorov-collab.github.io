@@ -3,92 +3,233 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="A fast-paced vocabulary quiz with a live leaderboard.">
+<meta name="theme-color" content="#1b1140">
 <title>Vocabulary Kahoot</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%237b2ff7'/%3E%3Ctext x='32' y='42' font-size='32' text-anchor='middle'%3E%F0%9F%A7%A0%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
   :root {
-    --red: #e21b3c; --blue: #1368ce; --yellow: #d89e00; --green: #26890c;
-    --bg: #46178f; --card: #ffffff; --ink: #333333;
+    --red: #ff4d6d; --blue: #2d7bff; --yellow: #ffb300; --green: #2ec971;
+    --ink: #1f2235; --sub: #6b7280; --card: #ffffff;
+    --accent1: #7b2ff7; --accent2: #f107a3; --accent3: #11cbd7;
+    --radius-lg: 24px; --radius-md: 16px;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { min-height: 100vh; }
   body {
-    font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    background: var(--bg);
+    font-family: 'Poppins', "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: radial-gradient(circle at 15% 20%, #3a1a8f 0%, transparent 45%),
+                radial-gradient(circle at 85% 80%, #7b0f8f 0%, transparent 45%),
+                linear-gradient(135deg, #2d0f6b 0%, #46178f 45%, #1b1140 100%);
+    background-size: 200% 200%, 200% 200%, 200% 200%;
+    animation: bgShift 18s ease infinite;
     min-height: 100vh;
     display: flex; align-items: center; justify-content: center;
     padding: 1.5rem;
     overflow-x: hidden;
+    position: relative;
   }
-  .wrap { width: 100%; max-width: 560px; }
+  body::before, body::after {
+    content: ''; position: fixed; border-radius: 50%; filter: blur(70px);
+    opacity: .3; z-index: 0; pointer-events: none;
+  }
+  body::before {
+    width: 420px; height: 420px; background: var(--accent3);
+    top: -120px; left: -120px; animation: float1 11s ease-in-out infinite;
+  }
+  body::after {
+    width: 480px; height: 480px; background: var(--accent2);
+    bottom: -160px; right: -140px; animation: float2 13s ease-in-out infinite;
+  }
+  @keyframes bgShift { 0%,100% { background-position: 0% 50%, 100% 50%, 0% 50%; } 50% { background-position: 30% 70%, 70% 30%, 100% 50%; } }
+  @keyframes float1 { 0%,100% { transform: translate(0,0); } 50% { transform: translate(40px,30px); } }
+  @keyframes float2 { 0%,100% { transform: translate(0,0); } 50% { transform: translate(-30px,-40px); } }
 
-  .start { background: var(--card); border-radius: 10px; padding: 2rem; text-align: center; animation: pop .4s ease; }
-  .start h1 { font-size: 1.7rem; color: var(--ink); margin-bottom: .5rem; }
-  .start p { color: #666; margin-bottom: 1.5rem; }
-  .start button {
-    background: var(--ink); color: #fff; border: none; padding: .9rem 2.5rem;
-    font-size: 1.1rem; font-weight: 700; border-radius: 8px; cursor: pointer;
+  :focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
+
+  .wrap { width: 100%; max-width: 560px; position: relative; z-index: 1; }
+
+  .brand {
+    text-align: center; color: rgba(255,255,255,.75); font-weight: 700;
+    letter-spacing: .5px; font-size: .85rem; margin-bottom: .9rem;
+    display: flex; align-items: center; justify-content: center; gap: .4rem;
   }
-  .start button:hover { filter: brightness(1.15); }
+
+  .card {
+    background: var(--card); border-radius: var(--radius-lg);
+    box-shadow: 0 30px 70px -20px rgba(0,0,0,.5), 0 1px 0 rgba(255,255,255,.6) inset;
+    border: 1px solid rgba(255,255,255,.5);
+  }
+
+  .start { padding: 2.75rem 2rem; text-align: center; animation: pop .5s cubic-bezier(.2,1.4,.4,1); }
+  .start .badge {
+    display: inline-block; font-size: 2.6rem; margin-bottom: .5rem;
+    animation: wiggle 2.4s ease-in-out infinite;
+  }
+  .start h1 {
+    font-size: 1.9rem; font-weight: 800; margin-bottom: .4rem;
+    background: linear-gradient(90deg, var(--accent1), var(--accent2));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .start p { color: var(--sub); margin-bottom: 1.5rem; font-size: 1.02rem; }
+
+  .namefield { margin-bottom: 1.5rem; text-align: left; }
+  .namefield label {
+    display: block; font-size: .8rem; font-weight: 700; color: var(--sub);
+    margin-bottom: .4rem; text-transform: uppercase; letter-spacing: .5px;
+  }
+  .namefield input {
+    width: 100%; padding: .85rem 1rem; border-radius: 12px; border: 2px solid #eee;
+    font-size: 1.05rem; font-family: inherit; font-weight: 600; color: var(--ink);
+    transition: border-color .15s ease;
+  }
+  .namefield input:focus { outline: none; border-color: var(--accent1); }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent1), var(--accent2));
+    color: #fff; border: none; padding: 1rem 2.75rem;
+    font-size: 1.1rem; font-weight: 700; border-radius: 50px; cursor: pointer;
+    box-shadow: 0 10px 25px -6px rgba(123,47,247,.6);
+    transition: transform .15s ease, box-shadow .15s ease;
+    font-family: inherit; position: relative; overflow: hidden;
+  }
+  .btn-primary:hover { transform: translateY(-3px) scale(1.03); box-shadow: 0 14px 30px -6px rgba(123,47,247,.7); }
+  .btn-primary:active { transform: translateY(0) scale(.98); }
 
   .quiz { display: none; }
+
+  .topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: .85rem; gap: .5rem; }
   .qnum {
-    display: inline-block; background: rgba(0,0,0,.2); color: #fff;
-    padding: .3rem .8rem; border-radius: 20px; font-weight: 700; font-size: .85rem; margin-bottom: .75rem;
+    display: inline-flex; align-items: center; background: rgba(255,255,255,.18);
+    backdrop-filter: blur(6px); color: #fff;
+    padding: .4rem 1rem; border-radius: 20px; font-weight: 700; font-size: .85rem;
+    border: 1px solid rgba(255,255,255,.25);
   }
-  .timerbar { height: 8px; background: rgba(0,0,0,.25); border-radius: 4px; overflow: hidden; margin-bottom: 1.25rem; }
-  .timerbar .fill { height: 100%; background: #fff; width: 100%; will-change: width; }
+  .streak {
+    display: inline-flex; align-items: center; gap: .3rem; background: rgba(255,179,0,.18);
+    color: #ffd873; padding: .4rem .85rem; border-radius: 20px; font-weight: 800; font-size: .85rem;
+    border: 1px solid rgba(255,179,0,.35); opacity: 0; transform: scale(.7); transition: all .25s ease;
+  }
+  .streak.show { opacity: 1; transform: scale(1); }
+
+  .dots { display: flex; justify-content: center; gap: .3rem; margin-bottom: .9rem; flex-wrap: wrap; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,.25); transition: all .25s ease; }
+  .dot.done { background: var(--green); }
+  .dot.current { background: #fff; transform: scale(1.4); }
+
+  .timerbar { height: 10px; background: rgba(0,0,0,.25); border-radius: 6px; overflow: hidden; margin-bottom: 1.25rem; box-shadow: inset 0 1px 3px rgba(0,0,0,.3); }
+  .timerbar .fill {
+    height: 100%; width: 100%; will-change: width;
+    background: linear-gradient(90deg, var(--green), #8be58b);
+    border-radius: 6px; transition: background .3s ease;
+  }
+  .timerbar .fill.warn { background: linear-gradient(90deg, var(--yellow), #ffd873); }
+  .timerbar .fill.danger { background: linear-gradient(90deg, var(--red), #ff8aa0); }
 
   .question {
-    background: var(--card); border-radius: 10px; padding: 2rem 1.5rem;
-    text-align: center; font-size: 1.6rem; font-weight: 700; color: var(--ink);
-    margin-bottom: 1.25rem; box-shadow: 0 4px 0 rgba(0,0,0,.15);
+    background: var(--card); border-radius: var(--radius-md); padding: 2.1rem 1.6rem;
+    text-align: center; font-size: 1.65rem; font-weight: 800; color: var(--ink);
+    margin-bottom: 1.25rem; box-shadow: 0 16px 40px -12px rgba(0,0,0,.35);
     animation: slideDown .35s ease;
+    border: 1px solid rgba(255,255,255,.5);
   }
   .think {
     text-align: center; color: #fff; font-weight: 800; font-size: 1rem;
     margin: 1rem 0; min-height: 3rem; letter-spacing: .5px;
     display: flex; align-items: center; justify-content: center;
+    text-shadow: 0 2px 10px rgba(0,0,0,.3);
   }
-  .think.big { animation: countPop .9s ease; font-size: 2.4rem; }
+  .think.big { animation: countPop .9s ease; font-size: 2.6rem; }
 
-  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: .8rem; }
   .opt {
-    border: none; border-radius: 8px; padding: 1rem .75rem; min-height: 88px;
+    border: none; border-radius: 14px; padding: 1.1rem .8rem; min-height: 92px;
     font-size: 1.05rem; font-weight: 700; color: #fff; cursor: pointer;
     display: flex; align-items: center; justify-content: center; text-align: center;
-    box-shadow: 0 4px 0 rgba(0,0,0,.2);
+    box-shadow: 0 6px 0 rgba(0,0,0,.2), 0 8px 18px rgba(0,0,0,.25);
     opacity: 0; transform: translateY(18px);
     will-change: transform, opacity;
+    transition: transform .12s ease, box-shadow .12s ease, filter .12s ease;
+    font-family: inherit; position: relative; overflow: hidden;
   }
-  .opt.show { animation: popIn .3s ease forwards; }
-  .opt.press { transform: translateY(2px); box-shadow: 0 2px 0 rgba(0,0,0,.2); }
+  .opt.show { animation: popIn .35s cubic-bezier(.2,1.2,.4,1) forwards; }
+  .opt:not(.disabled):hover { filter: brightness(1.1); transform: translateY(-2px); }
+  .opt.press { transform: translateY(3px); box-shadow: 0 2px 0 rgba(0,0,0,.2); }
   .opt .shape { margin-right: .6rem; font-size: 1.3rem; width: 1.6rem; display: inline-block; text-align: center; }
-  .opt.red { background: var(--red); }
-  .opt.blue { background: var(--blue); }
-  .opt.yellow { background: var(--yellow); }
-  .opt.green { background: var(--green); }
+  .opt.red { background: linear-gradient(135deg, var(--red), #ff7a92); }
+  .opt.blue { background: linear-gradient(135deg, var(--blue), #5aa0ff); }
+  .opt.yellow { background: linear-gradient(135deg, var(--yellow), #ffcf4d); }
+  .opt.green { background: linear-gradient(135deg, var(--green), #58e096); }
   .opt.disabled { cursor: default; pointer-events: none; }
-  .opt.dim { opacity: .4 !important; }
-  .opt.correct { opacity: 1 !important; animation: correctPulse .5s ease; }
+  .opt.dim { opacity: .35 !important; filter: grayscale(.3); }
+  .opt.correct { opacity: 1 !important; animation: correctPulse .5s ease; box-shadow: 0 0 0 3px #fff, 0 8px 20px rgba(46,201,113,.5); }
+
+  .ripple {
+    position: absolute; border-radius: 50%; background: rgba(255,255,255,.5);
+    transform: scale(0); animation: rippleAnim .5s ease-out forwards; pointer-events: none;
+  }
+  @keyframes rippleAnim { to { transform: scale(3); opacity: 0; } }
 
   .status { text-align: center; margin-top: 1.25rem; min-height: 3.5rem; }
-  .msg { display: inline-block; padding: .6rem 1.4rem; border-radius: 8px; font-weight: 800; font-size: 1.1rem; color: #fff; }
-  .msg.good { background: var(--green); animation: pop .3s ease; }
-  .msg.bad { background: var(--red); animation: shake .4s ease; }
-  .scoreline { color: #fff; font-weight: 700; margin-top: .75rem; font-size: 1rem; }
+  .msg { display: inline-block; padding: .65rem 1.5rem; border-radius: 50px; font-weight: 800; font-size: 1.1rem; color: #fff; }
+  .msg.good { background: linear-gradient(135deg, var(--green), #58e096); animation: pop .3s ease; box-shadow: 0 8px 20px -4px rgba(46,201,113,.6); }
+  .msg.bad { background: linear-gradient(135deg, var(--red), #ff7a92); animation: shake .4s ease; box-shadow: 0 8px 20px -4px rgba(255,77,109,.6); }
+  .scoreline { color: #fff; font-weight: 700; margin-top: .75rem; font-size: 1rem; opacity: .9; }
   .scoreline.bump { animation: pop .3s ease; display: inline-block; }
   .nextbtn {
-    display: block; margin: .75rem auto 0; background: var(--ink); color: #fff;
-    border: none; padding: .8rem 2.5rem; font-size: 1rem; font-weight: 700; border-radius: 8px; cursor: pointer;
-    animation: pop .3s ease;
+    display: block; margin: .9rem auto 0;
+    background: linear-gradient(135deg, var(--accent1), var(--accent2));
+    color: #fff; border: none; padding: .85rem 2.75rem; font-size: 1rem; font-weight: 700;
+    border-radius: 50px; cursor: pointer; animation: pop .3s ease;
+    box-shadow: 0 10px 22px -6px rgba(123,47,247,.6);
+    transition: transform .15s ease; font-family: inherit;
   }
-  .nextbtn:hover { filter: brightness(1.15); }
+  .nextbtn:hover { transform: translateY(-2px) scale(1.03); }
 
-  .results { display: none; background: var(--card); border-radius: 10px; padding: 2rem; text-align: center; animation: pop .4s ease; }
-  .results h2 { font-size: 1.8rem; color: var(--ink); margin-bottom: .75rem; }
-  .scoreBig { font-size: 4rem; font-weight: 800; color: var(--blue); }
-  .results .sub { color: #666; margin-bottom: 1.5rem; }
-  .results button { background: var(--ink); color: #fff; border: none; padding: .9rem 2.5rem; font-size: 1.1rem; font-weight: 700; border-radius: 8px; cursor: pointer; }
-  .results button:hover { filter: brightness(1.15); }
+  .results { display: none; padding: 2.5rem 2rem 2rem; text-align: center; animation: pop .5s cubic-bezier(.2,1.4,.4,1); position: relative; overflow: hidden; }
+  .results h2 { font-size: 1.9rem; font-weight: 800; color: var(--ink); margin-bottom: .25rem; }
+  .results .emoji { font-size: 3rem; margin-bottom: .25rem; display: block; }
+
+  .ring-wrap { position: relative; width: 170px; height: 170px; margin: 1rem auto 1rem; }
+  .ring-wrap svg { transform: rotate(-90deg); }
+  .ring-bg { fill: none; stroke: #eee; stroke-width: 12; }
+  .ring-fg { fill: none; stroke-width: 12; stroke-linecap: round; stroke: var(--green); transition: stroke-dasharray 1s cubic-bezier(.2,.8,.2,1); }
+  .ring-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .scoreBig { font-size: 2.1rem; font-weight: 900; color: var(--ink); line-height: 1; }
+  .scorePct { font-size: .8rem; font-weight: 700; color: #999; margin-top: .15rem; }
+
+  .results .sub { color: var(--sub); margin-bottom: 1.5rem; font-size: .95rem; }
+
+  .stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: .6rem; margin-bottom: 1.5rem; }
+  .stat {
+    background: #f6f3fe; border-radius: 12px; padding: .7rem .4rem;
+  }
+  .stat .num { font-size: 1.15rem; font-weight: 800; color: var(--accent1); display: block; }
+  .stat .lbl { font-size: .68rem; font-weight: 700; color: var(--sub); text-transform: uppercase; letter-spacing: .3px; }
+
+  .leaderboard {
+    text-align: left; background: #faf8ff; border-radius: var(--radius-md);
+    padding: 1.1rem 1rem; margin-bottom: 1.5rem; border: 1px solid #eee2ff;
+  }
+  .leaderboard .lb-title {
+    font-weight: 800; color: var(--ink); font-size: .95rem; margin-bottom: .7rem;
+    display: flex; align-items: center; gap: .4rem;
+  }
+  .lb-row {
+    display: flex; align-items: center; gap: .6rem; padding: .45rem .5rem;
+    border-radius: 10px; font-size: .9rem; font-weight: 600; color: var(--ink);
+  }
+  .lb-row.me { background: linear-gradient(135deg, rgba(123,47,247,.12), rgba(241,7,163,.12)); font-weight: 800; }
+  .lb-rank { width: 1.6rem; text-align: center; font-weight: 800; color: var(--sub); flex-shrink: 0; }
+  .lb-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .lb-score { font-weight: 800; color: var(--accent1); flex-shrink: 0; }
+  .lb-empty, .lb-loading { color: var(--sub); font-size: .88rem; text-align: center; padding: .4rem 0; }
+
+  .confetti { position: absolute; top: -10px; left: 50%; width: 8px; height: 14px; opacity: 0; border-radius: 2px; }
+  .confetti.go { animation: confettiFall 1.6s ease-in forwards; }
 
   .hidden { display: none !important; }
 
@@ -97,21 +238,39 @@
   @keyframes pop { from { opacity: 0; transform: scale(.85); } to { opacity: 1; transform: scale(1); } }
   @keyframes shake { 0%,100% { transform: translateX(0); } 20% { transform: translateX(-6px); } 40% { transform: translateX(6px); } 60% { transform: translateX(-4px); } 80% { transform: translateX(4px); } }
   @keyframes correctPulse { 0% { transform: scale(1); } 50% { transform: scale(1.06); } 100% { transform: scale(1); } }
-  @keyframes floatUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
   @keyframes countPop { 0% { opacity: 0; transform: scale(1.6); } 30% { opacity: 1; transform: scale(1); } 100% { transform: scale(.9); } }
+  @keyframes wiggle { 0%,100% { transform: rotate(0deg); } 25% { transform: rotate(-8deg); } 75% { transform: rotate(8deg); } }
+  @keyframes confettiFall { 0% { opacity: 1; transform: translateY(0) rotate(0deg); } 100% { opacity: 0; transform: translateY(420px) rotate(540deg); } }
+
+  @media (max-width: 420px) {
+    .question { font-size: 1.35rem; padding: 1.6rem 1.2rem; }
+    .opt { font-size: .92rem; min-height: 82px; }
+    .stats { grid-template-columns: 1fr 1fr; }
+  }
 </style>
 </head>
 <body>
 <div class="wrap">
 
-  <div class="start" id="start">
+  <div class="brand">🧠 Vocabulary Kahoot</div>
+
+  <div class="card start" id="start">
+    <span class="badge">🧠</span>
     <h1>Vocabulary Kahoot</h1>
     <p>See the word, pick the correct explanation!</p>
-    <button onclick="startGame()">Play</button>
+    <div class="namefield">
+      <label for="nameInput">Your name</label>
+      <input id="nameInput" type="text" maxlength="24" placeholder="e.g. Alex" autocomplete="off">
+    </div>
+    <button class="btn-primary" onclick="startGame()">▶ Play</button>
   </div>
 
   <div class="quiz" id="quiz">
-    <span class="qnum" id="qnum"></span>
+    <div class="topbar">
+      <span class="qnum" id="qnum"></span>
+      <span class="streak" id="streak">🔥 <span id="streakNum">0</span></span>
+    </div>
+    <div class="dots" id="dots"></div>
     <div class="timerbar"><div class="fill" id="fill"></div></div>
     <div class="question" id="question"></div>
     <div class="think" id="think"></div>
@@ -123,11 +282,34 @@
     </div>
   </div>
 
-  <div class="results" id="results">
+  <div class="card results" id="results">
+    <div id="confettiLayer"></div>
+    <span class="emoji" id="finalEmoji">🏆</span>
     <h2>Game Over!</h2>
-    <div class="scoreBig" id="finalScore"></div>
+    <div class="ring-wrap">
+      <svg width="170" height="170" viewBox="0 0 170 170">
+        <circle class="ring-bg" cx="85" cy="85" r="74"></circle>
+        <circle class="ring-fg" id="ringFg" cx="85" cy="85" r="74"></circle>
+      </svg>
+      <div class="ring-center">
+        <div class="scoreBig" id="finalScore"></div>
+        <div class="scorePct" id="finalPct"></div>
+      </div>
+    </div>
     <div class="sub" id="finalSub"></div>
-    <button onclick="restart()">Play Again</button>
+
+    <div class="stats">
+      <div class="stat"><span class="num" id="statCorrect">0</span><span class="lbl">Correct</span></div>
+      <div class="stat"><span class="num" id="statStreak">0</span><span class="lbl">Best streak</span></div>
+      <div class="stat"><span class="num" id="statAcc">0%</span><span class="lbl">Accuracy</span></div>
+    </div>
+
+    <div class="leaderboard">
+      <div class="lb-title">🏆 Leaderboard — Top 10</div>
+      <div id="lbBody"><div class="lb-loading">Loading…</div></div>
+    </div>
+
+    <button class="btn-primary" onclick="restart()">↻ Play Again</button>
   </div>
 
 </div>
@@ -229,13 +411,17 @@ const SHAPES = ['▲', '◆', '●', '■'];
 const THINK_MS = 2000;   // time to read the word before answers appear
 const ANSWER_MS = 15000; // time to answer
 
-let idx = 0, score = 0, streak = 0;
+const DREAMLO_PUBLIC = '6ac33cc78f40bb15a8caacb7';
+const DREAMLO_PRIVATE = 'uuIQSrtlXUOhPNukrakYMwxxP0_ZzQ7kexo9J2wrVUlA';
+
+let idx = 0, score = 0, streak = 0, bestStreak = 0, correctCount = 0;
 let order = [];
 let phase = 'think';   // 'think' | 'answer' | 'done'
 let rafId = null;
 let thinkTimer = null;
 let phaseStart = 0;
 let answered = false;
+let playerName = 'Player';
 
 function shuffle(arr) {
   const a = arr.slice();
@@ -247,12 +433,47 @@ function shuffle(arr) {
 }
 
 function startGame() {
-  idx = 0; score = 0; streak = 0;
+  const nameInput = document.getElementById('nameInput');
+  playerName = (nameInput.value || '').trim().slice(0, 24) || 'Player';
+  localStorage.setItem('vq_name', playerName);
+
+  idx = 0; score = 0; streak = 0; bestStreak = 0; correctCount = 0;
   order = shuffle(buildReverseQuestions());
   document.getElementById('start').style.display = 'none';
   document.getElementById('results').style.display = 'none';
+  buildDots();
   document.getElementById('quiz').style.display = 'block';
   showQuestion();
+}
+
+(function restoreName() {
+  const saved = localStorage.getItem('vq_name');
+  if (saved) document.getElementById('nameInput').value = saved;
+})();
+
+function buildDots() {
+  const dots = document.getElementById('dots');
+  dots.innerHTML = '';
+  order.forEach(() => {
+    const d = document.createElement('span');
+    d.className = 'dot';
+    dots.appendChild(d);
+  });
+}
+
+function updateDots() {
+  const dots = document.querySelectorAll('.dot');
+  dots.forEach((d, i) => {
+    d.classList.remove('current', 'done');
+    if (i < idx) d.classList.add('done');
+    else if (i === idx) d.classList.add('current');
+  });
+}
+
+function updateStreak() {
+  const el = document.getElementById('streak');
+  document.getElementById('streakNum').textContent = streak;
+  if (streak >= 2) el.classList.add('show'); else el.classList.remove('show');
 }
 
 function showQuestion() {
@@ -265,6 +486,8 @@ function showQuestion() {
   document.getElementById('scoreline').classList.remove('bump');
   document.getElementById('scoreline').textContent = `Score: ${score}`;
   document.getElementById('think').textContent = '';
+  updateDots();
+  updateStreak();
 
   const grid = document.getElementById('grid');
   grid.innerHTML = '';
@@ -274,12 +497,14 @@ function showQuestion() {
     b.className = `opt ${COLORS[pos]}`;
     b.innerHTML = `<span class="shape">${SHAPES[pos]}</span><span>${q.options[oi]}</span>`;
     b.dataset.oi = oi;
-    b.onclick = () => choose(b, oi);
+    b.onclick = (e) => choose(b, oi, e);
     grid.appendChild(b);
   });
 
   stopTimer();
-  document.getElementById('fill').style.width = '100%';
+  const fill = document.getElementById('fill');
+  fill.style.width = '100%';
+  fill.classList.remove('warn', 'danger');
   // countdown for the "think" phase
   const thinkEl = document.getElementById('think');
   let count = Math.round(THINK_MS / 1000);
@@ -321,6 +546,8 @@ function startTimer() {
     const elapsed = now - start;
     const frac = Math.max(0, 1 - elapsed / total);
     fill.style.width = (frac * 100) + '%';
+    fill.classList.toggle('warn', frac <= .5 && frac > .25);
+    fill.classList.toggle('danger', frac <= .25);
     if (elapsed < total && !answered) {
       rafId = requestAnimationFrame(step);
     } else if (!answered) {
@@ -345,13 +572,29 @@ function timeUp() {
     if (+b.dataset.oi === q.answer) b.classList.add('correct');
     else b.classList.add('dim');
   });
+  streak = 0;
+  updateStreak();
   reveal('bad', "Time's up!", q);
 }
 
-function choose(btn, oi) {
+function spawnRipple(btn, evt) {
+  const rect = btn.getBoundingClientRect();
+  const r = document.createElement('span');
+  r.className = 'ripple';
+  const size = Math.max(rect.width, rect.height);
+  r.style.width = r.style.height = size + 'px';
+  const x = (evt && evt.clientX ? evt.clientX - rect.left : rect.width / 2) - size / 2;
+  const y = (evt && evt.clientY ? evt.clientY - rect.top : rect.height / 2) - size / 2;
+  r.style.left = x + 'px'; r.style.top = y + 'px';
+  btn.appendChild(r);
+  setTimeout(() => r.remove(), 500);
+}
+
+function choose(btn, oi, evt) {
   if (answered || phase !== 'answer') return;
   answered = true;
   stopTimer();
+  spawnRipple(btn, evt);
   const q = order[idx];
   btn.classList.add('press');
   const buttons = document.querySelectorAll('.opt');
@@ -364,6 +607,8 @@ function choose(btn, oi) {
   const correct = oi === q.answer;
   if (correct) {
     streak++;
+    bestStreak = Math.max(bestStreak, streak);
+    correctCount++;
     const timeFrac = remainingMs() / ANSWER_MS;
     const pts = Math.round((500 + 500 * timeFrac) / 50) * 50; // 500..1000 by speed
     score += pts;
@@ -372,6 +617,7 @@ function choose(btn, oi) {
     streak = 0;
     reveal('bad', 'Wrong!', q);
   }
+  updateStreak();
 }
 
 function reveal(kind, text, q) {
@@ -398,6 +644,88 @@ function endGame() {
   document.getElementById('results').style.display = 'block';
   document.getElementById('finalScore').textContent = score;
   document.getElementById('finalSub').textContent = `${order.length} questions answered`;
+
+  const maxScore = order.length * 1000;
+  const pct = Math.max(0, Math.min(1, score / maxScore));
+  document.getElementById('finalPct').textContent = Math.round(pct * 100) + '%';
+
+  document.getElementById('statCorrect').textContent = `${correctCount}/${order.length}`;
+  document.getElementById('statStreak').textContent = bestStreak;
+  document.getElementById('statAcc').textContent = Math.round((correctCount / order.length) * 100) + '%';
+
+  const ring = document.getElementById('ringFg');
+  const r = 74, c = 2 * Math.PI * r;
+  ring.style.strokeDasharray = `${c} ${c}`;
+  ring.style.strokeDashoffset = c;
+  ring.style.stroke = pct >= .8 ? 'var(--green)' : pct >= .5 ? 'var(--yellow)' : 'var(--red)';
+  requestAnimationFrame(() => {
+    ring.style.transition = 'stroke-dashoffset 1s cubic-bezier(.2,.8,.2,1)';
+    ring.style.strokeDashoffset = c - c * pct;
+  });
+
+  document.getElementById('finalEmoji').textContent =
+    pct >= .9 ? '🏆' : pct >= .7 ? '🎉' : pct >= .5 ? '👍' : '💪';
+
+  launchConfetti();
+  submitAndShowLeaderboard();
+}
+
+function launchConfetti() {
+  const layer = document.getElementById('confettiLayer');
+  layer.innerHTML = '';
+  const colors = ['#ff4d6d', '#2d7bff', '#ffb300', '#2ec971', '#7b2ff7', '#f107a3'];
+  for (let i = 0; i < 40; i++) {
+    const c = document.createElement('div');
+    c.className = 'confetti';
+    c.style.left = (Math.random() * 100) + '%';
+    c.style.background = colors[Math.floor(Math.random() * colors.length)];
+    c.style.animationDelay = (Math.random() * .4) + 's';
+    c.style.transform = `translateX(${(Math.random() - .5) * 60}px)`;
+    layer.appendChild(c);
+    requestAnimationFrame(() => c.classList.add('go'));
+  }
+}
+
+async function submitAndShowLeaderboard() {
+  const lbBody = document.getElementById('lbBody');
+  lbBody.innerHTML = '<div class="lb-loading">Loading…</div>';
+  try {
+    const safeName = encodeURIComponent(playerName).slice(0, 48);
+    await fetch(`https://dreamlo.com/lb/${DREAMLO_PRIVATE}/add/${safeName}/${score}`);
+    const res = await fetch(`https://dreamlo.com/lb/${DREAMLO_PUBLIC}/json`);
+    const data = await res.json();
+    renderLeaderboard(data);
+  } catch (err) {
+    lbBody.innerHTML = '<div class="lb-empty">Couldn’t load the leaderboard right now.</div>';
+  }
+}
+
+function renderLeaderboard(data) {
+  const lbBody = document.getElementById('lbBody');
+  let entries = data && data.dreamlo && data.dreamlo.leaderboard ? data.dreamlo.leaderboard.entry : null;
+  if (!entries) { lbBody.innerHTML = '<div class="lb-empty">No scores yet — be the first!</div>'; return; }
+  if (!Array.isArray(entries)) entries = [entries];
+
+  entries = entries
+    .map(e => ({ name: e.name, score: parseInt(e.score, 10) || 0 }))
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 10);
+
+  const medals = ['🥇', '🥈', '🥉'];
+  let meMarked = false;
+  lbBody.innerHTML = entries.map((e, i) => {
+    const isMe = !meMarked && e.name === playerName && e.score === score;
+    if (isMe) meMarked = true;
+    return `<div class="lb-row ${isMe ? 'me' : ''}">
+      <span class="lb-rank">${medals[i] || (i + 1)}</span>
+      <span class="lb-name">${escapeHtml(e.name)}${isMe ? ' (you)' : ''}</span>
+      <span class="lb-score">${e.score}</span>
+    </div>`;
+  }).join('');
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 
 function restart() {
