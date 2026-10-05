@@ -4,168 +4,119 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="A fast-paced vocabulary quiz with a live leaderboard.">
-<meta name="theme-color" content="#1b1140">
+<meta name="theme-color" content="#46178f">
 <title>Vocabulary Kahoot</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%237b2ff7'/%3E%3Ctext x='32' y='42' font-size='32' text-anchor='middle'%3E%F0%9F%A7%A0%3C/text%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2346178f'/%3E%3Ctext x='32' y='42' font-size='32' text-anchor='middle'%3E%F0%9F%A7%A0%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800;900&display=swap" rel="stylesheet">
 <style>
   :root {
-    --red: #ff4d6d; --blue: #2d7bff; --yellow: #ffb300; --green: #2ec971;
-    --ink: #1f2235; --sub: #6b7280; --card: #ffffff;
-    --accent1: #7b2ff7; --accent2: #f107a3; --accent3: #11cbd7;
-    --radius-lg: 24px; --radius-md: 16px;
+    --red: #e21b3c; --blue: #1368ce; --yellow: #ffa602; --green: #26890c;
+    --bg: #46178f; --card: #ffffff; --ink: #333333; --sub: #6b7280;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  html, body { min-height: 100vh; }
+  html, body { height: 100%; }
   body {
-    font-family: 'Poppins', "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    background: radial-gradient(circle at 15% 20%, #3a1a8f 0%, transparent 45%),
-                radial-gradient(circle at 85% 80%, #7b0f8f 0%, transparent 45%),
-                linear-gradient(135deg, #2d0f6b 0%, #46178f 45%, #1b1140 100%);
-    background-size: 200% 200%, 200% 200%, 200% 200%;
-    animation: bgShift 18s ease infinite;
+    font-family: 'Montserrat', "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
     min-height: 100vh;
-    display: flex; align-items: center; justify-content: center;
-    padding: 1.5rem;
+    display: flex; flex-direction: column; align-items: center;
+    padding: 1rem;
     overflow-x: hidden;
-    position: relative;
   }
-  body::before, body::after {
-    content: ''; position: fixed; border-radius: 50%; filter: blur(70px);
-    opacity: .3; z-index: 0; pointer-events: none;
-  }
-  body::before {
-    width: 420px; height: 420px; background: var(--accent3);
-    top: -120px; left: -120px; animation: float1 11s ease-in-out infinite;
-  }
-  body::after {
-    width: 480px; height: 480px; background: var(--accent2);
-    bottom: -160px; right: -140px; animation: float2 13s ease-in-out infinite;
-  }
-  @keyframes bgShift { 0%,100% { background-position: 0% 50%, 100% 50%, 0% 50%; } 50% { background-position: 30% 70%, 70% 30%, 100% 50%; } }
-  @keyframes float1 { 0%,100% { transform: translate(0,0); } 50% { transform: translate(40px,30px); } }
-  @keyframes float2 { 0%,100% { transform: translate(0,0); } 50% { transform: translate(-30px,-40px); } }
 
   :focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
 
-  .wrap { width: 100%; max-width: 560px; position: relative; z-index: 1; }
+  .wrap { width: 100%; max-width: 680px; flex: 1; display: flex; flex-direction: column; }
 
-  .brand {
-    text-align: center; color: rgba(255,255,255,.75); font-weight: 700;
-    letter-spacing: .5px; font-size: .85rem; margin-bottom: .9rem;
-    display: flex; align-items: center; justify-content: center; gap: .4rem;
+  /* ---- start ---- */
+  .start {
+    margin: auto; background: var(--card); border-radius: 8px; padding: 2.5rem 2rem;
+    text-align: center; box-shadow: 0 6px 0 rgba(0,0,0,.2); width: 100%; max-width: 440px;
   }
-
-  .card {
-    background: var(--card); border-radius: var(--radius-lg);
-    box-shadow: 0 30px 70px -20px rgba(0,0,0,.5), 0 1px 0 rgba(255,255,255,.6) inset;
-    border: 1px solid rgba(255,255,255,.5);
-  }
-
-  .start { padding: 2.75rem 2rem; text-align: center; animation: pop .5s cubic-bezier(.2,1.4,.4,1); }
-  .start .badge {
-    display: inline-block; font-size: 2.6rem; margin-bottom: .5rem;
-    animation: wiggle 2.4s ease-in-out infinite;
-  }
-  .start h1 {
-    font-size: 1.9rem; font-weight: 800; margin-bottom: .4rem;
-    background: linear-gradient(90deg, var(--accent1), var(--accent2));
-    -webkit-background-clip: text; background-clip: text; color: transparent;
-  }
-  .start p { color: var(--sub); margin-bottom: 1.5rem; font-size: 1.02rem; }
-
+  .start h1 { font-size: 1.8rem; font-weight: 800; color: var(--ink); margin-bottom: .5rem; }
+  .start p { color: var(--sub); margin-bottom: 1.5rem; font-size: 1rem; }
   .namefield { margin-bottom: 1.5rem; text-align: left; }
   .namefield label {
-    display: block; font-size: .8rem; font-weight: 700; color: var(--sub);
+    display: block; font-size: .75rem; font-weight: 700; color: var(--sub);
     margin-bottom: .4rem; text-transform: uppercase; letter-spacing: .5px;
   }
   .namefield input {
-    width: 100%; padding: .85rem 1rem; border-radius: 12px; border: 2px solid #eee;
-    font-size: 1.05rem; font-family: inherit; font-weight: 600; color: var(--ink);
-    transition: border-color .15s ease;
+    width: 100%; padding: .8rem .9rem; border-radius: 6px; border: 2px solid #ddd;
+    font-size: 1rem; font-family: inherit; font-weight: 600; color: var(--ink);
   }
-  .namefield input:focus { outline: none; border-color: var(--accent1); }
-
+  .namefield input:focus { outline: none; border-color: var(--bg); }
   .btn-primary {
-    background: linear-gradient(135deg, var(--accent1), var(--accent2));
-    color: #fff; border: none; padding: 1rem 2.75rem;
-    font-size: 1.1rem; font-weight: 700; border-radius: 50px; cursor: pointer;
-    box-shadow: 0 10px 25px -6px rgba(123,47,247,.6);
-    transition: transform .15s ease, box-shadow .15s ease;
-    font-family: inherit; position: relative; overflow: hidden;
+    background: var(--ink); color: #fff; border: none; padding: .9rem 2.5rem;
+    font-size: 1.1rem; font-weight: 800; border-radius: 6px; cursor: pointer;
+    box-shadow: 0 4px 0 rgba(0,0,0,.3); font-family: inherit;
   }
-  .btn-primary:hover { transform: translateY(-3px) scale(1.03); box-shadow: 0 14px 30px -6px rgba(123,47,247,.7); }
-  .btn-primary:active { transform: translateY(0) scale(.98); }
+  .btn-primary:hover { filter: brightness(1.15); }
+  .btn-primary:active { transform: translateY(3px); box-shadow: 0 1px 0 rgba(0,0,0,.3); }
 
-  .quiz { display: none; }
+  /* ---- quiz ---- */
+  .quiz { display: none; flex: 1; flex-direction: column; }
 
-  .topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: .85rem; gap: .5rem; }
-  .qnum {
-    display: inline-flex; align-items: center; background: rgba(255,255,255,.18);
-    backdrop-filter: blur(6px); color: #fff;
-    padding: .4rem 1rem; border-radius: 20px; font-weight: 700; font-size: .85rem;
-    border: 1px solid rgba(255,255,255,.25);
-  }
+  .topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: .6rem; }
+  .qnum { color: #fff; font-weight: 800; font-size: .95rem; }
   .streak {
-    display: inline-flex; align-items: center; gap: .3rem; background: rgba(255,179,0,.18);
-    color: #ffd873; padding: .4rem .85rem; border-radius: 20px; font-weight: 800; font-size: .85rem;
-    border: 1px solid rgba(255,179,0,.35); opacity: 0; transform: scale(.7); transition: all .25s ease;
+    display: inline-flex; align-items: center; gap: .3rem; background: rgba(0,0,0,.2);
+    color: #ffd873; padding: .3rem .7rem; border-radius: 4px; font-weight: 800; font-size: .85rem;
+    opacity: 0; transition: opacity .2s ease;
   }
-  .streak.show { opacity: 1; transform: scale(1); }
+  .streak.show { opacity: 1; }
 
-  .dots { display: flex; justify-content: center; gap: .3rem; margin-bottom: .9rem; flex-wrap: wrap; }
-  .dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,.25); transition: all .25s ease; }
+  .dots { display: flex; justify-content: center; gap: .25rem; margin-bottom: .6rem; flex-wrap: wrap; }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,.3); }
   .dot.done { background: var(--green); }
-  .dot.current { background: #fff; transform: scale(1.4); }
+  .dot.current { background: #fff; }
 
-  .timerbar { height: 10px; background: rgba(0,0,0,.25); border-radius: 6px; overflow: hidden; margin-bottom: 1.25rem; box-shadow: inset 0 1px 3px rgba(0,0,0,.3); }
-  .timerbar .fill {
-    height: 100%; width: 100%; will-change: width;
-    background: linear-gradient(90deg, var(--green), #8be58b);
-    border-radius: 6px; transition: background .3s ease;
-  }
-  .timerbar .fill.warn { background: linear-gradient(90deg, var(--yellow), #ffd873); }
-  .timerbar .fill.danger { background: linear-gradient(90deg, var(--red), #ff8aa0); }
-
+  .question-wrap { position: relative; margin-bottom: .9rem; }
   .question {
-    background: var(--card); border-radius: var(--radius-md); padding: 2.1rem 1.6rem;
-    text-align: center; font-size: 1.65rem; font-weight: 800; color: var(--ink);
-    margin-bottom: 1.25rem; box-shadow: 0 16px 40px -12px rgba(0,0,0,.35);
-    animation: slideDown .35s ease;
-    border: 1px solid rgba(255,255,255,.5);
+    background: var(--card); border-radius: 8px; padding: 1.8rem 1.4rem;
+    text-align: center; font-size: 1.5rem; font-weight: 800; color: var(--ink);
+    box-shadow: 0 6px 0 rgba(0,0,0,.2); min-height: 100px;
+    display: flex; align-items: center; justify-content: center;
   }
+
+  .timer-circle {
+    position: absolute; top: -18px; right: -18px; width: 52px; height: 52px;
+    border-radius: 50%; background: var(--card); box-shadow: 0 4px 0 rgba(0,0,0,.2);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 900; font-size: 1.3rem; color: var(--ink);
+  }
+  .timer-circle svg { position: absolute; top: 0; left: 0; transform: rotate(-90deg); }
+  .timer-circle circle { fill: none; stroke-width: 4; }
+  .timer-circle .bg { stroke: #eee; }
+  .timer-circle .fg { stroke: var(--green); stroke-linecap: round; transition: stroke-dashoffset .2s linear, stroke .3s ease; }
+
   .think {
     text-align: center; color: #fff; font-weight: 800; font-size: 1rem;
-    margin: 1rem 0; min-height: 3rem; letter-spacing: .5px;
+    margin-bottom: .6rem; min-height: 2.4rem; letter-spacing: .5px;
     display: flex; align-items: center; justify-content: center;
-    text-shadow: 0 2px 10px rgba(0,0,0,.3);
   }
-  .think.big { animation: countPop .9s ease; font-size: 2.6rem; }
+  .think.big { animation: countPop .9s ease; font-size: 2.4rem; }
 
-  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: .8rem; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: .7rem; flex: 1; }
   .opt {
-    border: none; border-radius: 14px; padding: 1.1rem .8rem; min-height: 92px;
+    border: none; border-radius: 6px; padding: 1rem .75rem; min-height: 88px;
     font-size: 1.05rem; font-weight: 700; color: #fff; cursor: pointer;
     display: flex; align-items: center; justify-content: center; text-align: center;
-    box-shadow: 0 6px 0 rgba(0,0,0,.2), 0 8px 18px rgba(0,0,0,.25);
+    box-shadow: 0 5px 0 rgba(0,0,0,.25);
     opacity: 0; transform: translateY(18px);
-    will-change: transform, opacity;
-    transition: transform .12s ease, box-shadow .12s ease, filter .12s ease;
-    font-family: inherit; position: relative; overflow: hidden;
+    will-change: transform, opacity; position: relative; overflow: hidden;
   }
-  .opt.show { animation: popIn .35s cubic-bezier(.2,1.2,.4,1) forwards; }
-  .opt:not(.disabled):hover { filter: brightness(1.1); transform: translateY(-2px); }
-  .opt.press { transform: translateY(3px); box-shadow: 0 2px 0 rgba(0,0,0,.2); }
-  .opt .shape { margin-right: .6rem; font-size: 1.3rem; width: 1.6rem; display: inline-block; text-align: center; }
-  .opt.red { background: linear-gradient(135deg, var(--red), #ff7a92); }
-  .opt.blue { background: linear-gradient(135deg, var(--blue), #5aa0ff); }
-  .opt.yellow { background: linear-gradient(135deg, var(--yellow), #ffcf4d); }
-  .opt.green { background: linear-gradient(135deg, var(--green), #58e096); }
+  .opt.show { animation: popIn .25s ease forwards; }
+  .opt.press { transform: translateY(3px); box-shadow: 0 2px 0 rgba(0,0,0,.25); }
+  .opt .shape { margin-right: .55rem; font-size: 1.25rem; width: 1.5rem; display: inline-block; text-align: center; }
+  .opt.red { background: var(--red); }
+  .opt.blue { background: var(--blue); }
+  .opt.yellow { background: var(--yellow); }
+  .opt.green { background: var(--green); }
   .opt.disabled { cursor: default; pointer-events: none; }
-  .opt.dim { opacity: .35 !important; filter: grayscale(.3); }
-  .opt.correct { opacity: 1 !important; animation: correctPulse .5s ease; box-shadow: 0 0 0 3px #fff, 0 8px 20px rgba(46,201,113,.5); }
+  .opt.dim { opacity: .35 !important; }
+  .opt.correct { opacity: 1 !important; animation: correctPulse .4s ease; box-shadow: 0 0 0 3px #fff, 0 5px 0 rgba(0,0,0,.25); }
 
   .ripple {
     position: absolute; border-radius: 50%; background: rgba(255,255,255,.5);
@@ -173,78 +124,75 @@
   }
   @keyframes rippleAnim { to { transform: scale(3); opacity: 0; } }
 
-  .status { text-align: center; margin-top: 1.25rem; min-height: 3.5rem; }
-  .msg { display: inline-block; padding: .65rem 1.5rem; border-radius: 50px; font-weight: 800; font-size: 1.1rem; color: #fff; }
-  .msg.good { background: linear-gradient(135deg, var(--green), #58e096); animation: pop .3s ease; box-shadow: 0 8px 20px -4px rgba(46,201,113,.6); }
-  .msg.bad { background: linear-gradient(135deg, var(--red), #ff7a92); animation: shake .4s ease; box-shadow: 0 8px 20px -4px rgba(255,77,109,.6); }
-  .scoreline { color: #fff; font-weight: 700; margin-top: .75rem; font-size: 1rem; opacity: .9; }
-  .scoreline.bump { animation: pop .3s ease; display: inline-block; }
+  .status { text-align: center; margin-top: 1rem; min-height: 3.2rem; }
+  .msg { display: inline-block; padding: .55rem 1.3rem; border-radius: 4px; font-weight: 800; font-size: 1.05rem; color: #fff; }
+  .msg.good { background: var(--green); }
+  .msg.bad { background: var(--red); animation: shake .4s ease; }
+  .scoreline { color: #fff; font-weight: 700; margin-top: .6rem; font-size: .95rem; opacity: .9; }
   .nextbtn {
-    display: block; margin: .9rem auto 0;
-    background: linear-gradient(135deg, var(--accent1), var(--accent2));
-    color: #fff; border: none; padding: .85rem 2.75rem; font-size: 1rem; font-weight: 700;
-    border-radius: 50px; cursor: pointer; animation: pop .3s ease;
-    box-shadow: 0 10px 22px -6px rgba(123,47,247,.6);
-    transition: transform .15s ease; font-family: inherit;
+    display: block; margin: .75rem auto 0; background: var(--ink); color: #fff;
+    border: none; padding: .8rem 2.5rem; font-size: 1rem; font-weight: 800; border-radius: 6px;
+    cursor: pointer; box-shadow: 0 4px 0 rgba(0,0,0,.3); font-family: inherit;
   }
-  .nextbtn:hover { transform: translateY(-2px) scale(1.03); }
+  .nextbtn:hover { filter: brightness(1.15); }
 
-  .results { display: none; padding: 2.5rem 2rem 2rem; text-align: center; animation: pop .5s cubic-bezier(.2,1.4,.4,1); position: relative; overflow: hidden; }
-  .results h2 { font-size: 1.9rem; font-weight: 800; color: var(--ink); margin-bottom: .25rem; }
-  .results .emoji { font-size: 3rem; margin-bottom: .25rem; display: block; }
-
-  .ring-wrap { position: relative; width: 170px; height: 170px; margin: 1rem auto 1rem; }
-  .ring-wrap svg { transform: rotate(-90deg); }
-  .ring-bg { fill: none; stroke: #eee; stroke-width: 12; }
-  .ring-fg { fill: none; stroke-width: 12; stroke-linecap: round; stroke: var(--green); transition: stroke-dasharray 1s cubic-bezier(.2,.8,.2,1); }
-  .ring-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-  .scoreBig { font-size: 2.1rem; font-weight: 900; color: var(--ink); line-height: 1; }
-  .scorePct { font-size: .8rem; font-weight: 700; color: #999; margin-top: .15rem; }
-
-  .results .sub { color: var(--sub); margin-bottom: 1.5rem; font-size: .95rem; }
-
-  .stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: .6rem; margin-bottom: 1.5rem; }
-  .stat {
-    background: #f6f3fe; border-radius: 12px; padding: .7rem .4rem;
+  /* ---- results (Kahoot podium style) ---- */
+  .results { display: none; margin: auto; width: 100%; max-width: 480px; }
+  .podium-card {
+    background: var(--card); border-radius: 8px; padding: 2rem 1.5rem; text-align: center;
+    box-shadow: 0 6px 0 rgba(0,0,0,.2); margin-bottom: 1rem;
   }
-  .stat .num { font-size: 1.15rem; font-weight: 800; color: var(--accent1); display: block; }
-  .stat .lbl { font-size: .68rem; font-weight: 700; color: var(--sub); text-transform: uppercase; letter-spacing: .3px; }
+  .podium-card h2 { font-size: 1.6rem; font-weight: 800; color: var(--ink); margin-bottom: .2rem; }
+  .podium-card .emoji { font-size: 2.6rem; display: block; margin-bottom: .2rem; }
+  .finalScore { font-size: 2.6rem; font-weight: 900; color: var(--bg); margin: .3rem 0; }
+  .finalSub { color: var(--sub); font-size: .9rem; margin-bottom: 1.2rem; }
 
-  .leaderboard {
-    text-align: left; background: #faf8ff; border-radius: var(--radius-md);
-    padding: 1.1rem 1rem; margin-bottom: 1.5rem; border: 1px solid #eee2ff;
+  .stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: .5rem; margin-bottom: .3rem; }
+  .stat { background: #f2f2f2; border-radius: 6px; padding: .6rem .3rem; }
+  .stat .num { font-size: 1.1rem; font-weight: 800; color: var(--bg); display: block; }
+  .stat .lbl { font-size: .65rem; font-weight: 700; color: var(--sub); text-transform: uppercase; }
+
+  .leaderboard-card {
+    background: var(--card); border-radius: 8px; padding: 1.1rem 1rem; margin-bottom: 1rem;
+    box-shadow: 0 6px 0 rgba(0,0,0,.2);
   }
-  .leaderboard .lb-title {
-    font-weight: 800; color: var(--ink); font-size: .95rem; margin-bottom: .7rem;
-    display: flex; align-items: center; gap: .4rem;
+  .lb-title {
+    font-weight: 800; color: var(--ink); font-size: .95rem; margin-bottom: .7rem; text-align: center;
   }
+  .podium { display: flex; align-items: flex-end; justify-content: center; gap: .5rem; margin-bottom: .9rem; }
+  .podium .p { flex: 1; text-align: center; }
+  .podium .p .bar {
+    border-radius: 6px 6px 0 0; display: flex; align-items: flex-start; justify-content: center;
+    padding-top: .4rem; color: #fff; font-weight: 900; font-size: 1.1rem;
+  }
+  .podium .p.first .bar { background: var(--yellow); height: 86px; }
+  .podium .p.second .bar { background: #9aa0a6; height: 64px; }
+  .podium .p.third .bar { background: #cd7f32; height: 48px; }
+  .podium .p .pname { font-size: .78rem; font-weight: 700; color: var(--ink); margin-top: .35rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .podium .p .pscore { font-size: .7rem; color: var(--sub); font-weight: 700; }
+
   .lb-row {
-    display: flex; align-items: center; gap: .6rem; padding: .45rem .5rem;
-    border-radius: 10px; font-size: .9rem; font-weight: 600; color: var(--ink);
+    display: flex; align-items: center; gap: .6rem; padding: .4rem .4rem;
+    border-radius: 6px; font-size: .88rem; font-weight: 600; color: var(--ink);
   }
-  .lb-row.me { background: linear-gradient(135deg, rgba(123,47,247,.12), rgba(241,7,163,.12)); font-weight: 800; }
-  .lb-rank { width: 1.6rem; text-align: center; font-weight: 800; color: var(--sub); flex-shrink: 0; }
+  .lb-row.me { background: #f2eafc; font-weight: 800; }
+  .lb-rank { width: 1.5rem; text-align: center; font-weight: 800; color: var(--sub); flex-shrink: 0; }
   .lb-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .lb-score { font-weight: 800; color: var(--accent1); flex-shrink: 0; }
-  .lb-empty, .lb-loading { color: var(--sub); font-size: .88rem; text-align: center; padding: .4rem 0; }
+  .lb-score { font-weight: 800; color: var(--bg); flex-shrink: 0; }
+  .lb-empty, .lb-loading { color: var(--sub); font-size: .85rem; text-align: center; padding: .4rem 0; }
 
-  .confetti { position: absolute; top: -10px; left: 50%; width: 8px; height: 14px; opacity: 0; border-radius: 2px; }
-  .confetti.go { animation: confettiFall 1.6s ease-in forwards; }
+  .results .btn-primary { display: block; margin: 0 auto; }
 
   .hidden { display: none !important; }
 
-  @keyframes slideDown { from { opacity: 0; transform: translateY(-16px); } to { opacity: 1; transform: translateY(0); } }
-  @keyframes popIn { from { opacity: 0; transform: translateY(18px) scale(.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
-  @keyframes pop { from { opacity: 0; transform: scale(.85); } to { opacity: 1; transform: scale(1); } }
+  @keyframes popIn { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
   @keyframes shake { 0%,100% { transform: translateX(0); } 20% { transform: translateX(-6px); } 40% { transform: translateX(6px); } 60% { transform: translateX(-4px); } 80% { transform: translateX(4px); } }
   @keyframes correctPulse { 0% { transform: scale(1); } 50% { transform: scale(1.06); } 100% { transform: scale(1); } }
   @keyframes countPop { 0% { opacity: 0; transform: scale(1.6); } 30% { opacity: 1; transform: scale(1); } 100% { transform: scale(.9); } }
-  @keyframes wiggle { 0%,100% { transform: rotate(0deg); } 25% { transform: rotate(-8deg); } 75% { transform: rotate(8deg); } }
-  @keyframes confettiFall { 0% { opacity: 1; transform: translateY(0) rotate(0deg); } 100% { opacity: 0; transform: translateY(420px) rotate(540deg); } }
 
   @media (max-width: 420px) {
-    .question { font-size: 1.35rem; padding: 1.6rem 1.2rem; }
-    .opt { font-size: .92rem; min-height: 82px; }
+    .question { font-size: 1.2rem; padding: 1.4rem 1rem; }
+    .opt { font-size: .9rem; min-height: 78px; }
     .stats { grid-template-columns: 1fr 1fr; }
   }
 </style>
@@ -252,17 +200,14 @@
 <body>
 <div class="wrap">
 
-  <div class="brand">🧠 Vocabulary Kahoot</div>
-
-  <div class="card start" id="start">
-    <span class="badge">🧠</span>
+  <div class="start" id="start">
     <h1>Vocabulary Kahoot</h1>
     <p>See the word, pick the correct explanation!</p>
     <div class="namefield">
       <label for="nameInput">Your name</label>
       <input id="nameInput" type="text" maxlength="24" placeholder="e.g. Alex" autocomplete="off">
     </div>
-    <button class="btn-primary" onclick="startGame()">▶ Play</button>
+    <button class="btn-primary" onclick="startGame()">Play</button>
   </div>
 
   <div class="quiz" id="quiz">
@@ -271,8 +216,16 @@
       <span class="streak" id="streak">🔥 <span id="streakNum">0</span></span>
     </div>
     <div class="dots" id="dots"></div>
-    <div class="timerbar"><div class="fill" id="fill"></div></div>
-    <div class="question" id="question"></div>
+    <div class="question-wrap">
+      <div class="question" id="question"></div>
+      <div class="timer-circle hidden" id="timerCircle">
+        <svg width="52" height="52" viewBox="0 0 52 52">
+          <circle class="bg" cx="26" cy="26" r="22"></circle>
+          <circle class="fg" id="timerFg" cx="26" cy="26" r="22"></circle>
+        </svg>
+        <span id="timerNum">15</span>
+      </div>
+    </div>
     <div class="think" id="think"></div>
     <div class="grid" id="grid"></div>
     <div class="status">
@@ -282,34 +235,26 @@
     </div>
   </div>
 
-  <div class="card results" id="results">
-    <div id="confettiLayer"></div>
-    <span class="emoji" id="finalEmoji">🏆</span>
-    <h2>Game Over!</h2>
-    <div class="ring-wrap">
-      <svg width="170" height="170" viewBox="0 0 170 170">
-        <circle class="ring-bg" cx="85" cy="85" r="74"></circle>
-        <circle class="ring-fg" id="ringFg" cx="85" cy="85" r="74"></circle>
-      </svg>
-      <div class="ring-center">
-        <div class="scoreBig" id="finalScore"></div>
-        <div class="scorePct" id="finalPct"></div>
+  <div class="results" id="results">
+    <div class="podium-card">
+      <span class="emoji" id="finalEmoji">🏆</span>
+      <h2>Game Over!</h2>
+      <div class="finalScore" id="finalScore"></div>
+      <div class="finalSub" id="finalSub"></div>
+      <div class="stats">
+        <div class="stat"><span class="num" id="statCorrect">0</span><span class="lbl">Correct</span></div>
+        <div class="stat"><span class="num" id="statStreak">0</span><span class="lbl">Best streak</span></div>
+        <div class="stat"><span class="num" id="statAcc">0%</span><span class="lbl">Accuracy</span></div>
       </div>
     </div>
-    <div class="sub" id="finalSub"></div>
 
-    <div class="stats">
-      <div class="stat"><span class="num" id="statCorrect">0</span><span class="lbl">Correct</span></div>
-      <div class="stat"><span class="num" id="statStreak">0</span><span class="lbl">Best streak</span></div>
-      <div class="stat"><span class="num" id="statAcc">0%</span><span class="lbl">Accuracy</span></div>
-    </div>
-
-    <div class="leaderboard">
+    <div class="leaderboard-card">
       <div class="lb-title">🏆 Leaderboard — Top 10</div>
+      <div id="lbPodium"></div>
       <div id="lbBody"><div class="lb-loading">Loading…</div></div>
     </div>
 
-    <button class="btn-primary" onclick="restart()">↻ Play Again</button>
+    <button class="btn-primary" onclick="restart()">Play Again</button>
   </div>
 
 </div>
@@ -442,7 +387,7 @@ function startGame() {
   document.getElementById('start').style.display = 'none';
   document.getElementById('results').style.display = 'none';
   buildDots();
-  document.getElementById('quiz').style.display = 'block';
+  document.getElementById('quiz').style.display = 'flex';
   showQuestion();
 }
 
@@ -483,9 +428,9 @@ function showQuestion() {
   document.getElementById('question').textContent = q.word;
   document.getElementById('msg').classList.add('hidden');
   document.getElementById('nextbtn').classList.add('hidden');
-  document.getElementById('scoreline').classList.remove('bump');
   document.getElementById('scoreline').textContent = `Score: ${score}`;
   document.getElementById('think').textContent = '';
+  document.getElementById('timerCircle').classList.add('hidden');
   updateDots();
   updateStreak();
 
@@ -502,9 +447,6 @@ function showQuestion() {
   });
 
   stopTimer();
-  const fill = document.getElementById('fill');
-  fill.style.width = '100%';
-  fill.classList.remove('warn', 'danger');
   // countdown for the "think" phase
   const thinkEl = document.getElementById('think');
   let count = Math.round(THINK_MS / 1000);
@@ -530,6 +472,7 @@ function revealAnswers() {
     b.classList.add('show');
   });
   document.getElementById('think').textContent = '';
+  document.getElementById('timerCircle').classList.remove('hidden');
   phaseStart = Date.now();
   startTimer();
 }
@@ -539,15 +482,18 @@ function stopTimer() {
 }
 
 function startTimer() {
-  const fill = document.getElementById('fill');
+  const fg = document.getElementById('timerFg');
+  const numEl = document.getElementById('timerNum');
+  const r = 22, c = 2 * Math.PI * r;
+  fg.style.strokeDasharray = `${c} ${c}`;
   const total = ANSWER_MS;
   const start = performance.now();
   function step(now) {
     const elapsed = now - start;
     const frac = Math.max(0, 1 - elapsed / total);
-    fill.style.width = (frac * 100) + '%';
-    fill.classList.toggle('warn', frac <= .5 && frac > .25);
-    fill.classList.toggle('danger', frac <= .25);
+    fg.style.strokeDashoffset = c - c * frac;
+    fg.style.stroke = frac <= .25 ? 'var(--red)' : frac <= .5 ? 'var(--yellow)' : 'var(--green)';
+    numEl.textContent = Math.ceil(frac * total / 1000);
     if (elapsed < total && !answered) {
       rafId = requestAnimationFrame(step);
     } else if (!answered) {
@@ -625,9 +571,7 @@ function reveal(kind, text, q) {
   msg.className = `msg ${kind}`;
   msg.textContent = text;
   msg.classList.remove('hidden');
-  const sl = document.getElementById('scoreline');
-  sl.textContent = `Score: ${score}`;
-  sl.classList.add('bump');
+  document.getElementById('scoreline').textContent = `Score: ${score}`;
   const nb = document.getElementById('nextbtn');
   nb.textContent = idx === order.length - 1 ? 'See Results' : 'Next';
   nb.classList.remove('hidden');
@@ -645,50 +589,21 @@ function endGame() {
   document.getElementById('finalScore').textContent = score;
   document.getElementById('finalSub').textContent = `${order.length} questions answered`;
 
-  const maxScore = order.length * 1000;
-  const pct = Math.max(0, Math.min(1, score / maxScore));
-  document.getElementById('finalPct').textContent = Math.round(pct * 100) + '%';
-
+  const pct = Math.max(0, Math.min(1, score / (order.length * 1000)));
   document.getElementById('statCorrect').textContent = `${correctCount}/${order.length}`;
   document.getElementById('statStreak').textContent = bestStreak;
   document.getElementById('statAcc').textContent = Math.round((correctCount / order.length) * 100) + '%';
-
-  const ring = document.getElementById('ringFg');
-  const r = 74, c = 2 * Math.PI * r;
-  ring.style.strokeDasharray = `${c} ${c}`;
-  ring.style.strokeDashoffset = c;
-  ring.style.stroke = pct >= .8 ? 'var(--green)' : pct >= .5 ? 'var(--yellow)' : 'var(--red)';
-  requestAnimationFrame(() => {
-    ring.style.transition = 'stroke-dashoffset 1s cubic-bezier(.2,.8,.2,1)';
-    ring.style.strokeDashoffset = c - c * pct;
-  });
-
   document.getElementById('finalEmoji').textContent =
     pct >= .9 ? '🏆' : pct >= .7 ? '🎉' : pct >= .5 ? '👍' : '💪';
 
-  launchConfetti();
   submitAndShowLeaderboard();
-}
-
-function launchConfetti() {
-  const layer = document.getElementById('confettiLayer');
-  layer.innerHTML = '';
-  const colors = ['#ff4d6d', '#2d7bff', '#ffb300', '#2ec971', '#7b2ff7', '#f107a3'];
-  for (let i = 0; i < 40; i++) {
-    const c = document.createElement('div');
-    c.className = 'confetti';
-    c.style.left = (Math.random() * 100) + '%';
-    c.style.background = colors[Math.floor(Math.random() * colors.length)];
-    c.style.animationDelay = (Math.random() * .4) + 's';
-    c.style.transform = `translateX(${(Math.random() - .5) * 60}px)`;
-    layer.appendChild(c);
-    requestAnimationFrame(() => c.classList.add('go'));
-  }
 }
 
 async function submitAndShowLeaderboard() {
   const lbBody = document.getElementById('lbBody');
+  const lbPodium = document.getElementById('lbPodium');
   lbBody.innerHTML = '<div class="lb-loading">Loading…</div>';
+  lbPodium.innerHTML = '';
   try {
     const safeName = encodeURIComponent(playerName).slice(0, 48);
     await fetch(`https://dreamlo.com/lb/${DREAMLO_PRIVATE}/add/${safeName}/${score}`);
@@ -702,6 +617,7 @@ async function submitAndShowLeaderboard() {
 
 function renderLeaderboard(data) {
   const lbBody = document.getElementById('lbBody');
+  const lbPodium = document.getElementById('lbPodium');
   let entries = data && data.dreamlo && data.dreamlo.leaderboard ? data.dreamlo.leaderboard.entry : null;
   if (!entries) { lbBody.innerHTML = '<div class="lb-empty">No scores yet — be the first!</div>'; return; }
   if (!Array.isArray(entries)) entries = [entries];
@@ -711,14 +627,26 @@ function renderLeaderboard(data) {
     .sort((a, b) => b.score - a.score)
     .slice(0, 10);
 
-  const medals = ['🥇', '🥈', '🥉'];
   let meMarked = false;
+  const isMine = (e) => { const m = !meMarked && e.name === playerName && e.score === score; if (m) meMarked = true; return m; };
+
+  const top3 = entries.slice(0, 3);
+  const order3 = [top3[1], top3[0], top3[2]]; // 2nd, 1st, 3rd (podium layout)
+  const classes = ['second', 'first', 'third'];
+  lbPodium.innerHTML = top3.length ? `<div class="podium">${order3.map((e, i) => {
+    if (!e) return '<div class="p"></div>';
+    return `<div class="p ${classes[i]}">
+      <div class="bar">${i === 1 ? '🥇' : i === 0 ? '🥈' : '🥉'}</div>
+      <div class="pname">${escapeHtml(e.name)}</div>
+      <div class="pscore">${e.score}</div>
+    </div>`;
+  }).join('')}</div>` : '';
+
   lbBody.innerHTML = entries.map((e, i) => {
-    const isMe = !meMarked && e.name === playerName && e.score === score;
-    if (isMe) meMarked = true;
-    return `<div class="lb-row ${isMe ? 'me' : ''}">
-      <span class="lb-rank">${medals[i] || (i + 1)}</span>
-      <span class="lb-name">${escapeHtml(e.name)}${isMe ? ' (you)' : ''}</span>
+    const mine = isMine(e);
+    return `<div class="lb-row ${mine ? 'me' : ''}">
+      <span class="lb-rank">${i + 1}</span>
+      <span class="lb-name">${escapeHtml(e.name)}${mine ? ' (you)' : ''}</span>
       <span class="lb-score">${e.score}</span>
     </div>`;
   }).join('');
