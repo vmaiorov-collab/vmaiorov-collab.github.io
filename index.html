@@ -1,672 +1,126 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="A fast-paced vocabulary quiz with a live leaderboard.">
-<meta name="theme-color" content="#46178f">
-<title>Vocabulary Kahoot</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2346178f'/%3E%3Ctext x='32' y='42' font-size='32' text-anchor='middle'%3E%F0%9F%A7%A0%3C/text%3E%3C/svg%3E">
+<title>Вячеслав Майоров</title>
+<meta name="description" content="Проекты Вячеслава Майорова: конспекты лекций по олимпиадному программированию, учебные приложения и игры.">
+<meta name="theme-color" content="#1f4fd1">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Вячеслав Майоров — проекты">
+<meta property="og:description" content="Конспекты лекций по олимпиадному программированию, учебные приложения и игры.">
+<meta property="og:url" content="https://vmaiorov-collab.github.io/">
+<meta property="og:image" content="https://vmaiorov-collab.github.io/conspectus/og-image-v2.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" href="conspectus/favicon-v2.png">
+<link rel="apple-touch-icon" href="conspectus/apple-touch-icon.png">
+<script>(function(){try{var t=localStorage.getItem("conspectusTheme");if(!t&&window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches)t="dark";document.documentElement.setAttribute("data-theme",t||"light")}catch(e){}})();</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=PT+Serif:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --red: #e21b3c; --blue: #1368ce; --yellow: #ffa602; --green: #26890c;
-    --bg: #46178f; --card: #ffffff; --ink: #333333; --sub: #6b7280;
+  :root{
+    --bg:#f7f5f0; --paper:#fffdf8; --ink:#1c1b19; --muted:#6f6a61; --faint:#a19b90;
+    --accent:#1f4fd1; --line:#e3ded3; --hover:#efebe2;
+    --serif:"PT Serif",Georgia,"Times New Roman",serif;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
   }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  html, body { height: 100%; }
-  html { touch-action: manipulation; }
-  body {
-    font-family: 'Montserrat', "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    background: var(--bg);
-    min-height: 100vh;
-    display: flex; flex-direction: column; align-items: center;
-    padding: 1rem;
-    overflow-x: hidden;
+  :root[data-theme="dark"]{
+    --bg:#16150f; --paper:#1d1c16; --ink:#ece8dd; --muted:#a7a194; --faint:#6f6a61;
+    --accent:#7aa2ff; --line:#2e2c24; --hover:#26241c;
   }
-  button {
-    touch-action: manipulation;
-    -webkit-tap-highlight-color: transparent;
-    -webkit-user-select: none; user-select: none;
-  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.55;min-height:100vh}
+  a{color:inherit;text-decoration:none}
+  :focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:4px}
+  .wrap{max-width:860px;margin:0 auto;padding:0 20px}
 
-  :focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
+  header.top{display:flex;justify-content:space-between;align-items:center;padding:22px 0}
+  .brand{font-family:var(--serif);font-weight:700;font-size:1.05rem}
+  .tools{display:flex;gap:6px;align-items:center}
+  .tools a,.tools button{font:inherit;font-size:.9rem;color:var(--muted);background:none;border:1px solid transparent;
+    padding:6px 12px;border-radius:999px;cursor:pointer}
+  .tools a:hover,.tools button:hover{background:var(--hover);color:var(--ink)}
 
-  .wrap { width: 100%; max-width: 680px; flex: 1; display: flex; flex-direction: column; }
+  .hero{padding:56px 0 40px}
+  .eyebrow{font-size:.8rem;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);font-weight:600}
+  h1{font-family:var(--serif);font-size:clamp(2.3rem,7vw,3.6rem);line-height:1.1;margin:12px 0 16px;letter-spacing:-.01em}
+  .lead{font-family:var(--serif);font-size:1.2rem;color:var(--muted);max-width:34em}
 
-  /* ---- start ---- */
-  .start {
-    margin: auto; background: var(--card); border-radius: 8px; padding: 2.5rem 2rem;
-    text-align: center; box-shadow: 0 6px 0 rgba(0,0,0,.2); width: 100%; max-width: 440px;
-  }
-  .start h1 { font-size: 1.8rem; font-weight: 800; color: var(--ink); margin-bottom: .5rem; }
-  .start p { color: var(--sub); margin-bottom: 1.5rem; font-size: 1rem; }
-  .namefield { margin-bottom: 1.5rem; text-align: left; }
-  .namefield label {
-    display: block; font-size: .75rem; font-weight: 700; color: var(--sub);
-    margin-bottom: .4rem; text-transform: uppercase; letter-spacing: .5px;
-  }
-  .namefield input {
-    width: 100%; padding: .8rem .9rem; border-radius: 6px; border: 2px solid #ddd;
-    font-size: 1rem; font-family: inherit; font-weight: 600; color: var(--ink);
-  }
-  .namefield input:focus { outline: none; border-color: var(--bg); }
-  .btn-primary {
-    background: var(--ink); color: #fff; border: none; padding: .9rem 2.5rem;
-    font-size: 1.1rem; font-weight: 800; border-radius: 6px; cursor: pointer;
-    box-shadow: 0 4px 0 rgba(0,0,0,.3); font-family: inherit;
-  }
-  .btn-primary:hover { filter: brightness(1.15); }
-  .btn-primary:active { transform: translateY(3px); box-shadow: 0 1px 0 rgba(0,0,0,.3); }
+  h2{font-size:.8rem;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);font-weight:600;margin:48px 0 14px}
 
-  /* ---- quiz ---- */
-  .quiz { display: none; flex: 1; flex-direction: column; }
+  .featured{display:block;background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:28px;
+    transition:border-color .15s,transform .15s}
+  .featured:hover{border-color:var(--accent);transform:translateY(-2px)}
+  .featured .tag{display:inline-block;font-size:.75rem;font-weight:600;color:var(--accent);
+    background:color-mix(in srgb,var(--accent) 12%,transparent);padding:3px 10px;border-radius:999px;margin-bottom:12px}
+  .featured h3{font-family:var(--serif);font-size:1.6rem;line-height:1.2;margin-bottom:8px}
+  .featured p{color:var(--muted);max-width:38em}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:16px}
+  .chips span{font-size:.8rem;color:var(--muted);border:1px solid var(--line);padding:2px 10px;border-radius:999px}
+  .go{display:inline-block;margin-top:18px;color:var(--accent);font-weight:600}
 
-  .topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: .6rem; }
-  .qnum { color: #fff; font-weight: 800; font-size: .95rem; }
-  .streak {
-    display: inline-flex; align-items: center; gap: .3rem; background: rgba(0,0,0,.2);
-    color: #ffd873; padding: .3rem .7rem; border-radius: 4px; font-weight: 800; font-size: .85rem;
-    opacity: 0; transition: opacity .2s ease;
-  }
-  .streak.show { opacity: 1; }
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+  .card{display:block;background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:20px;
+    transition:border-color .15s,transform .15s}
+  .card:hover{border-color:var(--accent);transform:translateY(-2px)}
+  .card .ico{font-size:1.5rem;margin-bottom:10px}
+  .card h3{font-size:1rem;margin-bottom:4px}
+  .card p{font-size:.9rem;color:var(--muted)}
 
-  .dots { display: flex; justify-content: center; gap: .25rem; margin-bottom: .6rem; flex-wrap: wrap; }
-  .dot { width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,.3); }
-  .dot.done { background: var(--green); }
-  .dot.current { background: #fff; }
-
-  .question-wrap { position: relative; margin-bottom: .9rem; }
-  .question {
-    background: var(--card); border-radius: 8px; padding: 1.8rem 1.4rem;
-    text-align: center; font-size: 1.5rem; font-weight: 800; color: var(--ink);
-    box-shadow: 0 6px 0 rgba(0,0,0,.2); min-height: 100px;
-    display: flex; align-items: center; justify-content: center;
-  }
-
-  .timer-circle {
-    position: absolute; top: -18px; right: -18px; width: 52px; height: 52px;
-    border-radius: 50%; background: var(--card); box-shadow: 0 4px 0 rgba(0,0,0,.2);
-    display: flex; align-items: center; justify-content: center;
-    font-weight: 900; font-size: 1.3rem; color: var(--ink);
-  }
-  .timer-circle svg { position: absolute; top: 0; left: 0; transform: rotate(-90deg); }
-  .timer-circle circle { fill: none; stroke-width: 4; }
-  .timer-circle .bg { stroke: #eee; }
-  .timer-circle .fg { stroke: var(--green); stroke-linecap: round; transition: stroke-dashoffset .2s linear, stroke .3s ease; }
-
-  .think {
-    text-align: center; color: #fff; font-weight: 800; font-size: 1rem;
-    margin-bottom: .6rem; min-height: 2.4rem; letter-spacing: .5px;
-    display: flex; align-items: center; justify-content: center;
-  }
-  .think.big { animation: countPop .9s ease; font-size: 2.4rem; }
-
-  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: .7rem; flex: 1; }
-  .opt {
-    border: none; border-radius: 6px; padding: 1rem .75rem; min-height: 88px;
-    font-size: 1.05rem; font-weight: 700; color: #fff; cursor: pointer;
-    display: flex; align-items: center; justify-content: center; text-align: center;
-    box-shadow: 0 5px 0 rgba(0,0,0,.25);
-    opacity: 0; transform: translateY(18px);
-    will-change: transform, opacity; position: relative; overflow: hidden;
-  }
-  .opt.show { animation: popIn .25s ease forwards; }
-  .opt.press { transform: translateY(3px); box-shadow: 0 2px 0 rgba(0,0,0,.25); }
-  .opt .shape { margin-right: .55rem; font-size: 1.25rem; width: 1.5rem; display: inline-block; text-align: center; }
-  .opt.red { background: var(--red); }
-  .opt.blue { background: var(--blue); }
-  .opt.yellow { background: var(--yellow); }
-  .opt.green { background: var(--green); }
-  .opt.disabled { cursor: default; pointer-events: none; }
-  .opt.dim { opacity: .35 !important; }
-  .opt.correct { opacity: 1 !important; animation: correctPulse .4s ease; box-shadow: 0 0 0 3px #fff, 0 5px 0 rgba(0,0,0,.25); }
-
-  .ripple {
-    position: absolute; border-radius: 50%; background: rgba(255,255,255,.5);
-    transform: scale(0); animation: rippleAnim .5s ease-out forwards; pointer-events: none;
-  }
-  @keyframes rippleAnim { to { transform: scale(3); opacity: 0; } }
-
-  .status { text-align: center; margin-top: 1rem; min-height: 3.2rem; }
-  .msg { display: inline-block; padding: .55rem 1.3rem; border-radius: 4px; font-weight: 800; font-size: 1.05rem; color: #fff; }
-  .msg.good { background: var(--green); }
-  .msg.bad { background: var(--red); animation: shake .4s ease; }
-  .scoreline { color: #fff; font-weight: 700; margin-top: .6rem; font-size: .95rem; opacity: .9; }
-  .nextbtn {
-    display: block; margin: .75rem auto 0; background: var(--ink); color: #fff;
-    border: none; padding: .8rem 2.5rem; font-size: 1rem; font-weight: 800; border-radius: 6px;
-    cursor: pointer; box-shadow: 0 4px 0 rgba(0,0,0,.3); font-family: inherit;
-  }
-  .nextbtn:hover { filter: brightness(1.15); }
-
-  /* ---- results (Kahoot podium style) ---- */
-  .results { display: none; margin: auto; width: 100%; max-width: 480px; }
-  .podium-card {
-    background: var(--card); border-radius: 8px; padding: 2rem 1.5rem; text-align: center;
-    box-shadow: 0 6px 0 rgba(0,0,0,.2); margin-bottom: 1rem;
-  }
-  .podium-card h2 { font-size: 1.6rem; font-weight: 800; color: var(--ink); margin-bottom: .2rem; }
-  .podium-card .emoji { font-size: 2.6rem; display: block; margin-bottom: .2rem; }
-  .finalScore { font-size: 2.6rem; font-weight: 900; color: var(--bg); margin: .3rem 0; }
-  .finalSub { color: var(--sub); font-size: .9rem; margin-bottom: 1.2rem; }
-
-  .stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: .5rem; margin-bottom: .3rem; }
-  .stat { background: #f2f2f2; border-radius: 6px; padding: .6rem .3rem; }
-  .stat .num { font-size: 1.1rem; font-weight: 800; color: var(--bg); display: block; }
-  .stat .lbl { font-size: .65rem; font-weight: 700; color: var(--sub); text-transform: uppercase; }
-
-  .leaderboard-card {
-    background: var(--card); border-radius: 8px; padding: 1.1rem 1rem; margin-bottom: 1rem;
-    box-shadow: 0 6px 0 rgba(0,0,0,.2);
-  }
-  .lb-title {
-    font-weight: 800; color: var(--ink); font-size: .95rem; margin-bottom: .7rem; text-align: center;
-  }
-  .podium { display: flex; align-items: flex-end; justify-content: center; gap: .5rem; margin-bottom: .9rem; }
-  .podium .p { flex: 1; text-align: center; }
-  .podium .p .bar {
-    border-radius: 6px 6px 0 0; display: flex; align-items: flex-start; justify-content: center;
-    padding-top: .4rem; color: #fff; font-weight: 900; font-size: 1.1rem;
-  }
-  .podium .p.first .bar { background: var(--yellow); height: 86px; }
-  .podium .p.second .bar { background: #9aa0a6; height: 64px; }
-  .podium .p.third .bar { background: #cd7f32; height: 48px; }
-  .podium .p .pname { font-size: .78rem; font-weight: 700; color: var(--ink); margin-top: .35rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .podium .p .pscore { font-size: .7rem; color: var(--sub); font-weight: 700; }
-
-  .lb-row {
-    display: flex; align-items: center; gap: .6rem; padding: .4rem .4rem;
-    border-radius: 6px; font-size: .88rem; font-weight: 600; color: var(--ink);
-  }
-  .lb-row.me { background: #f2eafc; font-weight: 800; }
-  .lb-rank { width: 1.5rem; text-align: center; font-weight: 800; color: var(--sub); flex-shrink: 0; }
-  .lb-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .lb-score { font-weight: 800; color: var(--bg); flex-shrink: 0; }
-  .lb-empty, .lb-loading { color: var(--sub); font-size: .85rem; text-align: center; padding: .4rem 0; }
-
-  .results .btn-primary { display: block; margin: 0 auto; }
-
-  .hidden { display: none !important; }
-
-  @keyframes popIn { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
-  @keyframes shake { 0%,100% { transform: translateX(0); } 20% { transform: translateX(-6px); } 40% { transform: translateX(6px); } 60% { transform: translateX(-4px); } 80% { transform: translateX(4px); } }
-  @keyframes correctPulse { 0% { transform: scale(1); } 50% { transform: scale(1.06); } 100% { transform: scale(1); } }
-  @keyframes countPop { 0% { opacity: 0; transform: scale(1.6); } 30% { opacity: 1; transform: scale(1); } 100% { transform: scale(.9); } }
-
-  @media (max-width: 420px) {
-    .question { font-size: 1.2rem; padding: 1.4rem 1rem; }
-    .opt { font-size: .9rem; min-height: 78px; }
-    .stats { grid-template-columns: 1fr 1fr; }
-  }
+  footer{margin-top:64px;padding:24px 0 40px;border-top:1px solid var(--line);color:var(--faint);font-size:.85rem;
+    display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+  footer a:hover{color:var(--ink)}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+  @media (max-width:520px){.hero{padding:32px 0 24px}.featured{padding:22px}}
 </style>
 </head>
 <body>
 <div class="wrap">
+  <header class="top">
+    <span class="brand">vmaiorov-collab</span>
+    <nav class="tools">
+      <a href="https://github.com/vmaiorov-collab" rel="noopener">GitHub</a>
+      <button id="theme" type="button" aria-label="Сменить тему">◐</button>
+    </nav>
+  </header>
 
-  <div class="start" id="start">
-    <h1>Vocabulary Kahoot</h1>
-    <p>See the word, pick the correct explanation!</p>
-    <div class="namefield">
-      <label for="nameInput">Your name</label>
-      <input id="nameInput" type="text" maxlength="24" placeholder="e.g. Alex" autocomplete="off">
-    </div>
-    <button class="btn-primary" onclick="startGame()">Play</button>
+  <section class="hero">
+    <div class="eyebrow">Проекты</div>
+    <h1>Вячеслав Майоров</h1>
+    <p class="lead">Делаю подробные конспекты лекций по олимпиадному программированию, а ещё учебные приложения и небольшие игры.</p>
+  </section>
+
+  <h2>Главное</h2>
+  <a class="featured" href="conspectus/">
+    <span class="tag">Бесплатно · офлайн</span>
+    <h3>Конспекты лекций — Олимпиадное программирование</h3>
+    <p>Автономные конспекты лекций Яндекс Кружка: формулы, интерактивные схемы сортировок и бинпоиска, читаются без интернета, удобны с телефона и для печати.</p>
+    <div class="chips"><span>ДП и оптимизации</span><span>Графы</span><span>Строки</span><span>Структуры данных</span><span>C++</span><span>5 параллелей · 10 конспектов</span></div>
+    <span class="go">Открыть конспекты →</span>
+  </a>
+
+  <h2>Приложения и игры</h2>
+  <div class="grid">
+    <a class="card" href="kahoot/"><div class="ico">🧠</div><h3>Vocabulary Kahoot</h3><p>Викторина на словарный запас с таблицей лидеров.</p></a>
+    <a class="card" href="index10.html"><div class="ico">🗂️</div><h3>Student App Hub</h3><p>Планировщик и игры в одном месте.</p></a>
+    <a class="card" href="index1.html"><div class="ico">📅</div><h3>ManageBac Planner</h3><p>Планировщик заданий для учёбы.</p></a>
+    <a class="card" href="index2.html"><div class="ico">⭕</div><h3>Infinite Tic Tac Toe</h3><p>Крестики-нолики с тремя фигурами у каждого игрока.</p></a>
+    <a class="card" href="index5.html"><div class="ico">🐍</div><h3>Neon Snake</h3><p>Неоновая «змейка» с необычной механикой.</p></a>
   </div>
 
-  <div class="quiz" id="quiz">
-    <div class="topbar">
-      <span class="qnum" id="qnum"></span>
-      <span class="streak" id="streak">🔥 <span id="streakNum">0</span></span>
-    </div>
-    <div class="dots" id="dots"></div>
-    <div class="question-wrap">
-      <div class="question" id="question"></div>
-      <div class="timer-circle hidden" id="timerCircle">
-        <svg width="52" height="52" viewBox="0 0 52 52">
-          <circle class="bg" cx="26" cy="26" r="22"></circle>
-          <circle class="fg" id="timerFg" cx="26" cy="26" r="22"></circle>
-        </svg>
-        <span id="timerNum">15</span>
-      </div>
-    </div>
-    <div class="think" id="think"></div>
-    <div class="grid" id="grid"></div>
-    <div class="status">
-      <span class="msg hidden" id="msg"></span>
-      <div class="scoreline" id="scoreline"></div>
-      <button class="nextbtn hidden" id="nextbtn" onclick="nextQ()">Next</button>
-    </div>
-  </div>
-
-  <div class="results" id="results">
-    <div class="podium-card">
-      <span class="emoji" id="finalEmoji">🏆</span>
-      <h2>Game Over!</h2>
-      <div class="finalScore" id="finalScore"></div>
-      <div class="finalSub" id="finalSub"></div>
-      <div class="stats">
-        <div class="stat"><span class="num" id="statCorrect">0</span><span class="lbl">Correct</span></div>
-        <div class="stat"><span class="num" id="statStreak">0</span><span class="lbl">Best streak</span></div>
-        <div class="stat"><span class="num" id="statAcc">0%</span><span class="lbl">Accuracy</span></div>
-      </div>
-    </div>
-
-    <div class="leaderboard-card">
-      <div class="lb-title">🏆 Leaderboard — Top 10</div>
-      <div id="lbPodium"></div>
-      <div id="lbBody"><div class="lb-loading">Loading…</div></div>
-    </div>
-
-    <button class="btn-primary" onclick="restart()">Play Again</button>
-  </div>
-
+  <footer>
+    <span>© 2026 Вячеслав Майоров · MIT</span>
+    <a href="https://github.com/vmaiorov-collab" rel="noopener">github.com/vmaiorov-collab</a>
+  </footer>
 </div>
-
 <script>
-const QUESTIONS = [
-  { word: "Topic sentence", answer: 0, options: [
-    "The sentence that states the main idea of a paragraph",
-    "A sentence that introduces a new character",
-    "The last sentence of an essay",
-    "A sentence with no punctuation"] },
-  { word: "Chronologically", answer: 1, options: [
-    "In order of importance",
-    "In order of time",
-    "In alphabetical order",
-    "In random order"] },
-  { word: "Flashback", answer: 1, options: [
-    "A sudden bright light in a story",
-    "A scene set in a time earlier than the main story",
-    "A scene set in the future",
-    "A camera effect used in films"] },
-  { word: "Infer", answer: 2, options: [
-    "To state something directly",
-    "To copy someone's words",
-    "To figure out meaning that is not directly stated",
-    "To summarize a text"] },
-  { word: "Synonyms", answer: 3, options: [
-    "Words with opposite meanings",
-    "Words that sound the same",
-    "Words that rhyme",
-    "Words with similar meanings"] },
-  { word: "Connotation", answer: 1, options: [
-    "The dictionary definition of a word",
-    "The emotional or implied meaning of a word",
-    "The number of syllables in a word",
-    "The spelling of a word"] },
-  { word: "Quotations", answer: 0, options: [
-    "Exact words taken from a text",
-    "A summary of a text",
-    "A made-up dialogue",
-    "The title of a book"] },
-  { word: "Quotation marks", answer: 1, options: [
-    "Marks used to show a pause",
-    "Punctuation used around exact spoken or written words",
-    "Marks that show a new paragraph",
-    "Punctuation used at the end of a question"] },
-  { word: "Direct speech", answer: 2, options: [
-    "Reporting what someone said in your own words",
-    "Talking to yourself",
-    "The exact words someone said, shown with quotation marks",
-    "A conversation between two characters"] },
-  { word: "Protagonist", answer: 3, options: [
-    "The villain of a story",
-    "The narrator of a story",
-    "A minor character in a story",
-    "The main character of a story"] },
-  { word: "Intention", answer: 1, options: [
-    "The length of a text",
-    "What the author aims to achieve with a text",
-    "The genre of a text",
-    "The audience of a text"] },
-  { word: "Rhetorical device", answer: 0, options: [
-    "A technique used to persuade or create effect in language",
-    "A type of punctuation",
-    "A spelling mistake",
-    "A part of speech"] },
-  { word: "Bias", answer: 0, options: [
-    "An unfair preference or prejudice for or against something",
-    "A factual statement with evidence",
-    "A balanced, neutral opinion",
-    "A list of sources"] },
-  { word: "Emotive language", answer: 0, options: [
-    "Words chosen to stir up strong feelings or emotions",
-    "Words used in formal reports",
-    "Technical or scientific terms",
-    "Words that state plain facts"] }
-];
-
-// Reverse questions: see a definition, pick the correct word.
-function buildReverseQuestions() {
-  const words = QUESTIONS.map(q => q.word);
-  const rev = [];
-  QUESTIONS.forEach(q => {
-    const others = words.filter(w => w !== q.word);
-    const distractors = shuffle(others).slice(0, 3);
-    const options = shuffle([q.word, ...distractors]);
-    rev.push({
-      word: q.options[q.answer],
-      options: options,
-      answer: options.indexOf(q.word)
-    });
+  document.getElementById('theme').addEventListener('click',function(){
+    var r=document.documentElement,n=r.getAttribute('data-theme')==='dark'?'light':'dark';
+    r.setAttribute('data-theme',n);
+    try{localStorage.setItem('conspectusTheme',n)}catch(e){}
   });
-  return rev;
-}
-
-const COLORS = ['red', 'blue', 'yellow', 'green'];
-const SHAPES = ['▲', '◆', '●', '■'];
-
-const THINK_MS = 2000;   // time to read the word before answers appear
-const ANSWER_MS = 15000; // time to answer
-
-const DREAMLO_PUBLIC = '6ac33cc78f40bb15a8caacb7';
-const DREAMLO_PRIVATE = 'uuIQSrtlXUOhPNukrakYMwxxP0_ZzQ7kexo9J2wrVUlA';
-
-let idx = 0, score = 0, streak = 0, bestStreak = 0, correctCount = 0;
-let order = [];
-let phase = 'think';   // 'think' | 'answer' | 'done'
-let rafId = null;
-let thinkTimer = null;
-let phaseStart = 0;
-let answered = false;
-let playerName = 'Player';
-
-function shuffle(arr) {
-  const a = arr.slice();
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
-
-function startGame() {
-  const nameInput = document.getElementById('nameInput');
-  playerName = (nameInput.value || '').trim().slice(0, 24) || 'Player';
-  localStorage.setItem('vq_name', playerName);
-
-  idx = 0; score = 0; streak = 0; bestStreak = 0; correctCount = 0;
-  order = shuffle(buildReverseQuestions());
-  document.getElementById('start').style.display = 'none';
-  document.getElementById('results').style.display = 'none';
-  buildDots();
-  document.getElementById('quiz').style.display = 'flex';
-  showQuestion();
-}
-
-(function restoreName() {
-  const saved = localStorage.getItem('vq_name');
-  if (saved) document.getElementById('nameInput').value = saved;
-})();
-
-function buildDots() {
-  const dots = document.getElementById('dots');
-  dots.innerHTML = '';
-  order.forEach(() => {
-    const d = document.createElement('span');
-    d.className = 'dot';
-    dots.appendChild(d);
-  });
-}
-
-function updateDots() {
-  const dots = document.querySelectorAll('.dot');
-  dots.forEach((d, i) => {
-    d.classList.remove('current', 'done');
-    if (i < idx) d.classList.add('done');
-    else if (i === idx) d.classList.add('current');
-  });
-}
-
-function updateStreak() {
-  const el = document.getElementById('streak');
-  document.getElementById('streakNum').textContent = streak;
-  if (streak >= 2) el.classList.add('show'); else el.classList.remove('show');
-}
-
-function showQuestion() {
-  const q = order[idx];
-  phase = 'think'; answered = false;
-  document.getElementById('qnum').textContent = `Question ${idx + 1} of ${order.length}`;
-  document.getElementById('question').textContent = q.word;
-  document.getElementById('msg').classList.add('hidden');
-  document.getElementById('nextbtn').classList.add('hidden');
-  document.getElementById('scoreline').textContent = `Score: ${score}`;
-  document.getElementById('think').textContent = '';
-  document.getElementById('timerCircle').classList.add('hidden');
-  updateDots();
-  updateStreak();
-
-  const grid = document.getElementById('grid');
-  grid.innerHTML = '';
-  const optIdx = shuffle([0,1,2,3]);
-  optIdx.forEach((oi, pos) => {
-    const b = document.createElement('button');
-    b.className = `opt ${COLORS[pos]}`;
-    b.innerHTML = `<span class="shape">${SHAPES[pos]}</span><span>${q.options[oi]}</span>`;
-    b.dataset.oi = oi;
-    b.onclick = (e) => choose(b, oi, e);
-    grid.appendChild(b);
-  });
-
-  stopTimer();
-  // countdown for the "think" phase
-  const thinkEl = document.getElementById('think');
-  let count = Math.round(THINK_MS / 1000);
-  const tick = () => {
-    thinkEl.textContent = count > 0 ? count : 'Go!';
-    thinkEl.classList.remove('big');
-    requestAnimationFrame(() => thinkEl.classList.add('big')); // restart animation, no forced reflow
-    count--;
-    if (count >= 0) thinkTimer = setTimeout(tick, 1000);
-  };
-  tick();
-  phaseStart = Date.now();
-  setTimeout(revealAnswers, THINK_MS);
-}
-
-function revealAnswers() {
-  if (answered || phase !== 'think') return;
-  phase = 'answer';
-  const buttons = document.querySelectorAll('.opt');
-  buttons.forEach((b, i) => {
-    b.style.animationDelay = (i * 0.06) + 's';
-    b.classList.add('show');
-  });
-  document.getElementById('think').textContent = '';
-  document.getElementById('timerCircle').classList.remove('hidden');
-  phaseStart = Date.now();
-  startTimer();
-}
-
-function stopTimer() {
-  if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
-}
-
-function startTimer() {
-  const fg = document.getElementById('timerFg');
-  const numEl = document.getElementById('timerNum');
-  const r = 22, c = 2 * Math.PI * r;
-  fg.style.strokeDasharray = `${c} ${c}`;
-  const total = ANSWER_MS;
-  const start = performance.now();
-  let lastSec = -1, lastZone = '';
-  function step(now) {
-    const elapsed = now - start;
-    const frac = Math.max(0, 1 - elapsed / total);
-    fg.style.strokeDashoffset = c - c * frac;
-    const zone = frac <= .25 ? 'var(--red)' : frac <= .5 ? 'var(--yellow)' : 'var(--green)';
-    if (zone !== lastZone) { fg.style.stroke = zone; lastZone = zone; }
-    const sec = Math.ceil(frac * total / 1000);
-    if (sec !== lastSec) { numEl.textContent = sec; lastSec = sec; }
-    if (elapsed < total && !answered) {
-      rafId = requestAnimationFrame(step);
-    } else if (!answered) {
-      timeUp();
-    }
-  }
-  rafId = requestAnimationFrame(step);
-}
-
-function remainingMs() {
-  const elapsed = Date.now() - phaseStart;
-  return Math.max(0, ANSWER_MS - elapsed);
-}
-
-function timeUp() {
-  answered = true;
-  stopTimer();
-  const q = order[idx];
-  const buttons = document.querySelectorAll('.opt');
-  buttons.forEach(b => {
-    b.classList.add('disabled');
-    if (+b.dataset.oi === q.answer) b.classList.add('correct');
-    else b.classList.add('dim');
-  });
-  streak = 0;
-  updateStreak();
-  reveal('bad', "Time's up!", q);
-}
-
-function spawnRipple(btn, evt) {
-  const rect = btn.getBoundingClientRect();
-  const r = document.createElement('span');
-  r.className = 'ripple';
-  const size = Math.max(rect.width, rect.height);
-  r.style.width = r.style.height = size + 'px';
-  const x = (evt && evt.clientX ? evt.clientX - rect.left : rect.width / 2) - size / 2;
-  const y = (evt && evt.clientY ? evt.clientY - rect.top : rect.height / 2) - size / 2;
-  r.style.left = x + 'px'; r.style.top = y + 'px';
-  btn.appendChild(r);
-  setTimeout(() => r.remove(), 500);
-}
-
-function choose(btn, oi, evt) {
-  if (answered || phase !== 'answer') return;
-  answered = true;
-  stopTimer();
-  spawnRipple(btn, evt);
-  const q = order[idx];
-  btn.classList.add('press');
-  const buttons = document.querySelectorAll('.opt');
-  buttons.forEach(b => {
-    b.classList.add('disabled');
-    if (+b.dataset.oi === q.answer) b.classList.add('correct');
-    else if (b !== btn) b.classList.add('dim');
-  });
-
-  const correct = oi === q.answer;
-  if (correct) {
-    streak++;
-    bestStreak = Math.max(bestStreak, streak);
-    correctCount++;
-    const timeFrac = remainingMs() / ANSWER_MS;
-    const pts = Math.round((500 + 500 * timeFrac) / 50) * 50; // 500..1000 by speed
-    score += pts;
-    reveal('good', `Correct! +${pts}`, q);
-  } else {
-    streak = 0;
-    reveal('bad', 'Wrong!', q);
-  }
-  updateStreak();
-}
-
-function reveal(kind, text, q) {
-  const msg = document.getElementById('msg');
-  msg.className = `msg ${kind}`;
-  msg.textContent = text;
-  msg.classList.remove('hidden');
-  document.getElementById('scoreline').textContent = `Score: ${score}`;
-  const nb = document.getElementById('nextbtn');
-  nb.textContent = idx === order.length - 1 ? 'See Results' : 'Next';
-  nb.classList.remove('hidden');
-}
-
-function nextQ() {
-  idx++;
-  if (idx >= order.length) { endGame(); return; }
-  showQuestion();
-}
-
-function endGame() {
-  document.getElementById('quiz').style.display = 'none';
-  document.getElementById('results').style.display = 'block';
-  document.getElementById('finalScore').textContent = score;
-  document.getElementById('finalSub').textContent = `${order.length} questions answered`;
-
-  const pct = Math.max(0, Math.min(1, score / (order.length * 1000)));
-  document.getElementById('statCorrect').textContent = `${correctCount}/${order.length}`;
-  document.getElementById('statStreak').textContent = bestStreak;
-  document.getElementById('statAcc').textContent = Math.round((correctCount / order.length) * 100) + '%';
-  document.getElementById('finalEmoji').textContent =
-    pct >= .9 ? '🏆' : pct >= .7 ? '🎉' : pct >= .5 ? '👍' : '💪';
-
-  submitAndShowLeaderboard();
-}
-
-async function submitAndShowLeaderboard() {
-  const lbBody = document.getElementById('lbBody');
-  const lbPodium = document.getElementById('lbPodium');
-  lbBody.innerHTML = '<div class="lb-loading">Loading…</div>';
-  lbPodium.innerHTML = '';
-  try {
-    const safeName = encodeURIComponent(playerName).slice(0, 48);
-    await fetch(`https://dreamlo.com/lb/${DREAMLO_PRIVATE}/add/${safeName}/${score}`);
-    const res = await fetch(`https://dreamlo.com/lb/${DREAMLO_PUBLIC}/json`);
-    const data = await res.json();
-    renderLeaderboard(data);
-  } catch (err) {
-    lbBody.innerHTML = '<div class="lb-empty">Couldn’t load the leaderboard right now.</div>';
-  }
-}
-
-function renderLeaderboard(data) {
-  const lbBody = document.getElementById('lbBody');
-  const lbPodium = document.getElementById('lbPodium');
-  let entries = data && data.dreamlo && data.dreamlo.leaderboard ? data.dreamlo.leaderboard.entry : null;
-  if (!entries) { lbBody.innerHTML = '<div class="lb-empty">No scores yet — be the first!</div>'; return; }
-  if (!Array.isArray(entries)) entries = [entries];
-
-  entries = entries
-    .map(e => ({ name: e.name, score: parseInt(e.score, 10) || 0 }))
-    .sort((a, b) => b.score - a.score)
-    .slice(0, 10);
-
-  let meMarked = false;
-  const isMine = (e) => { const m = !meMarked && e.name === playerName && e.score === score; if (m) meMarked = true; return m; };
-
-  const top3 = entries.slice(0, 3);
-  const order3 = [top3[1], top3[0], top3[2]]; // 2nd, 1st, 3rd (podium layout)
-  const classes = ['second', 'first', 'third'];
-  lbPodium.innerHTML = top3.length ? `<div class="podium">${order3.map((e, i) => {
-    if (!e) return '<div class="p"></div>';
-    return `<div class="p ${classes[i]}">
-      <div class="bar">${i === 1 ? '🥇' : i === 0 ? '🥈' : '🥉'}</div>
-      <div class="pname">${escapeHtml(e.name)}</div>
-      <div class="pscore">${e.score}</div>
-    </div>`;
-  }).join('')}</div>` : '';
-
-  lbBody.innerHTML = entries.map((e, i) => {
-    const mine = isMine(e);
-    return `<div class="lb-row ${mine ? 'me' : ''}">
-      <span class="lb-rank">${i + 1}</span>
-      <span class="lb-name">${escapeHtml(e.name)}${mine ? ' (you)' : ''}</span>
-      <span class="lb-score">${e.score}</span>
-    </div>`;
-  }).join('');
-}
-
-function escapeHtml(s) {
-  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-}
-
-function restart() {
-  startGame();
-}
 </script>
 </body>
 </html>
