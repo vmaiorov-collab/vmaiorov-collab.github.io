@@ -96,7 +96,7 @@
   <p class="note">Или одной командой — закройте CLion и выберите систему:</p>
   <div class="tabs" id="tabs"><button class="on" data-t="mac">macOS</button><button data-t="lin">Linux</button><button data-t="win">Windows</button></div>
   <div class="cmd on" id="mac">curl -L -o /tmp/ejudge-clion.zip https://github.com/vmaiorov-collab/ejudge-clion/releases/latest/download/ejudge-clion.zip && unzip -o /tmp/ejudge-clion.zip -d "$HOME/Library/Application Support/JetBrains/CLion2026.2/plugins"<button>Копировать</button></div>
-  <div class="cmd" id="lin">curl -L -o /tmp/ejudge-clion.zip https://github.com/vmaiorov-collab/ejudge-clion/releases/latest/download/ejudge-clion.zip && unzip -o /tmp/ejudge-clion.zip -d "$HOME/.local/share/JetBrains/CLion2026.2/plugins"<button>Копировать</button></div>
+  <div class="cmd" id="lin">curl -L -o /tmp/ejudge-clion.zip https://github.com/vmaiorov-collab/ejudge-clion/releases/latest/download/ejudge-clion.zip && unzip -o /tmp/ejudge-clion.zip -d "$HOME/.local/share/JetBrains/CLion2026.2"<button>Копировать</button></div>
   <div class="cmd" id="win">Invoke-WebRequest https://github.com/vmaiorov-collab/ejudge-clion/releases/latest/download/ejudge-clion.zip -OutFile $env:TEMP\ejudge-clion.zip; Expand-Archive -Force $env:TEMP\ejudge-clion.zip "$env:APPDATA\JetBrains\CLion2026.2\plugins"<button>Копировать</button></div>
   <p class="note">Нужен CLion 2026.2 или новее. Если у вас другая версия, замените <code>CLion2026.2</code> в пути на свою папку. Плагин анонимно считает число пользователей — это отключается в настройках.</p>
 
