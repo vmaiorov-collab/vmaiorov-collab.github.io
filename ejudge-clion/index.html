@@ -52,6 +52,9 @@
   .cmd.on{display:block}
   .cmd button{position:absolute;top:10px;right:10px;font:inherit;font-size:12px;font-weight:700;padding:6px 12px;border-radius:8px;border:0;background:#3c3f45;color:#fff;cursor:pointer}
   .steps{padding-left:20px;color:var(--muted)} .steps b{color:var(--ink)}
+  .live{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:18px 0 0}
+  .live span{background:var(--paper);border:1px solid var(--line);border-radius:99px;padding:6px 14px;font-size:14px;color:var(--muted)}
+  .live b{color:var(--ink)}
   .note{color:var(--muted);font-size:14px;margin-top:10px}
   footer{margin:56px 0 32px;padding-top:20px;border-top:1px solid var(--line);color:var(--muted);font-size:14px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
   footer a{color:var(--muted)}
@@ -69,6 +72,7 @@
       <a class="btn" href="https://github.com/vmaiorov-collab/ejudge-clion/releases/latest/download/ejudge-clion-0.1.0.zip">Скачать плагин</a>
       <a class="btn alt" href="https://github.com/vmaiorov-collab/ejudge-clion">Код на GitHub</a>
     </div>
+    <div class="live" id="live" hidden><span>Установок: <b id="n-inst">…</b></span><span>Запускали сегодня: <b id="n-day">…</b></span></div>
     <img class="shot" src="screenshot.png" alt="Плагин Ejudge в окне CLion: условие, код и список задач с вердиктами">
   </section>
 
@@ -98,6 +102,16 @@
   </footer>
 </div>
 <script>
+  (function(){
+    var B='https://abacus.jasoncameron.dev/get/ejudge-clion-vmaiorov/';
+    function get(key,id){return fetch(B+key,{cache:'no-store'}).then(function(r){return r.json()}).then(function(j){document.getElementById(id).textContent=j.value}).catch(function(){document.getElementById(id).textContent='0'})}
+    function upd(){
+      var d=new Date(),day=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+      document.getElementById('live').hidden=false;
+      get('installs','n-inst');get('active-'+day,'n-day');
+    }
+    upd();setInterval(upd,60000);
+  })();
   var tabs=document.querySelectorAll('#tabs button');
   tabs.forEach(function(b){b.addEventListener('click',function(){
     tabs.forEach(function(x){x.classList.toggle('on',x===b)});
