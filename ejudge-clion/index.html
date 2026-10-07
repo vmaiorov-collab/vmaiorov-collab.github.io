@@ -69,7 +69,7 @@
     <h1>Ejudge <span>прямо в CLion</span></h1>
     <p class="lead">Решайте контесты Яндекс Кружка, не переключаясь на браузер: условия, тесты и отправка решений рядом с кодом.</p>
     <div class="btns">
-      <a class="btn" href="https://github.com/vmaiorov-collab/ejudge-clion/releases/latest/download/ejudge-clion-0.1.0.zip">Скачать плагин</a>
+      <a class="btn" href="https://github.com/vmaiorov-collab/ejudge-clion/releases/latest/download/ejudge-clion.zip">Скачать плагин</a>
       <a class="btn alt" href="https://github.com/vmaiorov-collab/ejudge-clion">Код на GitHub</a>
     </div>
     <div class="live" id="live" hidden><span>Установок: <b id="n-inst">…</b></span><span>Запускали сегодня: <b id="n-day">…</b></span></div>
@@ -82,6 +82,10 @@
     <div class="card"><div class="ico">📖</div><h3>Условие рядом с кодом</h3><p>Читается слева, шрифт можно менять, панель закрывается.</p></div>
     <div class="card"><div class="ico">🧪</div><h3>Тесты и свой ввод</h3><p>Проверка на примерах с вердиктами OK, WA, RE, TL и запуск на любых данных.</p></div>
     <div class="card"><div class="ico">🚀</div><h3>Отправка решений</h3><p>Одна кнопка — и вердикт сервера приходит уведомлением.</p></div>
+    <div class="card"><div class="ico">⏱</div><h3>Время и память</h3><p>Каждый запуск показывает время и память и предупреждает, если вы близки к лимиту.</p></div>
+    <div class="card"><div class="ico">🎲</div><h3>Стресс-тест</h3><p>Сравнивает решение с медленным верным на случайных тестах и находит ввод, на котором ответы разошлись.</p></div>
+    <div class="card"><div class="ico">✅</div><h3>Тест и отправка</h3><p>Примеры и свои тесты, а если все прошли — решение уходит на сервер само.</p></div>
+    <div class="card"><div class="ico">🗂</div><h3>Мои посылки</h3><p>Все посылки задачи с вердиктом, номером теста и кодом, избранные задачи и поиск.</p></div>
   </div>
 
   <h2>Установка</h2>
@@ -91,9 +95,9 @@
   </ol>
   <p class="note">Или одной командой — закройте CLion и выберите систему:</p>
   <div class="tabs" id="tabs"><button class="on" data-t="mac">macOS</button><button data-t="lin">Linux</button><button data-t="win">Windows</button></div>
-  <div class="cmd on" id="mac">curl -L -o /tmp/ejudge-clion.zip https://github.com/vmaiorov-collab/ejudge-clion/releases/latest/download/ejudge-clion-0.1.0.zip && unzip -o /tmp/ejudge-clion.zip -d "$HOME/Library/Application Support/JetBrains/CLion2026.2/plugins"<button>Копировать</button></div>
-  <div class="cmd" id="lin">curl -L -o /tmp/ejudge-clion.zip https://github.com/vmaiorov-collab/ejudge-clion/releases/latest/download/ejudge-clion-0.1.0.zip && unzip -o /tmp/ejudge-clion.zip -d "$HOME/.local/share/JetBrains/CLion2026.2/plugins"<button>Копировать</button></div>
-  <div class="cmd" id="win">Invoke-WebRequest https://github.com/vmaiorov-collab/ejudge-clion/releases/latest/download/ejudge-clion-0.1.0.zip -OutFile $env:TEMP\ejudge-clion.zip; Expand-Archive -Force $env:TEMP\ejudge-clion.zip "$env:APPDATA\JetBrains\CLion2026.2\plugins"<button>Копировать</button></div>
+  <div class="cmd on" id="mac">curl -L -o /tmp/ejudge-clion.zip https://github.com/vmaiorov-collab/ejudge-clion/releases/latest/download/ejudge-clion.zip && unzip -o /tmp/ejudge-clion.zip -d "$HOME/Library/Application Support/JetBrains/CLion2026.2/plugins"<button>Копировать</button></div>
+  <div class="cmd" id="lin">curl -L -o /tmp/ejudge-clion.zip https://github.com/vmaiorov-collab/ejudge-clion/releases/latest/download/ejudge-clion.zip && unzip -o /tmp/ejudge-clion.zip -d "$HOME/.local/share/JetBrains/CLion2026.2/plugins"<button>Копировать</button></div>
+  <div class="cmd" id="win">Invoke-WebRequest https://github.com/vmaiorov-collab/ejudge-clion/releases/latest/download/ejudge-clion.zip -OutFile $env:TEMP\ejudge-clion.zip; Expand-Archive -Force $env:TEMP\ejudge-clion.zip "$env:APPDATA\JetBrains\CLion2026.2\plugins"<button>Копировать</button></div>
   <p class="note">Нужен CLion 2026.2 или новее. Если у вас другая версия, замените <code>CLion2026.2</code> в пути на свою папку. Плагин анонимно считает число пользователей — это отключается в настройках.</p>
 
   <footer>
