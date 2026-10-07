@@ -55,6 +55,7 @@
   .live{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:18px 0 0}
   .live span{background:var(--paper);border:1px solid var(--line);border-radius:99px;padding:6px 14px;font-size:14px;color:var(--muted)}
   .live b{color:var(--ink)}
+  .tip{display:none} .tip.on{display:block}
   .note{color:var(--muted);font-size:14px;margin-top:10px}
   footer{margin:56px 0 32px;padding-top:20px;border-top:1px solid var(--line);color:var(--muted);font-size:14px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
   footer a{color:var(--muted)}
@@ -98,6 +99,9 @@
   <div class="cmd on" id="mac">curl -L -o /tmp/ejudge-clion.zip https://github.com/vmaiorov-collab/ejudge-clion/releases/latest/download/ejudge-clion.zip && unzip -o /tmp/ejudge-clion.zip -d "$HOME/Library/Application Support/JetBrains/CLion2026.2/plugins"</div>
   <div class="cmd" id="lin">curl -L -o /tmp/ejudge-clion.zip https://github.com/vmaiorov-collab/ejudge-clion/releases/latest/download/ejudge-clion.zip && unzip -o /tmp/ejudge-clion.zip -d "$HOME/.local/share/JetBrains/CLion2026.2"</div>
   <div class="cmd" id="win">Invoke-WebRequest https://github.com/vmaiorov-collab/ejudge-clion/releases/latest/download/ejudge-clion.zip -OutFile $env:TEMP\ejudge-clion.zip; Expand-Archive -Force $env:TEMP\ejudge-clion.zip "$env:APPDATA\JetBrains\CLion2026.2\plugins"</div>
+  <p class="note tip on" id="tip-mac">Откройте <b>Терминал</b> (Cmd+Пробел → «Терминал»), вставьте команду и нажмите Enter.</p>
+  <p class="note tip" id="tip-lin">Откройте терминал, вставьте команду и нажмите Enter.</p>
+  <p class="note tip" id="tip-win">Нажмите Win, наберите <b>PowerShell</b>, откройте его и вставьте команду в это окно (не в «Командную строку»), затем Enter.</p>
   <p class="note">Нужен CLion 2026.2 или новее. Если у вас другая версия, замените <code>CLion2026.2</code> в пути на свою папку. Плагин анонимно считает число пользователей — это отключается в настройках.</p>
 
   <footer>
@@ -120,6 +124,7 @@
   tabs.forEach(function(b){b.addEventListener('click',function(){
     tabs.forEach(function(x){x.classList.toggle('on',x===b)});
     document.querySelectorAll('.cmd').forEach(function(c){c.classList.toggle('on',c.id===b.dataset.t)});
+    document.querySelectorAll('.tip').forEach(function(c){c.classList.toggle('on',c.id==='tip-'+b.dataset.t)});
   })});
 </script>
 </body>
