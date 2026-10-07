@@ -3,7 +3,7 @@
   <plugin id="com.ejudge.clion" url="https://github.com/vmaiorov-collab/ejudge-clion/releases/download/v0.2.1/ejudge-clion-0.2.1.zip" version="0.2.1">
     <name>Ejudge</name>
     <idea-version since-build="262"/>
-    <description>Ejudge for CLion: contests, tests, stress test and submissions.</description>
+    <description>Ejudge for CLion: contests, tests and submissions.</description>
     <change-notes>Time and memory per test, own tests, test and submit, submission history, search and favorites, update notifications.</change-notes>
   </plugin>
 </plugins>
