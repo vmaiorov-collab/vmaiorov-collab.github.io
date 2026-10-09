@@ -97,8 +97,8 @@
   </ol>
   <p class="note">Или одной командой — закройте CLion и выберите систему:</p>
   <div class="tabs" id="tabs"><button class="on" data-t="mac">macOS</button><button data-t="lin">Linux</button><button data-t="win">Windows</button></div>
-  <div class="cmd on" id="mac">curl -L -o /tmp/ejudge-clion.zip https://github.com/vmaiorov-collab/ejudge-clion/releases/latest/download/ejudge-clion.zip && unzip -o /tmp/ejudge-clion.zip -d "$HOME/Library/Application Support/JetBrains/CLion2026.2/plugins"</div>
-  <div class="cmd" id="lin">curl -L -o /tmp/ejudge-clion.zip https://github.com/vmaiorov-collab/ejudge-clion/releases/latest/download/ejudge-clion.zip && unzip -o /tmp/ejudge-clion.zip -d "$HOME/.local/share/JetBrains/CLion2026.2"</div>
+  <div class="cmd on" id="mac">curl -L -o /tmp/ejudge-clion.zip https://github.com/vmaiorov-collab/ejudge-clion/releases/latest/download/ejudge-clion.zip && mkdir -p "$HOME/Library/Application Support/JetBrains/CLion2026.2/plugins" && unzip -o /tmp/ejudge-clion.zip -d "$HOME/Library/Application Support/JetBrains/CLion2026.2/plugins"</div>
+  <div class="cmd" id="lin">curl -L -o /tmp/ejudge-clion.zip https://github.com/vmaiorov-collab/ejudge-clion/releases/latest/download/ejudge-clion.zip && mkdir -p "$HOME/.local/share/JetBrains/CLion2026.2" && unzip -o /tmp/ejudge-clion.zip -d "$HOME/.local/share/JetBrains/CLion2026.2"</div>
   <div class="cmd" id="win">Invoke-WebRequest https://github.com/vmaiorov-collab/ejudge-clion/releases/latest/download/ejudge-clion.zip -OutFile $env:TEMP\ejudge-clion.zip; Expand-Archive -Force $env:TEMP\ejudge-clion.zip "$env:APPDATA\JetBrains\CLion2026.2\plugins"</div>
   <p class="note tip on" id="tip-mac">Откройте <b>Терминал</b> (Cmd+Пробел → «Терминал»), вставьте команду и нажмите Enter.</p>
   <p class="note tip" id="tip-lin">Откройте терминал, вставьте команду и нажмите Enter.</p>
