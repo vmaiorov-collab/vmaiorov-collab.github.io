@@ -4,20 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Вячеслав Майоров</title>
-<meta name="description" content="Проекты Вячеслава Майорова: конспекты лекций по олимпиадному программированию, учебные приложения и игры.">
+<meta name="description" content="Конспекты лекций по олимпиадному программированию Вячеслава Майорова.">
 <meta name="theme-color" content="#1f4fd1">
 <meta property="og:type" content="website">
-<meta property="og:title" content="Вячеслав Майоров — проекты">
-<meta property="og:description" content="Конспекты лекций по олимпиадному программированию, учебные приложения и игры.">
+<meta property="og:title" content="Вячеслав Майоров — конспекты">
+<meta property="og:description" content="Конспекты лекций по олимпиадному программированию.">
 <meta property="og:url" content="https://vmaiorov-collab.github.io/">
-<meta property="og:image" content="https://vmaiorov-collab.github.io/og-image.png">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Вячеслав Майоров: конспекты, игры и приложения">
 <meta property="og:site_name" content="Вячеслав Майоров">
 <meta property="og:locale" content="ru_RU">
-<meta name="twitter:image" content="https://vmaiorov-collab.github.io/og-image.png">
-<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:card" content="summary">
 <link rel="icon" type="image/png" href="conspectus/favicon-v2.png">
 <link rel="apple-touch-icon" href="conspectus/apple-touch-icon.png">
 <script>(function(){try{var t=localStorage.getItem("conspectusTheme");if(!t&&window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches)t="dark";document.documentElement.setAttribute("data-theme",t||"light")}catch(e){}})();</script>
@@ -42,6 +37,11 @@
   :focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:4px}
   .wrap{max-width:860px;margin:0 auto;padding:56px 20px}
 
+  .hero{padding:0 0 40px}
+  .eyebrow{font-size:.8rem;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);font-weight:600}
+  h1{font-family:var(--serif);font-size:clamp(2.3rem,7vw,3.6rem);line-height:1.1;margin:12px 0 16px;letter-spacing:-.01em}
+  .lead{font-family:var(--serif);font-size:1.2rem;color:var(--muted);max-width:34em}
+
   .featured{display:block;background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:28px;
     transition:border-color .15s,transform .15s}
   .featured + .featured{margin-top:16px}
@@ -56,11 +56,17 @@
   .go{display:inline-block;margin-top:18px;color:var(--accent);font-weight:600}
 
   @media (prefers-reduced-motion:reduce){*{transition:none!important}}
-  @media (max-width:520px){.wrap{padding-top:32px}.featured{padding:22px}}
+  @media (max-width:520px){.wrap{padding-top:32px}.hero{padding-bottom:24px}.featured{padding:22px}}
 </style>
 </head>
 <body>
 <div class="wrap">
+  <section class="hero">
+    <div class="eyebrow">Проекты</div>
+    <h1>Вячеслав Майоров</h1>
+    <p class="lead">Делаю подробные конспекты лекций по олимпиадному программированию.</p>
+  </section>
+
   <a class="featured" href="conspectus/">
     <span class="tag">Бесплатно · офлайн</span>
     <h3>Конспекты лекций — Олимпиадное программирование, Яндекс</h3>
