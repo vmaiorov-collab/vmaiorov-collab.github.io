@@ -40,24 +40,11 @@
   body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.55;min-height:100vh}
   a{color:inherit;text-decoration:none}
   :focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:4px}
-  .wrap{max-width:860px;margin:0 auto;padding:0 20px}
-
-  header.top{display:flex;justify-content:space-between;align-items:center;padding:22px 0}
-  .brand{font-family:var(--serif);font-weight:700;font-size:1.05rem}
-  .tools{display:flex;gap:6px;align-items:center}
-  .tools a,.tools button{font:inherit;font-size:.9rem;color:var(--muted);background:none;border:1px solid transparent;
-    padding:6px 12px;border-radius:999px;cursor:pointer}
-  .tools a:hover,.tools button:hover{background:var(--hover);color:var(--ink)}
-
-  .hero{padding:56px 0 40px}
-  .eyebrow{font-size:.8rem;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);font-weight:600}
-  h1{font-family:var(--serif);font-size:clamp(2.3rem,7vw,3.6rem);line-height:1.1;margin:12px 0 16px;letter-spacing:-.01em}
-  .lead{font-family:var(--serif);font-size:1.2rem;color:var(--muted);max-width:34em}
-
-  h2{font-size:.8rem;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);font-weight:600;margin:48px 0 14px}
+  .wrap{max-width:860px;margin:0 auto;padding:56px 20px}
 
   .featured{display:block;background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:28px;
     transition:border-color .15s,transform .15s}
+  .featured + .featured{margin-top:16px}
   .featured.tb:hover{border-color:#ffdd2d;box-shadow:0 0 0 1px #ffdd2d}
   .featured:hover{border-color:var(--accent);transform:translateY(-2px)}
   .featured .tag{display:inline-block;font-size:.75rem;font-weight:600;color:var(--accent);
@@ -68,39 +55,12 @@
   .chips span{font-size:.8rem;color:var(--muted);border:1px solid var(--line);padding:2px 10px;border-radius:999px}
   .go{display:inline-block;margin-top:18px;color:var(--accent);font-weight:600}
 
-  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
-  .card{display:block;background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:20px;
-    transition:border-color .15s,transform .15s}
-  .card:hover{border-color:var(--accent);transform:translateY(-2px)}
-  .card .ico{font-size:1.5rem;margin-bottom:10px}
-  .card h3{font-size:1rem;margin-bottom:4px}
-  .card p{font-size:.9rem;color:var(--muted)}
-
-  footer{margin-top:64px;padding:24px 0 40px;border-top:1px solid var(--line);color:var(--faint);font-size:.85rem;
-    display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
-  footer a:hover{color:var(--ink)}
   @media (prefers-reduced-motion:reduce){*{transition:none!important}}
-  @media (max-width:520px){.hero{padding:32px 0 24px}.featured{padding:22px}}
+  @media (max-width:520px){.wrap{padding-top:32px}.featured{padding:22px}}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <header class="top">
-    <span class="brand">vmaiorov-collab</span>
-    <nav class="tools">
-      <a href="https://t.me/MayorovTLF" rel="noopener">Telegram</a>
-      <a href="https://github.com/vmaiorov-collab" rel="noopener">GitHub</a>
-      <button id="theme" type="button" aria-label="Сменить тему">◐</button>
-    </nav>
-  </header>
-
-  <section class="hero">
-    <div class="eyebrow">Проекты</div>
-    <h1>Вячеслав Майоров</h1>
-    <p class="lead">Делаю подробные конспекты лекций по олимпиадному программированию, а ещё учебные приложения и небольшие игры.</p>
-  </section>
-
-  <h2>Главное</h2>
   <a class="featured" href="conspectus/">
     <span class="tag">Бесплатно · офлайн</span>
     <h3>Конспекты лекций — Олимпиадное программирование, Яндекс</h3>
@@ -109,35 +69,13 @@
     <span class="go">Открыть конспекты →</span>
   </a>
 
-  <a class="featured tb" href="olymp-notes/" style="margin-top:16px">
+  <a class="featured tb" href="olymp-notes/">
     <span class="tag">Бесплатно · офлайн</span>
     <h3>Конспекты лекций — Олимпиадное программирование, Т-Банк</h3>
     <p>Подробные автономные конспекты занятий Т-Банка по олимпиадному программированию (параллели X, XS, B, BS, C): формулы, схемы, интерактивные плееры алгоритмов, проверенный C++ код, ссылки с таймкодами на записи.</p>
     <div class="chips"><span>Деревья и LCA</span><span>Бинпоиск</span><span>Строки</span><span>Математика</span><span>C++</span><span>5 параллелей</span></div>
     <span class="go">Открыть конспекты →</span>
   </a>
-
-  <h2>Приложения и игры</h2>
-  <div class="grid">
-    <a class="card" href="kahoot/"><div class="ico">🧠</div><h3>Vocabulary Kahoot</h3><p>Викторина на словарный запас с таблицей лидеров.</p></a>
-    <a class="card" href="index10.html"><div class="ico">🗂️</div><h3>Student App Hub</h3><p>Планировщик и игры в одном месте.</p></a>
-    <a class="card" href="index1.html"><div class="ico">📅</div><h3>ManageBac Planner</h3><p>Планировщик заданий для учёбы.</p></a>
-    <a class="card" href="index2.html"><div class="ico">⭕</div><h3>Infinite Tic Tac Toe</h3><p>Крестики-нолики с тремя фигурами у каждого игрока.</p></a>
-    <a class="card" href="index5.html"><div class="ico">🐍</div><h3>Neon Snake</h3><p>Неоновая «змейка» с необычной механикой.</p></a>
-    <a class="card" href="ejudge-clion/"><div class="ico">🧩</div><h3>Ejudge для CLion</h3><p>Плагин: импорт контестов, условия, тесты и отправка решений прямо из CLion.</p></a>
-  </div>
-
-  <footer>
-    <span>© 2026 Вячеслав Майоров · MIT</span>
-    <span><a href="https://t.me/MayorovTLF" rel="noopener">@MayorovTLF</a> · <a href="https://github.com/vmaiorov-collab" rel="noopener">github.com/vmaiorov-collab</a></span>
-  </footer>
 </div>
-<script>
-  document.getElementById('theme').addEventListener('click',function(){
-    var r=document.documentElement,n=r.getAttribute('data-theme')==='dark'?'light':'dark';
-    r.setAttribute('data-theme',n);
-    try{localStorage.setItem('conspectusTheme',n)}catch(e){}
-  });
-</script>
 </body>
 </html>
