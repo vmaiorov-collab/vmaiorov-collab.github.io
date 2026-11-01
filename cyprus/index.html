@@ -3,14 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Кипр за 14 дней — маршрут с фото</title>
-<meta name="description" content="Готовый маршрут по Кипру на две недели: Ларнака, Айя-Напа, Лимассол, Троодос, Пафос, Акамас, Никосия и Кирения.">
-<meta property="og:title" content="Кипр за 14 дней — маршрут с фото">
-<meta property="og:description" content="Что посмотреть на Кипре за две недели: по дням, с фото, советами и ссылками на карту.">
+<title>Кипр за 14 дней из Лимассола — подробный путеводитель</title>
+<meta name="description" content="Подробный путеводитель на две недели с базой в Лимассоле: история и что смотреть в каждом месте, как добраться, часы работы, цены, план дня, еда и карта.">
+<meta property="og:title" content="Кипр за 14 дней из Лимассола — подробный путеводитель">
+<meta property="og:description" content="14 однодневных поездок из Лимассола: Троодос, Пафос, Акамас, Айя-Напа, Никосия, Фамагуста, Кирения. История, цены, часы работы, карта.">
 <meta property="og:image" content="https://vmaiorov-collab.github.io/cyprus/img/cape_greco.jpg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
 <style>
 :root{
   --sea:#0d4f6c; --sea-2:#1b7a9a; --foam:#e8f3f5; --sand:#f6efe4; --clay:#c8643b;
@@ -18,305 +19,255 @@
 }
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
-body{margin:0;font-family:Manrope,system-ui,sans-serif;color:var(--ink);background:var(--sand);line-height:1.6;font-size:17px}
-h1,h2,h3{font-family:Fraunces,Georgia,serif;line-height:1.15;margin:0}
+body{margin:0;font-family:Manrope,system-ui,sans-serif;color:var(--ink);background:var(--sand);line-height:1.65;font-size:17px}
+h1,h2,h3,h4{font-family:Fraunces,Georgia,serif;line-height:1.15;margin:0}
 a{color:var(--sea-2)}
 img{display:block;max-width:100%}
+.wrap{max-width:980px;margin:0 auto;padding:0 20px}
 
 /* hero */
-.hero{position:relative;min-height:88vh;display:flex;align-items:flex-end;color:#fff;
-  background:linear-gradient(180deg,rgba(6,30,42,.15) 0%,rgba(6,30,42,.75) 100%),url(img/cape_greco.jpg) center/cover}
-.hero-inner{max-width:1100px;margin:0 auto;padding:0 24px 72px;width:100%}
+.hero{position:relative;min-height:86vh;display:flex;align-items:flex-end;color:#fff;
+  background:linear-gradient(180deg,rgba(6,30,42,.15) 0%,rgba(6,30,42,.78) 100%),url(img/cape_greco.jpg) center/cover}
+.hero .wrap{padding-bottom:64px;width:100%}
 .kicker{letter-spacing:.18em;text-transform:uppercase;font-size:13px;font-weight:700;opacity:.9}
-.hero h1{font-size:clamp(44px,8vw,92px);margin:10px 0 16px}
-.hero p{max-width:620px;font-size:19px;opacity:.95;margin:0 0 28px}
-.stats{display:flex;flex-wrap:wrap;gap:12px}
-.stat{background:rgba(255,255,255,.14);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.25);border-radius:999px;padding:8px 16px;font-size:14px;font-weight:600}
+.hero h1{font-size:clamp(40px,7.5vw,84px);margin:10px 0 16px}
+.hero p{max-width:640px;font-size:19px;opacity:.95;margin:0 0 26px}
+.stats{display:flex;flex-wrap:wrap;gap:10px}
+.stat{background:rgba(255,255,255,.14);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.25);border-radius:999px;padding:7px 15px;font-size:14px;font-weight:600}
 
 /* nav */
-nav.days{position:sticky;top:0;z-index:10;background:rgba(246,239,228,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
-nav.days .wrap{max-width:1100px;margin:0 auto;padding:10px 16px;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
+nav.days{position:sticky;top:0;z-index:1000;background:rgba(246,239,228,.95);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+nav.days .in{max-width:980px;margin:0 auto;padding:10px 16px;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
 nav.days a{flex:0 0 auto;text-decoration:none;color:var(--sea);font-weight:700;font-size:14px;padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:#fff}
 nav.days a:hover,nav.days a.on{background:var(--sea);color:#fff;border-color:var(--sea)}
 
-main{max-width:1100px;margin:0 auto;padding:48px 20px 40px}
-.intro{display:grid;grid-template-columns:1.2fr 1fr;gap:32px;margin-bottom:56px}
-.intro h2{font-size:34px;margin-bottom:12px}
-.route{list-style:none;padding:0;margin:0;display:grid;gap:8px}
-.route li{display:flex;gap:12px;align-items:baseline;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 14px}
-.route b{color:var(--clay);min-width:76px;font-size:14px}
+section.block{padding:52px 0 8px}
+section.block h2{font-size:36px;margin-bottom:14px}
+.lead{font-size:18px;color:#33454c;max-width:760px}
+
+/* overview table */
+.toc{display:grid;gap:8px;margin-top:22px}
+.toc a{display:grid;grid-template-columns:64px minmax(0,1fr) auto;gap:14px;align-items:center;text-decoration:none;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 14px}
+.toc a:hover{border-color:var(--sea-2)}
+.toc b{font-family:Fraunces,serif;color:var(--clay);font-size:20px}
+.toc small{color:var(--muted);font-size:13px;white-space:nowrap}
+.lvl{display:inline-block;font-size:12px;font-weight:700;border-radius:999px;padding:2px 9px;margin-left:6px;vertical-align:middle}
+.lvl.l1{background:#e3f1e6;color:#2f6b3c}.lvl.l2{background:#fdf0d9;color:#8a5a12}.lvl.l3{background:#fbe3da;color:#9b3d1d}
+
+#map{height:460px;border-radius:16px;border:1px solid var(--line);margin-top:22px;z-index:1}
+.leaflet-popup-content{font-family:Manrope,sans-serif;font-size:14px}
+.pin{background:var(--clay);color:#fff;border-radius:50%;width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.35)}
+.pin.home{background:var(--sea);width:32px;height:32px;font-size:15px}
 
 /* day */
-.day{display:grid;grid-template-columns:120px 1fr;gap:28px;padding:44px 0;border-top:1px solid var(--line);scroll-margin-top:64px}
-.num{font-family:Fraunces,serif;font-size:72px;color:var(--clay);line-height:1}
-.num small{display:block;font-family:Manrope;font-size:12px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);font-weight:700}
-.day h3{font-size:32px;margin-bottom:6px}
-.where{color:var(--muted);font-size:15px;margin-bottom:18px}
-.where span{display:inline-block;margin-right:14px}
-.gallery{display:grid;grid-template-columns:2fr 1fr;grid-auto-rows:170px;gap:10px;margin:0 0 20px}
-.gallery figure{margin:0;position:relative;border-radius:14px;overflow:hidden;background:linear-gradient(135deg,var(--sea),var(--sea-2))}
-.gallery figure:first-child{grid-row:span 2}
-.gallery.one{grid-template-columns:1fr;grid-auto-rows:340px}
-.gallery.two{grid-template-columns:1fr 1fr;grid-auto-rows:280px}
-.gallery.two figure:first-child,.gallery.one figure:first-child{grid-row:auto}
-.gallery img{width:100%;height:100%;object-fit:cover;transition:transform .6s, opacity .5s;opacity:0}
-.gallery img.ok{opacity:1}
-.gallery figure:hover img{transform:scale(1.04)}
-.gallery figcaption{position:absolute;left:0;right:0;bottom:0;padding:24px 12px 9px;color:#fff;font-size:13px;font-weight:600;background:linear-gradient(transparent,rgba(0,0,0,.6))}
-.gallery figcaption a{color:#fff;text-decoration:none}
-.spots{display:grid;gap:10px;padding:0;margin:0 0 16px;list-style:none}
-.spots li{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 16px}
-.spots b{color:var(--sea)}
-.tip{background:var(--foam);border-left:4px solid var(--sea-2);border-radius:0 12px 12px 0;padding:12px 16px;font-size:15px}
-.tip.warn{background:#fbeee6;border-color:var(--clay)}
+.day{padding:56px 0 20px;border-top:1px solid var(--line);scroll-margin-top:60px}
+.dayhead{display:flex;gap:22px;align-items:flex-start;margin-bottom:18px}
+.num{font-family:Fraunces,serif;font-size:76px;color:var(--clay);line-height:.9;min-width:90px}
+.num small{display:block;font-family:Manrope;font-size:12px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:6px}
+.day h3{font-size:34px;margin-bottom:6px}
+.daysub{color:var(--muted);font-size:16px}
+.meta{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 18px}
+.meta span{background:#fff;border:1px solid var(--line);border-radius:999px;padding:5px 12px;font-size:14px}
+.intro{font-size:17.5px}
+
+.plan{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 20px;margin:22px 0 28px}
+.plan h4{font-size:19px;margin-bottom:10px;color:var(--sea)}
+.plan ol{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.plan li{display:grid;grid-template-columns:110px 1fr;gap:10px;font-size:15.5px}
+.plan li b{color:var(--clay);font-weight:700}
+
+/* place */
+.place{background:var(--card);border:1px solid var(--line);border-radius:18px;overflow:hidden;margin:0 0 22px}
+.place figure{margin:0;position:relative;height:340px;background:linear-gradient(135deg,var(--sea),var(--sea-2))}
+.place figure img{width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .5s}
+.place figure img.ok{opacity:1}
+.place figcaption{position:absolute;right:10px;bottom:8px;font-size:11px;color:#fff;opacity:.85;background:rgba(0,0,0,.35);padding:2px 8px;border-radius:6px}
+.place figcaption a{color:#fff;text-decoration:none}
+.place.nophoto figure{display:none}
+.pbody{padding:22px 24px 24px}
+.place h4{font-size:26px;margin-bottom:10px}
+.place p{margin:0 0 14px}
+.see h5,.facts h5{font-family:Manrope;font-size:13px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin:16px 0 8px}
+.see ul{margin:0;padding-left:20px}
+.see li{margin:3px 0}
+.facts dl{display:grid;grid-template-columns:170px 1fr;gap:6px 14px;margin:0;font-size:15.5px}
+.facts dt{font-weight:700;color:var(--sea)}
+.facts dd{margin:0}
+.tip{background:var(--foam);border-left:4px solid var(--sea-2);border-radius:0 12px 12px 0;padding:11px 15px;font-size:15.5px;margin-top:16px}
 .maplink{display:inline-block;margin-top:14px;font-weight:700;font-size:14px;text-decoration:none;color:var(--clay)}
+.food{background:#fbeee6;border-radius:14px;padding:16px 20px;margin:6px 0 10px}
+.food h4{font-size:19px;color:var(--clay);margin-bottom:6px}
+.food p{margin:0}
 
-/* practical */
-.practical{margin-top:40px;padding:40px 0;border-top:1px solid var(--line)}
-.practical h2{font-size:34px;margin-bottom:20px}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:14px;margin-top:18px}
 .box{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px}
-.box h4{margin:0 0 6px;font-size:16px;color:var(--sea)}
-.box p{margin:0;font-size:15px;color:var(--muted)}
-footer{text-align:center;color:var(--muted);font-size:13px;padding:30px 20px 50px}
+.box h4{margin:0 0 6px;font-size:18px;color:var(--sea)}
+.box p{margin:0;font-size:15.5px;color:#3d4d53}
+.warnbox{background:#fbe3da;border:1px solid #f0c3b2;border-radius:14px;padding:16px 20px;margin-top:18px}
+footer{text-align:center;color:var(--muted);font-size:13px;padding:40px 20px 60px}
 
-@media (max-width:760px){
+@media (max-width:720px){
   body{font-size:16px}
-  .intro{grid-template-columns:1fr}
-  .day{grid-template-columns:1fr;gap:8px}
-  .num{font-size:52px}
-  .gallery{grid-template-columns:1fr 1fr;grid-auto-rows:130px}
-  .gallery figure:first-child{grid-column:span 2;grid-row:span 2}
-  .gallery.two{grid-auto-rows:180px}
-  .gallery.two figure:first-child,.gallery.one figure:first-child{grid-column:auto;grid-row:auto}
-  .gallery.one{grid-auto-rows:230px}
+  .dayhead{flex-direction:column;gap:4px}
+  .num{font-size:54px}
+  .day h3{font-size:27px}
+  .place figure{height:230px}
+  .pbody{padding:18px}
+  .place h4{font-size:22px}
+  .facts dl{grid-template-columns:1fr;gap:2px}
+  .facts dd{margin-bottom:8px}
+  .plan li{grid-template-columns:62px 1fr}
+  .toc a{grid-template-columns:44px 1fr}
+  .toc small{grid-column:2;white-space:normal}
+  .toc a>span{min-width:0}
+  #map{height:380px}
 }
 </style>
 </head>
 <body>
 
 <header class="hero">
-  <div class="hero-inner">
-    <div class="kicker">Маршрут на две недели</div>
+  <div class="wrap">
+    <div class="kicker">Подробный путеводитель · база в Лимассоле</div>
     <h1>Кипр за&nbsp;14&nbsp;дней</h1>
-    <p>От лазурных бухт Айя-Напы до горных монастырей Троодоса и античных мозаик Пафоса. Маршрут по дням: что посмотреть, где ночевать и что важно знать.</p>
+    <p>Четырнадцать однодневных поездок из Лимассола: от морских пещер Айя-Напы до горных монастырей Троодоса, мозаик Пафоса и готических соборов Фамагусты. У каждой локации — история, что смотреть, как добраться, часы работы, цены и советы.</p>
     <div class="stats">
-      <span class="stat">≈ 900 км на машине</span>
-      <span class="stat">5 баз для ночёвки</span>
-      <span class="stat">7 объектов ЮНЕСКО</span>
-      <span class="stat">прилёт и вылет — Ларнака</span>
+      <span class="stat">🏨 Живём в Лимассоле все 14 ночей</span>
+      <span class="stat">🚗 ≈ 2000 км за две недели</span>
+      <span class="stat">🏛 3 объекта ЮНЕСКО</span>
+      <span class="stat">🛂 3 дня на Севере</span>
     </div>
   </div>
 </header>
 
-<nav class="days"><div class="wrap" id="nav"></div></nav>
+<nav class="days"><div class="in" id="nav"><a href="#overview">Обзор</a></div></nav>
 
-<main>
-  <section class="intro">
-    <div>
-      <h2>Как устроен маршрут</h2>
-      <p>Маршрут идёт по кругу с востока на запад и обратно: сначала пляжи и восток острова, затем Лимассол и горы Троодос, потом Пафос и дикий полуостров Акамас, а в конце — Никосия и северное побережье. Переезды между базами — не больше 1–1,5 часа, так что в каждом дне остаётся время на море.</p>
-      <p>Удобнее всего арендовать машину на все 14 дней: общественный транспорт между деревнями и в горах ходит редко.</p>
+<main class="wrap">
+  <section class="block" id="overview">
+    <h2>Как устроен маршрут</h2>
+    <p class="lead">Лимассол стоит посередине южного побережья, поэтому из него удобно ездить во все стороны: час до гор Троодос, Пафоса и Никосии, 1–1,5 часа до Айя-Напы, Фамагусты и Кирении. Не нужно каждые три дня собирать чемоданы. Дальние поездки чередуются с лёгкими днями рядом с домом, а дни с поездками на Север стоят в конце: в Никосии границу переходят пешком, а в Фамагусту и Кирению едут на машине два дня подряд, чтобы хватило одной страховки.</p>
+    <div class="toc" id="toc"></div>
+    <p style="margin-top:14px;font-size:14px;color:var(--muted)">
+      <span class="lvl l1">лёгкий</span> до 40 минут за рулём в одну сторону ·
+      <span class="lvl l2">средний</span> около часа ·
+      <span class="lvl l3">длинный</span> 1,5 часа и больше, ранний выезд
+    </p>
+    <div id="map"></div>
+  </section>
+
+  <section class="block">
+    <h2>Перед поездкой</h2>
+    <div class="grid">
+      <div class="box"><h4>🚗 Машина</h4><p>Без машины этот маршрут не проехать: автобусы в горы и между деревнями ходят редко. Движение левостороннее, руль справа. Права нужны с минимум годом стажа, возраст водителя обычно от 21–25 лет. Бронируйте заранее.</p></div>
+      <div class="box"><h4>🛂 Север острова</h4><p>Дни 12–14 частично проходят на территории непризнанной Турецкой Республики Северного Кипра. Нужен паспорт. Страховка прокатной машины там не действует: на КПП покупают отдельную, ≈ €20–30 на несколько дней. Заранее проверьте, разрешает ли прокатчик выезд на Север.</p></div>
+      <div class="box"><h4>🎟 Билеты в музеи</h4><p>Большинство античных памятников принадлежит Департаменту древностей. Крупные объекты стоят €4,50, небольшие — €2,50. Есть общие абонементы на 1, 3 и 7 дней (€8,50 / €17 / €25), но по этому маршруту выгоднее покупать билеты по отдельности. Дети, студенты и пенсионеры часто проходят бесплатно.</p></div>
+      <div class="box"><h4>🕗 Часы работы</h4><p>У государственных объектов два сезона: 16 апреля — 15 сентября обычно 08:30–19:30, 16 сентября — 15 апреля обычно 08:30–17:00. Закрыты 25 декабря, 1 января и в православную Пасху. Бывают внеплановые закрытия из-за забастовок — проверяйте накануне.</p></div>
+      <div class="box"><h4>☀️ Когда ехать</h4><p>Лучше всего апрель–июнь и сентябрь–октябрь. В июле–августе на побережье +35 °C, на раскопках без тени тяжело: выходите к открытию. Зимой мягко, но в горах бывает снег; зато с ноября по март на солёных озёрах зимуют фламинго.</p></div>
+      <div class="box"><h4>⛪ Церкви и мечети</h4><p>Плечи и колени должны быть закрыты, в мечетях снимают обувь, женщины покрывают голову. В расписных церквях Троодоса не фотографируют фрески со вспышкой. Смотрителю обычно оставляют пожертвование.</p></div>
     </div>
-    <ul class="route">
-      <li><b>Дни 1–3</b> Ларнака или Айя-Напа</li>
-      <li><b>Дни 4–7</b> Лимассол</li>
-      <li><b>Дни 8–9</b> Горы Троодос (Платрес или Какопетрия)</li>
-      <li><b>Дни 10–12</b> Пафос</li>
-      <li><b>Дни 13–14</b> Никосия → вылет из Ларнаки</li>
-    </ul>
+    <div class="warnbox"><b>⚠️ Актуально на ноябрь 2026:</b> ущелье Авакас на полуострове Акамас закрыто Департаментом лесов с 6 декабря 2025 года из-за камнепадов и подъёма воды. Поэтому в маршрут его не включили. Если до поездки ущелье откроют, его можно добавить в день 10.</div>
   </section>
 
   <div id="days"></div>
-
-  <section class="practical">
-    <h2>Полезно знать</h2>
-    <div class="grid">
-      <div class="box"><h4>🚗 Машина</h4><p>Движение левостороннее, руль справа. Бронируйте заранее — летом машины разбирают. Для гор хватит обычного авто, для грунтовок Акамаса нужен внедорожник.</p></div>
-      <div class="box"><h4>🛂 Поездка на Север</h4><p>Для Фамагусты, Кирении и северной Никосии нужен паспорт. Страховка из проката обычно не действует на Севере — её покупают прямо на КПП. Уточните у прокатчика, разрешён ли выезд.</p></div>
-      <div class="box"><h4>☀️ Когда ехать</h4><p>Лучшее время — апрель–июнь и сентябрь–октябрь: тепло, море тёплое, нет изнуряющей жары. В июле–августе +35°C и выше, в горах прохладнее. Фламинго на Солёном озере — с ноября по март.</p></div>
-      <div class="box"><h4>💶 Деньги</h4><p>На юге — евро, карты принимают почти везде. На Севере — турецкая лира, но евро часто берут. Немного наличных пригодится в деревнях и на парковках.</p></div>
-      <div class="box"><h4>🍽 Что попробовать</h4><p>Мезе (десятки маленьких блюд), халлуми, сувлаки, клефтико, сладкое вино коммандария, зивания, лукумы из Героскипу.</p></div>
-      <div class="box"><h4>⛪ Монастыри</h4><p>Плечи и колени должны быть закрыты. В расписных церквях Троодоса нельзя фотографировать фрески со вспышкой, часто просят оставить пожертвование смотрителю.</p></div>
-    </div>
-  </section>
 </main>
 
 <footer>
-  Фотографии — Wikimedia Commons / Википедия (по клику на подпись открывается статья с автором и лицензией).<br>
-  Часы работы и цены уточняйте перед поездкой.
+  Фотографии — Wikimedia Commons / Википедия (по клику на подпись открывается статья с автором и лицензией). Карта © участники OpenStreetMap.<br>
+  Цены и часы работы собраны по открытым источникам в ноябре 2026 года и могут меняться — проверяйте перед поездкой.
 </footer>
 
+<script src="data1.js"></script>
+<script src="data2.js"></script>
+<script src="data3.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 <script>
-// local: файл в папке img; wiki: название статьи англ. Википедии — фото подгрузится автоматически
-const DAYS = [
- {t:"Ларнака: набережная и Солёное озеро", base:"Ларнака", drive:"от аэропорта 15 мин",
-  photos:[{local:"larnaca.jpg",cap:"Набережная Финикудес",wiki:"Larnaca"},{wiki:"Church of Saint Lazarus, Larnaca",cap:"Церковь Святого Лазаря"},{local:"hala_sultan_tekke.jpg",cap:"Мечеть Хала Султан Текке",wiki:"Hala Sultan Tekke"}],
-  spots:[["Набережная Финикудес","пальмовая аллея, кафе и городской пляж — идеально для первого вечера."],
-         ["Церковь Святого Лазаря","IX век, резной иконостас и крипта, где по преданию был похоронен Лазарь."],
-         ["Солёное озеро и Хала Султан Текке","зимой здесь зимуют розовые фламинго, на берегу — одна из главных исламских святынь острова."]],
-  tip:"Вечером поужинайте рыбным мезе в районе старого форта — хороший способ попробовать всё сразу.",
-  map:"Larnaca Finikoudes"},
- {t:"Айя-Напа и мыс Греко", base:"Ларнака / Айя-Напа", drive:"40 мин",
-  photos:[{local:"cape_greco.jpg",cap:"Национальный парк Каво-Греко",wiki:"Cape Greco"},{local:"ayia_napa.jpg",cap:"Айя-Напа",wiki:"Ayia Napa"},{wiki:"Nissi Beach",cap:"Пляж Нисси"}],
-  spots:[["Мыс Греко","скалы, морские пещеры и «Мост влюблённых»; прозрачная вода для снорклинга."],
-         ["Бухта Коннос","маленький пляж с бирюзовой водой между скалами — приезжайте до 10 утра."],
-         ["Пляж Нисси и монастырь Айя-Напы","белый песок и средневековый монастырь XVI века в самом центре курорта."]],
-  tip:"Возьмите маску: у пещер Каво-Греко отличная видимость под водой. Обувь для скал тоже пригодится.",
-  map:"Cape Greco National Forest Park"},
- {t:"Протарас и Фамагуста", base:"Ларнака / Айя-Напа", drive:"30 мин + КПП Деринья",
-  photos:[{wiki:"Fig Tree Bay",cap:"Бухта Фиг-Три, Протарас"},{wiki:"Lala Mustafa Pasha Mosque",cap:"Мечеть Лала Мустафа-паши"},{wiki:"Varosha, Famagusta",cap:"Квартал-призрак Вароша"}],
-  spots:[["Фиг-Три-Бэй","один из лучших пляжей острова с островком, до которого можно доплыть."],
-         ["Старая Фамагуста (Север)","венецианские стены, «Башня Отелло» и готический собор, ставший мечетью."],
-         ["Вароша","курортный квартал, заброшенный с 1974 года; часть улиц открыта для прогулки, можно взять велосипед."]],
-  tip:"Для Фамагусты нужен паспорт и отдельная страховка для машины — её продают на КПП Деринья.",warn:true,
-  map:"Famagusta Walled City"},
- {t:"Лефкара и Хирокития → Лимассол", base:"Лимассол", drive:"≈ 1 ч 15 мин с остановками",
-  photos:[{wiki:"Pano Lefkara",cap:"Деревня Лефкара"},{wiki:"Choirokoitia",cap:"Неолитическое поселение Хирокития"}],
-  spots:[["Лефкара","каменная деревня, знаменитая кружевом «лефкаритико» и серебром; говорят, Леонардо да Винчи увёз отсюда скатерть для Миланского собора."],
-         ["Хирокития","поселение 7-го тысячелетия до н. э., объект ЮНЕСКО, с реконструкцией круглых домов."],
-         ["Вечер в Лимассоле","прогулка по набережной Молос до марины."]],
-  tip:"В Лефкаре загляните в музей кружева и попробуйте местный лукум «лукуми».",
-  map:"Pano Lefkara"},
- {t:"Лимассол", base:"Лимассол", drive:"по городу",
-  photos:[{wiki:"Limassol",cap:"Лимассол"},{wiki:"Limassol Castle",cap:"Лимассольский замок"},{wiki:"Amathus",cap:"Руины Аматуса"}],
-  spots:[["Старый город и замок","средневековый замок, где по легенде венчался Ричард Львиное Сердце; сейчас там музей."],
-         ["Марина и набережная Молос","парк скульптур, яхты, рестораны — лучше на закате."],
-         ["Аматус","руины античного города-царства прямо у моря на востоке города."]],
-  tip:"Вечером зайдите в старый город за мезе — таверны вокруг замка и старой рожковой мельницы Carob Mill.",
-  map:"Limassol Castle"},
- {t:"Курион и замок Колосси", base:"Лимассол", drive:"20 мин",
-  photos:[{local:"kourion.jpg",cap:"Античный театр Куриона",wiki:"Kourion"},{wiki:"Kolossi Castle",cap:"Замок Колосси"},{wiki:"Sanctuary of Apollo Hylates",cap:"Святилище Аполлона Гилатского"}],
-  spots:[["Курион","греко-римский театр над обрывом и виллы с мозаиками — один из самых красивых видов острова."],
-         ["Святилище Аполлона Гилатского","храм бога лесов в 3 км от Куриона."],
-         ["Замок Колосси","крепость рыцарей-госпитальеров, здесь делали первое вино коммандария."]],
-  tip:"Приезжайте в Курион к открытию или после 16:00 — днём тени нет совсем. Под обрывом — пляж Курион.",
-  map:"Kourion Archaeological Site"},
- {t:"Полуостров Акротири: кошки, фламинго и пляжи", base:"Лимассол", drive:"25 мин",
-  photos:[{wiki:"Akrotiri Salt Lake",cap:"Солёное озеро Акротири"},{wiki:"Saint Nicholas of the Cats Monastery",cap:"Монастырь Святого Николая Кошачьего"},{wiki:"Akrotiri Peninsula",cap:"Полуостров Акротири"}],
-  spots:[["Монастырь Святого Николая Кошачьего","по легенде, в IV веке сюда завезли кошек для борьбы со змеями; десятки кошек живут при монастыре и сейчас."],
-         ["Солёное озеро Акротири","крупнейшее озеро острова; с ноября по март здесь тысячи розовых фламинго. Смотровая площадка и инфоцентр — у деревни Акротири."],
-         ["Пляж Леди-Майл и болота Фасури","длинный песчаный пляж с мелководьем и рыбные таверны на берегу; на обратном пути — эвкалиптовые рощи Фасури."]],
-  tip:"Возьмите бинокль для фламинго. Часть полуострова — британская военная база: не фотографируйте заборы и объекты базы.",warn:true,
-  map:"Saint Nicholas of the Cats Monastery"},
- {t:"Горы Троодос и водопады", base:"Горы Троодос", drive:"≈ 1 ч из Лимассола",
-  photos:[{wiki:"Troodos Mountains",cap:"Горы Троодос"},{wiki:"Kakopetria",cap:"Какопетрия"}],
-  spots:[["Тропа к водопаду Каледония","≈ 3 км по ручью в сосновом лесу, подходит для неподготовленных."],
-         ["Гора Олимп (1952 м)","высшая точка Кипра; тропы Артемида и Атланта вокруг вершины."],
-         ["Какопетрия","старый квартал с деревянными балконами и форелью в тавернах."]],
-  tip:"В горах на 8–10°C прохладнее, чем у моря. Возьмите кофту даже летом, а зимой здесь лежит снег.",
-  map:"Caledonia Waterfall Cyprus"},
- {t:"Расписные церкви и монастырь Киккос", base:"Горы Троодос", drive:"≈ 2 ч за день",
-  photos:[{wiki:"Painted Churches in the Troodos Region",cap:"Расписные церкви Троодоса (ЮНЕСКО)"},{wiki:"Kykkos Monastery",cap:"Монастырь Киккос"},{wiki:"Church of Saint Nicholas of the Roof",cap:"Церковь Св. Николая «под крышей»"}],
-  spots:[["Агиос Николаос тис Стегис","фрески XI–XVII веков под двойной деревянной крышей."],
-         ["Панагия Асину или Панагия ту Арака","одни из лучших византийских росписей на острове."],
-         ["Монастырь Киккос","самый богатый монастырь Кипра с иконой, которую приписывают апостолу Луке."]],
-  tip:"Церкви часто закрыты — ключ у смотрителя, его телефон обычно висит на двери. Закройте плечи и колени.",
-  map:"Kykkos Monastery"},
- {t:"Скала Афродиты → Пафос", base:"Пафос", drive:"≈ 1 ч 15 мин",
-  photos:[{wiki:"Petra tou Romiou",cap:"Скала Афродиты (Петра-ту-Ромиу)"},{wiki:"Paphos",cap:"Гавань Пафоса"}],
-  spots:[["Петра-ту-Ромиу","по мифу, здесь из пены вышла Афродита. Лучше всего — на рассвете или на закате."],
-         ["Святилище Афродиты в Куклии","руины одного из главных храмов богини в античном мире."],
-         ["Гавань Пафоса","средневековый форт и набережная с ресторанами."]],
-  tip:"Над скалой есть смотровая площадка — оттуда лучший кадр. На пляже галька, возьмите коралловые тапочки.",
-  map:"Petra tou Romiou"},
- {t:"Античный Пафос", base:"Пафос", drive:"по городу",
-  photos:[{wiki:"Paphos Archaeological Park",cap:"Мозаики археологического парка"},{wiki:"Tombs of the Kings (Paphos)",cap:"Гробницы царей"},{wiki:"Chrysopolitissa Basilica",cap:"Базилика Хрисополитисса"}],
-  spots:[["Археологический парк Като Пафос","римские виллы Диониса и Тесея с одними из лучших мозаик Средиземноморья (ЮНЕСКО)."],
-         ["Гробницы царей","высеченные в скале подземные склепы IV века до н. э."],
-         ["Айя Кириаки и столб Святого Павла","раннехристианская базилика, у которой, по преданию, бичевали апостола Павла."]],
-  tip:"Спланируйте день так: утро — парк (до жары), обед — у гавани, вечер — закат у Гробниц царей.",
-  map:"Paphos Archaeological Park"},
- {t:"Полуостров Акамас", base:"Пафос", drive:"≈ 50 мин до Лачи",
-  photos:[{wiki:"Baths of Aphrodite",cap:"Купальня Афродиты"},{wiki:"Avakas Gorge",cap:"Ущелье Авакас"},{wiki:"Akamas",cap:"Полуостров Акамас"}],
-  spots:[["Голубая лагуна","на лодке из Лачи — бирюзовая вода и снорклинг."],
-         ["Купальня Афродиты и тропа Афродиты","короткая прогулка к гроту и красивая тропа вдоль моря."],
-         ["Ущелье Авакас и пляж Лара","узкий каньон с отвесными стенами; на Ларе с июня по август черепахи откладывают яйца."]],
-  tip:"Дороги Акамаса — грунтовки; обычная арендованная машина там не застрахована. Безопаснее взять джип-тур или лодку.",warn:true,
-  map:"Blue Lagoon Akamas"},
- {t:"Никосия — последняя разделённая столица", base:"Никосия", drive:"≈ 1 ч 45 мин из Пафоса",
-  photos:[{local:"nicosia.jpg",cap:"Никосия",wiki:"Nicosia"},{wiki:"Ledra Street",cap:"Улица Ледра"},{wiki:"Selimiye Mosque, Nicosia",cap:"Мечеть Селимие"}],
-  spots:[["Венецианские стены и Кипрский музей","лучшая коллекция древностей острова."],
-         ["Улица Ледра и КПП","пешком переходите на северную сторону по паспорту за пару минут."],
-         ["Бююк-Хан и мечеть Селимие","османский караван-сарай и готический собор Святой Софии, ставший мечетью."]],
-  tip:"Поднимитесь на смотровую Shacolas Tower на Ледре — с неё видна буферная зона ООН и весь город.",
-  map:"Ledra Street Nicosia"},
- {t:"Кирения и Беллапаис → вылет", base:"вылет из Ларнаки", drive:"40 мин до Кирении, 1 ч до аэропорта",
-  photos:[{wiki:"Kyrenia Castle",cap:"Замок Кирении"},{wiki:"Bellapais Abbey",cap:"Аббатство Беллапаис"},{wiki:"St. Hilarion Castle",cap:"Замок Святого Илариона"}],
-  spots:[["Кирения","подковообразная старая гавань и замок с музеем затонувшего корабля возрастом 2300 лет."],
-         ["Аббатство Беллапаис","готические руины XIII века над морем."],
-         ["Замок Святого Илариона","«сказочный» замок на скалах с видом на побережье, если останется время."]],
-  tip:"Заложите на возвращение в аэропорт запас: проверка на КПП может занять 15–30 минут.",warn:true,
-  map:"Kyrenia Harbour"}
-];
+const LEVEL={"лёгкий":"l1","средний":"l2","длинный":"l3"};
+const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const nav=document.getElementById('nav'), toc=document.getElementById('toc'), box=document.getElementById('days');
+const wikiTitles=new Set();
 
-const nav=document.getElementById('nav'), box=document.getElementById('days');
-const wikiImgs=[];
 DAYS.forEach((d,i)=>{
   const n=i+1;
   nav.insertAdjacentHTML('beforeend',`<a href="#d${n}">День ${n}</a>`);
-  const cls=d.photos.length===1?'one':d.photos.length===2?'two':'';
-  const figs=d.photos.map(p=>{
-    const href=p.wiki?`https://en.wikipedia.org/wiki/${encodeURIComponent(p.wiki.replace(/ /g,'_'))}`:'#';
-    const img=p.local?`<img src="img/${p.local}" alt="${p.cap}" loading="lazy" class="ok">`
-                     :`<img data-wiki="${p.wiki}" alt="${p.cap}" loading="lazy">`;
-    if(!p.local) wikiImgs.push(p.wiki);
-    return `<figure>${img}<figcaption><a href="${href}" target="_blank" rel="noopener">${p.cap}</a></figcaption></figure>`;
+  toc.insertAdjacentHTML('beforeend',`<a href="#d${n}"><b>${n}</b><span>${esc(d.title)} <span class="lvl ${LEVEL[d.level]||'l2'}">${esc(d.level)}</span></span><small>🚗 ${esc(d.drive.split(',')[0])}</small></a>`);
+
+  const plan=d.plan.map(p=>`<li><b>${esc(p[0])}</b><span>${esc(p[1])}</span></li>`).join('');
+  const places=d.places.map(p=>{
+    const hasImg=p.local||p.wiki;
+    if(p.wiki&&!p.local) wikiTitles.add(p.wiki);
+    const enHref=p.wiki?`https://en.wikipedia.org/wiki/${encodeURIComponent(p.wiki.replace(/ /g,'_'))}`:'';
+    const img=p.local?`<img src="img/${p.local}" alt="${esc(p.name)}" loading="lazy" class="ok">`
+                     :(p.wiki?`<img data-wiki="${esc(p.wiki)}" alt="${esc(p.name)}" loading="lazy">`:'');
+    const fig=hasImg?`<figure>${img}<figcaption><a href="${enHref}" target="_blank" rel="noopener">Фото: Wikimedia Commons</a></figcaption></figure>`:'';
+    const see=p.see&&p.see.length?`<div class="see"><h5>Что посмотреть</h5><ul>${p.see.map(s=>`<li>${esc(s)}</li>`).join('')}</ul></div>`:'';
+    const fk=Object.entries(p.facts||{});
+    const facts=fk.length?`<div class="facts"><h5>Практическое</h5><dl>${fk.map(([k,v])=>`<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join('')}</dl></div>`:'';
+    const tip=p.tip?`<div class="tip">💡 ${esc(p.tip)}</div>`:'';
+    const ml=p.ll?`<a class="maplink" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination=${p.ll[0]},${p.ll[1]}">Маршрут в Google Картах →</a>`:'';
+    return `<article class="place${hasImg?'':' nophoto'}">${fig}<div class="pbody"><h4>${esc(p.name)}</h4><p>${esc(p.text)}</p>${see}${facts}${tip}${ml}</div></article>`;
   }).join('');
+
   box.insertAdjacentHTML('beforeend',`
   <section class="day" id="d${n}">
-    <div class="num"><small>День</small>${n}</div>
-    <div>
-      <h3>${d.t}</h3>
-      <div class="where"><span>🏨 ${d.base}</span><span>🚗 ${d.drive}</span></div>
-      <div class="gallery ${cls}">${figs}</div>
-      <ul class="spots">${d.spots.map(s=>`<li><b>${s[0]}</b> — ${s[1]}</li>`).join('')}</ul>
-      <div class="tip${d.warn?' warn':''}">💡 ${d.tip}</div>
-      <a class="maplink" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(d.map)}">Открыть на карте →</a>
+    <div class="dayhead">
+      <div class="num"><small>День</small>${n}</div>
+      <div><h3>${esc(d.title)}</h3><div class="daysub">${esc(d.sub)}</div></div>
     </div>
+    <div class="meta"><span>🚗 ${esc(d.drive)}</span><span class="lvl ${LEVEL[d.level]||'l2'}" style="font-size:13px;padding:6px 12px;margin:0">${esc(d.level)} день</span></div>
+    <p class="intro">${esc(d.intro)}</p>
+    <div class="plan"><h4>План дня</h4><ol>${plan}</ol></div>
+    ${places}
+    <div class="food"><h4>🍽 Где и что поесть</h4><p>${esc(d.food)}</p></div>
   </section>`);
 });
 
-// Подгружаем фото из Википедии (одним-двумя запросами)
+// ---------- фото из Википедии ----------
 async function loadWiki(titles){
   const map={};
   for(let i=0;i<titles.length;i+=45){
     const chunk=titles.slice(i,i+45);
-    const u='https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&redirects=1&prop=pageimages&piprop=thumbnail&pithumbsize=1000&pilimit=50&titles='+encodeURIComponent(chunk.join('|'));
+    const u='https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&redirects=1&prop=pageimages&piprop=thumbnail&pithumbsize=1280&pilimit=50&titles='+encodeURIComponent(chunk.join('|'));
     try{
       const j=await (await fetch(u)).json();
       const alias={};
       (j.query.normalized||[]).forEach(x=>alias[x.from]=x.to);
       (j.query.redirects||[]).forEach(x=>alias[x.from]=x.to);
-      const byTitle={};
-      Object.values(j.query.pages).forEach(p=>{ if(p.thumbnail) byTitle[p.title]=p.thumbnail.source; });
-      chunk.forEach(t=>{ let k=t; for(let s=0;s<3&&alias[k];s++) k=alias[k]; if(byTitle[k]) map[t]=byTitle[k]; });
+      const by={};
+      Object.values(j.query.pages).forEach(p=>{ if(p.thumbnail) by[p.title]=p.thumbnail.source; });
+      chunk.forEach(t=>{ let k=t; for(let s=0;s<3&&alias[k];s++) k=alias[k]; if(by[k]) map[t]=by[k]; });
     }catch(e){ console.warn('wiki',e); }
   }
   document.querySelectorAll('img[data-wiki]').forEach(img=>{
     const src=map[img.dataset.wiki];
-    if(src){ img.onload=()=>img.classList.add('ok'); img.onerror=()=>drop(img); img.src=src; }
-    else drop(img);
+    if(src){ img.onload=()=>img.classList.add('ok'); img.onerror=()=>noPhoto(img); img.src=src; }
+    else noPhoto(img);
   });
 }
-// если фото не нашлось — убираем карточку и перестраиваем галерею
-function drop(img){
-  const g=img.closest('.gallery'), f=img.closest('figure');
-  if(!g||!f) return;
-  if(g.children.length>1){ f.remove(); }
-  else { img.remove(); return; } // последнюю карточку оставляем — градиент с подписью
-  g.classList.remove('one','two');
-  if(g.children.length===1) g.classList.add('one');
-  if(g.children.length===2) g.classList.add('two');
-}
-loadWiki([...new Set(wikiImgs)]);
+function noPhoto(img){ const a=img.closest('.place'); if(a) a.classList.add('nophoto'); }
+loadWiki([...wikiTitles]);
 
-// Подсветка текущего дня в навигации
+// ---------- карта ----------
+function initMap(){
+  if(!window.L) return;
+  const m=L.map('map',{scrollWheelZoom:false}).setView([34.95,33.2],8);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18,attribution:'© OpenStreetMap'}).addTo(m);
+  const home=[34.6786,33.0413];
+  L.marker(home,{icon:L.divIcon({className:'',html:'<div class="pin home">🏨</div>',iconSize:[32,32]})}).addTo(m).bindPopup('<b>Лимассол</b><br>ваша база на все 14 дней');
+  const pts=[home];
+  DAYS.forEach((d,i)=>d.places.forEach(p=>{ if(!p.ll) return; pts.push(p.ll);
+    L.marker(p.ll,{icon:L.divIcon({className:'',html:`<div class="pin">${i+1}</div>`,iconSize:[26,26]})}).addTo(m)
+     .bindPopup(`<b>${esc(p.name)}</b><br>День ${i+1}: ${esc(d.title)}<br><a href="#d${i+1}">Читать →</a>`);
+  }));
+  m.fitBounds(pts,{padding:[20,20]});
+}
+initMap();
+
+// ---------- подсветка дня в навигации ----------
 const links=[...nav.querySelectorAll('a')];
 const io=new IntersectionObserver(es=>es.forEach(e=>{ if(e.isIntersecting){
   links.forEach(a=>a.classList.toggle('on',a.getAttribute('href')==='#'+e.target.id));
 }}),{rootMargin:'-45% 0px -50% 0px'});
-document.querySelectorAll('.day').forEach(s=>io.observe(s));
+document.querySelectorAll('.day,#overview').forEach(s=>io.observe(s));
 </script>
 </body>
 </html>
