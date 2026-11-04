@@ -82,6 +82,8 @@ section.block h2{font-size:clamp(36px,5vw,52px);margin-bottom:22px;color:var(--l
 /* карта */
 #map{height:520px;border:1px solid var(--rule-2);margin-top:14px;z-index:1;background:#e8eae6}
 .leaflet-container{font-family:var(--text)}
+/* приглушаем стандартную карту OSM под палитру страницы */
+.leaflet-tile-pane{filter:grayscale(.78) sepia(.12) brightness(1.04) contrast(.92)}
 .leaflet-popup-content{font-family:var(--text);font-size:14px;line-height:1.45}
 .leaflet-popup-content b{font-family:var(--display);font-weight:400;font-size:17px}
 .leaflet-popup-content-wrapper,.leaflet-popup-tip{border-radius:2px;box-shadow:0 6px 24px rgba(20,43,79,.18)}
@@ -273,7 +275,7 @@ nav.days a.full::after{content:"";display:inline-block;width:5px;height:5px;bord
 </main>
 
 <footer>
-  Фотографии — Wikimedia Commons, автор и лицензия указаны на каждом фото (по клику открывается страница файла). Карта © участники OpenStreetMap и CARTO, маршруты — OSRM.<br>
+  Фотографии — Wikimedia Commons, автор и лицензия указаны на каждом фото (по клику открывается страница файла). Карта © участники OpenStreetMap, маршруты — OSRM.<br>
   Цены и часы работы собраны по открытым источникам в ноябре 2026 года и могут меняться — проверяйте перед поездкой.
 </footer>
 
@@ -372,7 +374,7 @@ function noPhoto(img){ const a=img.closest('.place'); if(a) a.classList.add('nop
 loadWiki([...wikiTitles]);
 
 // ---------- карты ----------
-const tiles=()=>L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{maxZoom:19,subdomains:'abcd',attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> © <a href="https://carto.com/attributions">CARTO</a>, маршруты OSRM'});
+const tiles=()=>L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>, маршруты OSRM'});
 const homeMarker=()=>L.marker(HOME,{icon:L.divIcon({className:'',html:'<div class="pin home">Л</div>',iconSize:[30,30]}),zIndexOffset:1000}).bindPopup('<b>Лимассол</b><br>ваша база на все 14 дней');
 function pin(label,c){ return L.divIcon({className:'',html:`<div class="pin" style="background:${c}">${label}</div>`,iconSize:[26,26]}); }
 

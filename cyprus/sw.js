@@ -1,6 +1,6 @@
 // Офлайн-режим путеводителя: страница, данные и фото кэшируются при первом открытии,
 // фото из Википедии и куски карты — по мере просмотра.
-const VERSION = 'cyprus-v3';
+const VERSION = 'cyprus-v4';
 const CORE = [
   './', 'index.html', 'data1.js', 'data2.js', 'data3.js', 'routes.js', 'photos.js', 'manifest.webmanifest',
   'img/cape_greco.jpg', 'img/kourion.jpg', 'img/larnaca.jpg', 'img/hala_sultan_tekke.jpg',
@@ -8,7 +8,7 @@ const CORE = [
   'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css',
   'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js',
 ];
-const TILES = 'cyprus-tiles';
+const TILES = 'cyprus-tiles-v2'; // v1 содержал заглушки CARTO «API KEY REQUIRED»
 const MAX_TILES = 1500;
 
 self.addEventListener('install', e => {
