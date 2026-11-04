@@ -58,6 +58,14 @@ section.block h2{font-size:36px;margin-bottom:14px}
 .leaflet-popup-content{font-family:Manrope,sans-serif;font-size:14px}
 .pin{background:var(--clay);color:#fff;border-radius:50%;width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.35)}
 .pin.home{background:var(--sea);width:32px;height:32px;font-size:15px}
+.dayfilter{display:flex;flex-wrap:wrap;gap:6px;margin-top:22px}
+.dayfilter button{font:700 13px Manrope,sans-serif;border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:999px;padding:5px 11px;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.dayfilter button i{width:10px;height:10px;border-radius:50%;display:inline-block}
+.dayfilter button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+#map{margin-top:12px}
+.daymap{height:300px;border-radius:14px;border:1px solid var(--line);margin:0 0 22px;z-index:1;background:var(--foam)}
+.dayroute{display:inline-block;margin:0 0 22px;font-weight:700;font-size:15px;text-decoration:none;color:#fff;background:var(--sea);border-radius:999px;padding:9px 18px}
+.dayroute:hover{background:var(--sea-2)}
 
 /* day */
 .day{padding:56px 0 20px;border-top:1px solid var(--line);scroll-margin-top:60px}
@@ -65,6 +73,7 @@ section.block h2{font-size:36px;margin-bottom:14px}
 .num{font-family:Fraunces,serif;font-size:76px;color:var(--clay);line-height:.9;min-width:90px}
 .num small{display:block;font-family:Manrope;font-size:12px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:6px}
 .day h3{font-size:34px;margin-bottom:6px}
+.num{color:var(--dc,var(--clay))}
 .daysub{color:var(--muted);font-size:16px}
 .meta{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 18px}
 .meta span{background:#fff;border:1px solid var(--line);border-radius:999px;padding:5px 12px;font-size:14px}
@@ -121,6 +130,7 @@ footer{text-align:center;color:var(--muted);font-size:13px;padding:40px 20px 60p
   .toc small{grid-column:2;white-space:normal}
   .toc a>span{min-width:0}
   #map{height:380px}
+  .daymap{height:240px}
 }
 </style>
 </head>
@@ -133,7 +143,7 @@ footer{text-align:center;color:var(--muted);font-size:13px;padding:40px 20px 60p
     <p>Четырнадцать однодневных поездок из Лимассола: от морских пещер Айя-Напы до горных монастырей Троодоса, мозаик Пафоса и готических соборов Фамагусты. У каждой локации — история, что смотреть, как добраться, часы работы, цены и советы.</p>
     <div class="stats">
       <span class="stat">🏨 Живём в Лимассоле все 14 ночей</span>
-      <span class="stat">🚗 ≈ 2000 км за две недели</span>
+      <span class="stat" id="totalkm">🚗 ≈ 2000 км за две недели</span>
       <span class="stat">🏛 3 объекта ЮНЕСКО</span>
       <span class="stat">🛂 3 дня на Севере</span>
     </div>
@@ -152,6 +162,7 @@ footer{text-align:center;color:var(--muted);font-size:13px;padding:40px 20px 60p
       <span class="lvl l2">средний</span> около часа ·
       <span class="lvl l3">длинный</span> 1,5 часа и больше, ранний выезд
     </p>
+    <div class="dayfilter" id="dayfilter"></div>
     <div id="map"></div>
   </section>
 
@@ -172,57 +183,80 @@ footer{text-align:center;color:var(--muted);font-size:13px;padding:40px 20px 60p
 </main>
 
 <footer>
-  Фотографии — Wikimedia Commons / Википедия (по клику на подпись открывается статья с автором и лицензией). Карта © участники OpenStreetMap.<br>
+  Фотографии — Wikimedia Commons, автор и лицензия указаны на каждом фото (по клику открывается страница файла). Карта © участники OpenStreetMap, маршруты — OSRM.<br>
   Цены и часы работы собраны по открытым источникам в ноябре 2026 года и могут меняться — проверяйте перед поездкой.
 </footer>
 
 <script src="data1.js"></script>
 <script src="data2.js"></script>
 <script src="data3.js"></script>
+<script src="routes.js"></script>
+<script src="photos.js"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 <script>
 const LEVEL={"лёгкий":"l1","средний":"l2","длинный":"l3"};
 const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 const nav=document.getElementById('nav'), toc=document.getElementById('toc'), box=document.getElementById('days');
+const ROUTES=window.ROUTES||[], PHOTOS=window.PHOTOS||{};
+const HOME=[34.6786,33.0413];
+// 14 различимых цветов, по кругу от моря к закату
+const COLORS=['#0d6e8c','#c8643b','#3f8f4f','#8e44ad','#d4a017','#1f9e9e','#b03a48','#5b6fd6','#7a8b2e','#e07b9c','#2c3e50','#d35400','#16a085','#9c640c'];
+const col=i=>COLORS[i%COLORS.length];
 const wikiTitles=new Set();
+const stops=d=>d.places.filter(p=>p.ll&&!p.nomap);
+const gmapsDay=d=>{
+  const w=stops(d).map(p=>p.ll.join(',')).join('|');
+  return `https://www.google.com/maps/dir/?api=1&origin=${HOME}&destination=${HOME}&travelmode=driving&waypoints=${encodeURIComponent(w)}`;
+};
 
 DAYS.forEach((d,i)=>{
-  const n=i+1;
+  const n=i+1, r=ROUTES[i], c=col(i);
   nav.insertAdjacentHTML('beforeend',`<a href="#d${n}">День ${n}</a>`);
-  toc.insertAdjacentHTML('beforeend',`<a href="#d${n}"><b>${n}</b><span>${esc(d.title)} <span class="lvl ${LEVEL[d.level]||'l2'}">${esc(d.level)}</span></span><small>🚗 ${esc(d.drive.split(',')[0])}</small></a>`);
+  toc.insertAdjacentHTML('beforeend',`<a href="#d${n}"><b style="color:${c}">${n}</b><span>${esc(d.title)} <span class="lvl ${LEVEL[d.level]||'l2'}">${esc(d.level)}</span></span><small>🚗 ${r?`≈ ${r.km} км за день`:esc(d.drive.split(',')[0])}</small></a>`);
 
   const plan=d.plan.map(p=>`<li><b>${esc(p[0])}</b><span>${esc(p[1])}</span></li>`).join('');
   const places=d.places.map(p=>{
-    const hasImg=p.local||p.wiki;
-    if(p.wiki&&!p.local) wikiTitles.add(p.wiki);
+    const ph=PHOTOS[p.name];
     const enHref=p.wiki?`https://en.wikipedia.org/wiki/${encodeURIComponent(p.wiki.replace(/ /g,'_'))}`:'';
-    const img=p.local?`<img src="img/${p.local}" alt="${esc(p.name)}" loading="lazy" class="ok">`
-                     :(p.wiki?`<img data-wiki="${esc(p.wiki)}" alt="${esc(p.name)}" loading="lazy">`:'');
-    const fig=hasImg?`<figure>${img}<figcaption><a href="${enHref}" target="_blank" rel="noopener">Фото: Wikimedia Commons</a></figcaption></figure>`:'';
+    let fig='';
+    if(ph){
+      fig=`<figure><img src="${esc(ph.src)}" alt="${esc(p.name)}" loading="lazy" decoding="async" class="ok"><figcaption><a href="${esc(ph.url)}" target="_blank" rel="noopener">Фото: ${esc(ph.author)} · ${esc(ph.license)}</a></figcaption></figure>`;
+    }else if(p.local){
+      fig=`<figure><img src="img/${p.local}" alt="${esc(p.name)}" loading="lazy" decoding="async" class="ok"><figcaption><a href="${enHref}" target="_blank" rel="noopener">Фото: Wikimedia Commons</a></figcaption></figure>`;
+    }else if(p.wiki){ // запасной вариант, если фото ещё не скачано скриптом
+      wikiTitles.add(p.wiki);
+      fig=`<figure><img data-wiki="${esc(p.wiki)}" alt="${esc(p.name)}" loading="lazy"><figcaption><a href="${enHref}" target="_blank" rel="noopener">Фото: Wikimedia Commons</a></figcaption></figure>`;
+    }
     const see=p.see&&p.see.length?`<div class="see"><h5>Что посмотреть</h5><ul>${p.see.map(s=>`<li>${esc(s)}</li>`).join('')}</ul></div>`:'';
     const fk=Object.entries(p.facts||{});
     const facts=fk.length?`<div class="facts"><h5>Практическое</h5><dl>${fk.map(([k,v])=>`<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join('')}</dl></div>`:'';
     const tip=p.tip?`<div class="tip">💡 ${esc(p.tip)}</div>`:'';
-    const ml=p.ll?`<a class="maplink" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination=${p.ll[0]},${p.ll[1]}">Маршрут в Google Картах →</a>`:'';
-    return `<article class="place${hasImg?'':' nophoto'}">${fig}<div class="pbody"><h4>${esc(p.name)}</h4><p>${esc(p.text)}</p>${see}${facts}${tip}${ml}</div></article>`;
+    const ml=p.ll&&!p.nomap?`<a class="maplink" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination=${p.ll[0]},${p.ll[1]}">Маршрут в Google Картах →</a>`:'';
+    return `<article class="place${fig?'':' nophoto'}">${fig}<div class="pbody"><h4>${esc(p.name)}</h4><p>${esc(p.text)}</p>${see}${facts}${tip}${ml}</div></article>`;
   }).join('');
 
   box.insertAdjacentHTML('beforeend',`
-  <section class="day" id="d${n}">
+  <section class="day" id="d${n}" style="--dc:${c}">
     <div class="dayhead">
       <div class="num"><small>День</small>${n}</div>
       <div><h3>${esc(d.title)}</h3><div class="daysub">${esc(d.sub)}</div></div>
     </div>
-    <div class="meta"><span>🚗 ${esc(d.drive)}</span><span class="lvl ${LEVEL[d.level]||'l2'}" style="font-size:13px;padding:6px 12px;margin:0">${esc(d.level)} день</span></div>
+    <div class="meta"><span>🚗 ${esc(d.drive)}</span>${r?`<span>🛣 ≈ ${r.km} км за день</span>`:''}<span class="lvl ${LEVEL[d.level]||'l2'}" style="font-size:13px;padding:6px 12px;margin:0">${esc(d.level)} день</span></div>
     <p class="intro">${esc(d.intro)}</p>
     <div class="plan"><h4>План дня</h4><ol>${plan}</ol></div>
+    <div class="daymap" id="m${n}" data-day="${i}"></div>
+    <a class="dayroute" target="_blank" rel="noopener" href="${gmapsDay(d)}">🧭 Весь день в Google Картах</a>
     ${places}
     <div class="food"><h4>🍽 Где и что поесть</h4><p>${esc(d.food)}</p></div>
   </section>`);
 });
 
-// ---------- фото из Википедии ----------
+const total=ROUTES.reduce((a,r)=>a+(r?r.km:0),0);
+if(total) document.getElementById('totalkm').textContent=`🚗 ≈ ${Math.round(total/50)*50} км за две недели`;
+
+// ---------- запасная загрузка фото из Википедии ----------
 async function loadWiki(titles){
+  if(!titles.length) return;
   const map={};
   for(let i=0;i<titles.length;i+=45){
     const chunk=titles.slice(i,i+45);
@@ -246,21 +280,60 @@ async function loadWiki(titles){
 function noPhoto(img){ const a=img.closest('.place'); if(a) a.classList.add('nophoto'); }
 loadWiki([...wikiTitles]);
 
-// ---------- карта ----------
+// ---------- карты ----------
+const tiles=()=>L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18,attribution:'© OpenStreetMap · маршруты OSRM'});
+const homeMarker=()=>L.marker(HOME,{icon:L.divIcon({className:'',html:'<div class="pin home">🏨</div>',iconSize:[32,32]}),zIndexOffset:1000}).bindPopup('<b>Лимассол</b><br>ваша база на все 14 дней');
+function pin(label,c){ return L.divIcon({className:'',html:`<div class="pin" style="background:${c}">${label}</div>`,iconSize:[26,26]}); }
+
+function dayLayer(i,{numbered}){
+  const d=DAYS[i], c=col(i), g=L.featureGroup();
+  const r=ROUTES[i];
+  const path=r&&r.path&&r.path.length?r.path:[HOME,...stops(d).map(p=>p.ll),HOME];
+  L.polyline(path,{color:'#fff',weight:7,opacity:.8}).addTo(g);
+  L.polyline(path,{color:c,weight:4,opacity:.9}).addTo(g);
+  stops(d).forEach((p,k)=>{
+    L.marker(p.ll,{icon:pin(numbered?k+1:i+1,c)}).addTo(g)
+     .bindPopup(`<b>${esc(p.name)}</b><br>День ${i+1}: ${esc(d.title)}${numbered?'':`<br><a href="#d${i+1}">Читать →</a>`}`);
+  });
+  return g;
+}
+
 function initMap(){
   if(!window.L) return;
-  const m=L.map('map',{scrollWheelZoom:false}).setView([34.95,33.2],8);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18,attribution:'© OpenStreetMap'}).addTo(m);
-  const home=[34.6786,33.0413];
-  L.marker(home,{icon:L.divIcon({className:'',html:'<div class="pin home">🏨</div>',iconSize:[32,32]})}).addTo(m).bindPopup('<b>Лимассол</b><br>ваша база на все 14 дней');
-  const pts=[home];
-  DAYS.forEach((d,i)=>d.places.forEach(p=>{ if(!p.ll) return; pts.push(p.ll);
-    L.marker(p.ll,{icon:L.divIcon({className:'',html:`<div class="pin">${i+1}</div>`,iconSize:[26,26]})}).addTo(m)
-     .bindPopup(`<b>${esc(p.name)}</b><br>День ${i+1}: ${esc(d.title)}<br><a href="#d${i+1}">Читать →</a>`);
-  }));
-  m.fitBounds(pts,{padding:[20,20]});
+  const m=L.map('map',{scrollWheelZoom:false});
+  tiles().addTo(m);
+  const layers=DAYS.map((d,i)=>dayLayer(i,{numbered:false}));
+  const all=L.featureGroup(layers).addTo(m);
+  homeMarker().addTo(m);
+  m.fitBounds(all.getBounds(),{padding:[20,20]});
+
+  const fb=document.getElementById('dayfilter');
+  const btn=(label,c,i)=>`<button data-i="${i}">${c?`<i style="background:${c}"></i>`:''}${label}</button>`;
+  fb.innerHTML=btn('Все дни','',-1)+DAYS.map((d,i)=>btn(i+1,col(i),i)).join('');
+  const show=i=>{
+    fb.querySelectorAll('button').forEach(b=>b.classList.toggle('on',+b.dataset.i===i));
+    layers.forEach((l,k)=>{ const on=i<0||k===i; if(on&&!all.hasLayer(l)) all.addLayer(l); if(!on&&all.hasLayer(l)) all.removeLayer(l); });
+    const b=(i<0?all:layers[i]).getBounds().extend(HOME);
+    m.flyToBounds(b,{padding:[30,30],duration:.6});
+  };
+  fb.addEventListener('click',e=>{ const b=e.target.closest('button'); if(b) show(+b.dataset.i); });
+  fb.querySelector('button').classList.add('on');
 }
+
+// мини-карта дня — создаётся, когда до неё доскроллили
+const dayIO=new IntersectionObserver(es=>es.forEach(e=>{
+  if(!e.isIntersecting||!window.L) return;
+  dayIO.unobserve(e.target);
+  const i=+e.target.dataset.day;
+  const m=L.map(e.target,{scrollWheelZoom:false,zoomControl:true});
+  tiles().addTo(m);
+  const g=dayLayer(i,{numbered:true}).addTo(m);
+  homeMarker().addTo(m);
+  m.fitBounds(g.getBounds().extend(HOME),{padding:[24,24]});
+}),{rootMargin:'300px 0px'});
+
 initMap();
+document.querySelectorAll('.daymap').forEach(el=>dayIO.observe(el));
 
 // ---------- подсветка дня в навигации ----------
 const links=[...nav.querySelectorAll('a')];
