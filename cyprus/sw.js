@@ -1,6 +1,6 @@
 // Офлайн-режим путеводителя. Страница и данные всегда берутся из сети (кэш — только без интернета),
 // фото и куски карты — из кэша, если уже сохранены.
-const VERSION = 'cyprus-v5';
+const VERSION = 'cyprus-v6';
 const CORE = [
   './', 'index.html', 'data1.js', 'data2.js', 'data3.js', 'routes.js', 'photos.js', 'manifest.webmanifest',
   'img/cape_greco.jpg', 'img/kourion.jpg', 'img/larnaca.jpg', 'img/hala_sultan_tekke.jpg',
@@ -65,7 +65,8 @@ self.addEventListener('fetch', e => {
   e.respondWith(caches.open(VERSION).then(async c => {
     const hit = await c.match(req, { ignoreSearch: url.origin === location.origin });
     const net = fetch(req).then(res => {
-      if (res.ok || res.type === 'opaque') c.put(req, res.clone());
+      // непрозрачные ответы с Wikimedia не храним: за ними может прятаться ошибка 429
+      if (res.ok || (res.type === 'opaque' && !url.hostname.endsWith('wikimedia.org'))) c.put(req, res.clone());
       return res;
     }).catch(() => hit);
     return hit || net;

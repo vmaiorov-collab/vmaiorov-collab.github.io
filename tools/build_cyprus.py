@@ -20,7 +20,7 @@ from PIL import Image
 
 ROOT = Path(__file__).resolve().parent.parent / "cyprus"
 HOME = (34.6786, 33.0413)  # Лимассол — база
-UA = {"User-Agent": "cyprus-guide-builder/1.0 (https://github.com/vmaiorov-collab/vmaiorov-collab.github.io)"}
+UA = {"User-Agent": "cyprus-guide-builder/1.0 (https://github.com/vmaiorov-collab/vmaiorov-collab.github.io; photos-bot) python-urllib"}
 WIDTH = 1200
 
 

@@ -1,0 +1,33 @@
+name: Cyprus guide — download photos
+# Скачивает фото мест с Wikimedia Commons в cyprus/img/w/ и пишет cyprus/photos.js
+# (автор и лицензия каждого фото). Запускается вручную и при правках данных путеводителя.
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['cyprus/data*.js', 'tools/build_cyprus.py']
+permissions:
+  contents: write
+concurrency:
+  group: cyprus-photos
+  cancel-in-progress: false
+jobs:
+  photos:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install Pillow
+      - name: Download photos
+        run: python3 tools/build_cyprus.py --photos
+      - name: Commit
+        run: |
+          git add cyprus/photos.js cyprus/img/w
+          if git diff --cached --quiet; then echo "nothing new"; exit 0; fi
+          git config user.name "photos-bot"
+          git config user.email "photos-bot@users.noreply.github.com"
+          git commit -qm "cyprus: обновить фото с Wikimedia Commons"
+          for i in 1 2 3; do git pull -q --rebase && git push && break; sleep 5; done

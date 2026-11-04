@@ -353,9 +353,13 @@ async function loadWiki(titles){
   const map={};
   for(let i=0;i<titles.length;i+=45){
     const chunk=titles.slice(i,i+45);
-    const u='https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&redirects=1&prop=pageimages&piprop=thumbnail&pithumbsize=1280&pilimit=50&titles='+encodeURIComponent(chunk.join('|'));
+    // 960 px — стандартный размер превью Wikimedia: такие файлы уже лежат в их кэше и отдаются быстро
+    const u='https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&redirects=1&prop=pageimages&piprop=thumbnail&pithumbsize=960&pilimit=50&titles='+encodeURIComponent(chunk.join('|'));
     try{
-      const j=await (await fetch(u)).json();
+      let r=await fetch(u);
+      for(let t=1;t<=2&&r.status===429;t++){ await new Promise(ok=>setTimeout(ok,2500*t)); r=await fetch(u); }
+      if(!r.ok) throw new Error('HTTP '+r.status);
+      const j=await r.json();
       const alias={};
       (j.query.normalized||[]).forEach(x=>alias[x.from]=x.to);
       (j.query.redirects||[]).forEach(x=>alias[x.from]=x.to);
@@ -366,10 +370,20 @@ async function loadWiki(titles){
   }
   document.querySelectorAll('img[data-wiki]').forEach(img=>{
     const src=map[img.dataset.wiki];
-    if(src){ img.onload=()=>img.classList.add('ok'); img.onerror=()=>noPhoto(img); img.src=src; }
-    else noPhoto(img);
+    if(!src){ noPhoto(img); return; }
+    img.crossOrigin='anonymous'; // чтобы офлайн-кэш видел код ответа и не сохранял ошибки
+    img.onload=()=>img.classList.add('ok');
+    img.onerror=()=>noPhoto(img);
+    img.src=src;
+    photoWatch.observe(img);
   });
 }
+// если фото не пришло через 12 секунд после появления на экране — убираем пустую рамку
+const photoWatch=new IntersectionObserver(es=>es.forEach(e=>{
+  if(!e.isIntersecting) return;
+  photoWatch.unobserve(e.target);
+  setTimeout(()=>{ const i=e.target; if(!(i.complete&&i.naturalWidth)) noPhoto(i); },12000);
+}));
 function noPhoto(img){ const a=img.closest('.place'); if(a) a.classList.add('nophoto'); }
 loadWiki([...wikiTitles]);
 
