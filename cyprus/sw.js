@@ -1,6 +1,6 @@
 // Офлайн-режим путеводителя: страница, данные и фото кэшируются при первом открытии,
 // фото из Википедии и куски карты — по мере просмотра.
-const VERSION = 'cyprus-v2';
+const VERSION = 'cyprus-v3';
 const CORE = [
   './', 'index.html', 'data1.js', 'data2.js', 'data3.js', 'routes.js', 'photos.js', 'manifest.webmanifest',
   'img/cape_greco.jpg', 'img/kourion.jpg', 'img/larnaca.jpg', 'img/hala_sultan_tekke.jpg',
@@ -32,7 +32,7 @@ self.addEventListener('fetch', e => {
   const url = new URL(req.url);
 
   // куски карты: сначала кэш, потом сеть
-  if (url.hostname.endsWith('tile.openstreetmap.org')) {
+  if (url.hostname.endsWith('tile.openstreetmap.org') || url.hostname.endsWith('basemaps.cartocdn.com')) {
     e.respondWith(caches.open(TILES).then(async c => {
       const hit = await c.match(req);
       if (hit) return hit;

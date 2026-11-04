@@ -10,165 +10,212 @@
 <meta property="og:image" content="https://vmaiorov-collab.github.io/cyprus/img/cape_greco.jpg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Prata&family=Golos+Text:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
 <link rel="manifest" href="manifest.webmanifest">
-<meta name="theme-color" content="#0d4f6c">
+<meta name="theme-color" content="#142b4f">
 <link rel="icon" type="image/png" href="img/icon-192.png">
 <link rel="apple-touch-icon" href="img/icon-192.png">
 <style>
+/* Лазурит и сусальное золото — по фрескам расписных церквей Троодоса */
 :root{
-  --sea:#0d4f6c; --sea-2:#1b7a9a; --foam:#e8f3f5; --sand:#f6efe4; --clay:#c8643b;
-  --ink:#1d2a30; --muted:#5d6b71; --card:#fffdf9; --line:#e6dccd;
+  --lapis:#142b4f; --lapis-2:#1f3d6b; --chalk:#f1f2ef; --paper:#fafaf8;
+  --gold:#a8844a; --gold-ink:#7f6230; --olive:#5f6b52;
+  --ink:#19212b; --muted:#5f6670; --rule:#d9dad3; --rule-2:#c9c3b3;
+  --display:"Prata",Georgia,serif; --text:"Golos Text",system-ui,sans-serif;
 }
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
-body{margin:0;font-family:Manrope,system-ui,sans-serif;color:var(--ink);background:var(--sand);line-height:1.65;font-size:17px}
-h1,h2,h3,h4{font-family:Fraunces,Georgia,serif;line-height:1.15;margin:0}
-a{color:var(--sea-2)}
+body{margin:0;font-family:var(--text);color:var(--ink);background:var(--chalk);line-height:1.62;font-size:17px;
+  font-feature-settings:"kern","liga";-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4{font-family:var(--display);font-weight:400;line-height:1.08;margin:0;letter-spacing:-.005em}
+a{color:var(--lapis-2);text-decoration-thickness:1px;text-underline-offset:3px}
 img{display:block;max-width:100%}
-.wrap{max-width:980px;margin:0 auto;padding:0 20px}
+:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+.wrap{max-width:1040px;margin:0 auto;padding:0 28px}
+::selection{background:#e9dcc3}
 
-/* hero */
-.hero{position:relative;min-height:86vh;display:flex;align-items:flex-end;color:#fff;
-  background:linear-gradient(180deg,rgba(6,30,42,.15) 0%,rgba(6,30,42,.78) 100%),url(img/cape_greco.jpg) center/cover}
-.hero .wrap{padding-bottom:64px;width:100%}
-.kicker{letter-spacing:.18em;text-transform:uppercase;font-size:13px;font-weight:700;opacity:.9}
-.hero h1{font-size:clamp(40px,7.5vw,84px);margin:10px 0 16px}
-.hero p{max-width:640px;font-size:19px;opacity:.95;margin:0 0 26px}
-.stats{display:flex;flex-wrap:wrap;gap:10px}
-.stat{background:rgba(255,255,255,.14);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.25);border-radius:999px;padding:7px 15px;font-size:14px;font-weight:600}
+/* обложка */
+.hero{position:relative;min-height:92vh;display:flex;align-items:flex-end;color:#fff;
+  background:linear-gradient(180deg,rgba(14,30,56,.28) 0%,rgba(14,30,56,.42) 38%,rgba(14,30,56,.9) 100%),url(img/cape_greco.jpg) center 40%/cover}
+.hero .wrap{padding-bottom:72px;width:100%}
+.kicker{font-size:17px;color:#ecdcb8;margin-bottom:22px;text-shadow:0 1px 12px rgba(0,0,0,.35)}
+.hero h1{font-size:clamp(64px,12vw,156px);line-height:.92;letter-spacing:-.02em;margin:0 0 28px}
+.hero h1 span{display:block;font-size:.56em;line-height:1.05;letter-spacing:-.01em;margin-top:.12em}
+.hero p{max-width:34em;font-size:19px;line-height:1.55;color:rgba(255,255,255,.9);margin:0 0 40px}
+.stats{display:flex;flex-wrap:wrap;gap:0;border-top:1px solid rgba(230,211,172,.45);padding-top:18px;max-width:820px}
+.stat{font-size:15px;color:rgba(255,255,255,.92);padding:0 22px;border-left:1px solid rgba(230,211,172,.45);line-height:1.3}
+.stat:first-child{padding-left:0;border-left:0}
+.stat b{display:block;font-weight:500;font-size:26px;letter-spacing:-.01em;color:#fff;margin-bottom:2px;font-variant-numeric:lining-nums}
+@media (prefers-reduced-motion:no-preference){
+  .hero h1,.hero p,.stats{animation:rise 1.1s cubic-bezier(.2,.7,.2,1) both}
+  .hero p{animation-delay:.15s}.stats{animation-delay:.3s}
+  @keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+}
 
-/* nav */
-nav.days{position:sticky;top:0;z-index:1000;background:rgba(246,239,228,.95);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
-nav.days .in{max-width:980px;margin:0 auto;padding:10px 16px;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
-nav.days a{flex:0 0 auto;text-decoration:none;color:var(--sea);font-weight:700;font-size:14px;padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:#fff}
-nav.days a:hover,nav.days a.on{background:var(--sea);color:#fff;border-color:var(--sea)}
+/* навигация по дням */
+nav.days{position:sticky;top:0;z-index:1000;background:rgba(241,242,239,.94);backdrop-filter:blur(10px);border-bottom:1px solid var(--rule)}
+nav.days .in{max-width:1040px;margin:0 auto;padding:0 20px;display:flex;gap:2px;overflow-x:auto;scrollbar-width:none}
+nav.days a{flex:0 0 auto;text-decoration:none;color:var(--muted);font:500 15px var(--text);font-variant-numeric:tabular-nums;min-width:38px;text-align:center;padding:15px 8px 13px;border-bottom:2px solid transparent}
+nav.days a:first-child{margin-right:10px;padding-left:0;padding-right:14px;text-align:left}
+nav.days a:hover{color:var(--ink)}
+nav.days a.on{color:var(--lapis);border-bottom-color:var(--gold)}
 
-section.block{padding:52px 0 8px}
-section.block h2{font-size:36px;margin-bottom:14px}
-.lead{font-size:18px;color:#33454c;max-width:760px}
+section.block{padding:96px 0 16px}
+section.block h2{font-size:clamp(36px,5vw,52px);margin-bottom:22px;color:var(--lapis)}
+.lead{font-size:19px;line-height:1.6;color:#2d3540;max-width:36em}
 
-/* overview table */
-.toc{display:grid;gap:8px;margin-top:22px}
-.toc a{display:grid;grid-template-columns:64px minmax(0,1fr) auto;gap:14px;align-items:center;text-decoration:none;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 14px}
-.toc a:hover{border-color:var(--sea-2)}
-.toc b{font-family:Fraunces,serif;color:var(--clay);font-size:20px}
-.toc small{color:var(--muted);font-size:13px;white-space:nowrap}
-.lvl{display:inline-block;font-size:12px;font-weight:700;border-radius:999px;padding:2px 9px;margin-left:6px;vertical-align:middle}
-.lvl.l1{background:#e3f1e6;color:#2f6b3c}.lvl.l2{background:#fdf0d9;color:#8a5a12}.lvl.l3{background:#fbe3da;color:#9b3d1d}
+/* оглавление */
+.toc{display:grid;margin-top:40px;border-top:1px solid var(--ink)}
+.toc a{display:grid;grid-template-columns:72px minmax(0,1fr) auto;gap:18px;align-items:baseline;text-decoration:none;color:var(--ink);padding:15px 4px;border-bottom:1px solid var(--rule)}
+.toc a:hover{background:var(--paper)}
+.toc a:hover>span{color:var(--lapis-2)}
+.toc b{font-weight:500;color:var(--gold-ink);font-size:20px;line-height:1;font-variant-numeric:tabular-nums}
+.toc a>span{font-size:17px}
+.toc small{color:var(--muted);font-size:14px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.lvl{display:inline-block;font-size:13px;font-weight:500;color:var(--olive);margin-left:10px;vertical-align:1px;white-space:nowrap}
+.lvl::before{letter-spacing:2px;margin-right:6px;color:var(--gold)}
+.lvl.l1::before{content:"●○○"}.lvl.l2::before{content:"●●○"}.lvl.l3::before{content:"●●●"}
+.legend{margin-top:16px;font-size:14px;color:var(--muted);display:flex;flex-wrap:wrap;gap:6px 28px}
+.legend .lvl{margin:0 6px 0 0}
 
-#map{height:460px;border-radius:16px;border:1px solid var(--line);margin-top:22px;z-index:1}
-.leaflet-popup-content{font-family:Manrope,sans-serif;font-size:14px}
-.pin{background:var(--clay);color:#fff;border-radius:50%;width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.35)}
-.pin.home{background:var(--sea);width:32px;height:32px;font-size:15px}
-.dayfilter{display:flex;flex-wrap:wrap;gap:6px;margin-top:22px}
-.dayfilter button{font:700 13px Manrope,sans-serif;border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:999px;padding:5px 11px;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
-.dayfilter button i{width:10px;height:10px;border-radius:50%;display:inline-block}
-.dayfilter button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
-#map{margin-top:12px}
-.daymap{height:300px;border-radius:14px;border:1px solid var(--line);margin:0 0 22px;z-index:1;background:var(--foam)}
-.dayroute{display:inline-block;margin:0 0 22px;font-weight:700;font-size:15px;text-decoration:none;color:#fff;background:var(--sea);border-radius:999px;padding:9px 18px}
-.dayroute:hover{background:var(--sea-2)}
+/* карта */
+#map{height:520px;border:1px solid var(--rule-2);margin-top:14px;z-index:1;background:#e8eae6}
+.leaflet-container{font-family:var(--text)}
+.leaflet-popup-content{font-family:var(--text);font-size:14px;line-height:1.45}
+.leaflet-popup-content b{font-family:var(--display);font-weight:400;font-size:17px}
+.leaflet-popup-content-wrapper,.leaflet-popup-tip{border-radius:2px;box-shadow:0 6px 24px rgba(20,43,79,.18)}
+.leaflet-bar,.leaflet-bar a{border-radius:0!important}
+.pin{background:var(--lapis);color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font:600 11px var(--text);border:1.5px solid #e6d3ac;box-shadow:0 1px 6px rgba(20,43,79,.35)}
+.pin.home{background:var(--gold);color:#fff;width:30px;height:30px;font:400 15px var(--display);border:2px solid #fff}
+.dayfilter{display:flex;flex-wrap:wrap;gap:4px;margin-top:56px}
+.dayfilter button{font:500 14px var(--text);border:1px solid var(--rule-2);background:transparent;color:var(--ink);border-radius:0;padding:6px 11px;cursor:pointer;display:inline-flex;align-items:center;gap:7px}
+.dayfilter button:hover{border-color:var(--lapis)}
+.dayfilter button i{width:9px;height:9px;border-radius:50%;display:inline-block}
+.dayfilter button.on{background:var(--lapis);color:#fff;border-color:var(--lapis)}
+.daymap{height:320px;border:1px solid var(--rule-2);margin:0 0 18px;z-index:1;background:#e8eae6}
+.dayroute{display:inline-block;margin:0 0 56px;font-weight:500;font-size:15px;text-decoration:none;color:#fff;background:var(--lapis);padding:12px 22px;letter-spacing:.01em}
+.dayroute:hover{background:var(--lapis-2)}
 
-/* day */
-.day{padding:56px 0 20px;border-top:1px solid var(--line);scroll-margin-top:60px}
-.dayhead{display:flex;gap:22px;align-items:flex-start;margin-bottom:18px}
-.num{font-family:Fraunces,serif;font-size:76px;color:var(--clay);line-height:.9;min-width:90px}
-.num small{display:block;font-family:Manrope;font-size:12px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:6px}
-.day h3{font-size:34px;margin-bottom:6px}
-.num{color:var(--dc,var(--clay))}
-.daysub{color:var(--muted);font-size:16px}
-.meta{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 18px}
-.meta span{background:#fff;border:1px solid var(--line);border-radius:999px;padding:5px 12px;font-size:14px}
-.intro{font-size:17.5px}
+/* день */
+.day{padding:120px 0 24px;scroll-margin-top:50px}
+.dayhead{display:grid;grid-template-columns:200px minmax(0,1fr);gap:24px;align-items:end;padding-bottom:28px;border-bottom:1px solid var(--ink);margin-bottom:22px}
+.num{font-family:var(--display);font-size:168px;color:var(--gold);line-height:.74;letter-spacing:-.04em}
+.num small{display:block;font-family:var(--text);font-size:15px;letter-spacing:0;color:var(--muted);margin-bottom:22px;line-height:1}
+.day h3{font-size:clamp(34px,4.4vw,50px);margin-bottom:12px;color:var(--lapis)}
+.daysub{color:var(--muted);font-size:17px}
+.meta{display:flex;flex-wrap:wrap;margin:0 0 30px;font-size:15px;color:var(--muted)}
+.meta span{padding:0 16px;border-left:1px solid var(--rule-2)}
+.meta span:first-child{padding-left:0;border-left:0}
+.meta .lvl{margin:0}
+.intro{font-size:19px;line-height:1.62;max-width:36em;margin:0 0 44px}
 
-.plan{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 20px;margin:22px 0 28px}
-.plan h4{font-size:19px;margin-bottom:10px;color:var(--sea)}
-.plan ol{list-style:none;margin:0;padding:0;display:grid;gap:6px}
-.plan li{display:grid;grid-template-columns:110px 1fr;gap:10px;font-size:15.5px}
-.plan li b{color:var(--clay);font-weight:700}
+.plan{margin:0 0 56px;max-width:720px}
+.plan h4{font-size:24px;margin-bottom:18px;color:var(--lapis)}
+.plan ol{list-style:none;margin:0;padding:0 0 0 22px;border-left:1px solid var(--gold);display:grid;gap:12px}
+.plan li{display:grid;grid-template-columns:76px 1fr;gap:12px;font-size:16px;position:relative}
+.plan li::before{content:"";position:absolute;left:-26px;top:.62em;width:7px;height:7px;border-radius:50%;background:var(--chalk);border:1px solid var(--gold)}
+.plan li b{font-weight:500;color:var(--gold-ink);font-size:15.5px;font-variant-numeric:tabular-nums;letter-spacing:.02em}
 
-/* place */
-.place{background:var(--card);border:1px solid var(--line);border-radius:18px;overflow:hidden;margin:0 0 22px}
-.place figure{margin:0;position:relative;height:340px;background:linear-gradient(135deg,var(--sea),var(--sea-2))}
-.place figure img{width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .5s}
+/* место */
+.place{margin:0 0 72px}
+.place figure{margin:0 0 26px;position:relative;aspect-ratio:16/9;background:linear-gradient(135deg,var(--lapis),var(--lapis-2));overflow:hidden}
+.place figure img{width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .6s}
 .place figure img.ok{opacity:1}
-.place figcaption{position:absolute;right:10px;bottom:8px;font-size:11px;color:#fff;opacity:.85;background:rgba(0,0,0,.35);padding:2px 8px;border-radius:6px}
-.place figcaption a{color:#fff;text-decoration:none}
+.place figcaption{position:absolute;right:0;bottom:0;font-size:11.5px;background:rgba(14,30,56,.62);padding:4px 10px}
+.place figcaption a{color:rgba(255,255,255,.88);text-decoration:none}
 .place.nophoto figure{display:none}
-.pbody{padding:22px 24px 24px}
-.place h4{font-size:26px;margin-bottom:10px}
-.place p{margin:0 0 14px}
-.see h5,.facts h5{font-family:Manrope;font-size:13px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin:16px 0 8px}
-.see ul{margin:0;padding-left:20px}
-.see li{margin:3px 0}
-.facts dl{display:grid;grid-template-columns:170px 1fr;gap:6px 14px;margin:0;font-size:15.5px}
-.facts dt{font-weight:700;color:var(--sea)}
+.pbody{max-width:720px}
+.ph{display:flex;justify-content:space-between;align-items:baseline;gap:18px;margin-bottom:14px}
+.place h4{font-size:clamp(28px,3.2vw,36px);color:var(--ink)}
+.place p{margin:0 0 18px}
+.see h5,.facts h5{font-family:var(--text);font-size:15px;font-weight:600;color:var(--lapis);margin:26px 0 10px}
+.see ul{margin:0;padding-left:0;list-style:none;columns:2;column-gap:32px}
+.see li{margin:0 0 6px;padding-left:18px;position:relative;break-inside:avoid}
+.see li::before{content:"";position:absolute;left:0;top:.72em;width:8px;height:1px;background:var(--gold)}
+.facts dl{display:grid;grid-template-columns:180px 1fr;margin:0;font-size:15.5px;border-top:1px solid var(--rule)}
+.facts dt,.facts dd{padding:9px 0;border-bottom:1px solid var(--rule)}
+.facts dt{color:var(--muted)}
 .facts dd{margin:0}
-.tip{background:var(--foam);border-left:4px solid var(--sea-2);border-radius:0 12px 12px 0;padding:11px 15px;font-size:15.5px;margin-top:16px}
-.maplink{display:inline-block;margin-top:14px;font-weight:700;font-size:14px;text-decoration:none;color:var(--clay)}
-.food{background:#fbeee6;border-radius:14px;padding:16px 20px;margin:6px 0 10px}
-.food h4{font-size:19px;color:var(--clay);margin-bottom:6px}
-.food p{margin:0}
+.tip{border-left:2px solid var(--gold);padding:4px 0 4px 18px;font-size:16px;margin-top:24px;color:#2d3540}
+.tip b{color:var(--gold-ink);font-weight:600}
+.maplink{display:inline-block;margin-top:18px;font-weight:500;font-size:15px;color:var(--lapis-2)}
+.food{background:var(--lapis);color:#e8ebf0;padding:34px 38px;margin:8px 0 10px}
+.food h4{font-size:26px;color:#e6d3ac;margin-bottom:10px}
+.food p{margin:0;max-width:40em}
 
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:14px;margin-top:18px}
-.box{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px}
-.box h4{margin:0 0 6px;font-size:18px;color:var(--sea)}
-.box p{margin:0;font-size:15.5px;color:#3d4d53}
-.warnbox{background:#fbe3da;border:1px solid #f0c3b2;border-radius:14px;padding:16px 20px;margin-top:18px}
-footer{text-align:center;color:var(--muted);font-size:13px;padding:40px 20px 60px}
+/* перед поездкой */
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:36px 40px;margin-top:34px}
+.box{border-top:1px solid var(--ink);padding-top:16px}
+.box h4{margin:0 0 8px;font-size:22px;color:var(--lapis)}
+.box p{margin:0;font-size:15.5px;color:#36404b}
+.warnbox{border:1px solid var(--gold);padding:20px 24px;margin-top:44px;font-size:16px;background:var(--paper)}
+.warnbox b{color:var(--gold-ink)}
+footer{background:var(--lapis);color:#b9c2d0;font-size:14px;padding:56px 28px 72px;margin-top:80px;text-align:center;line-height:1.7}
+footer a{color:#e6d3ac}
 
 /* отметки «посетил» */
-.ph{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:10px}
-.ph h4{margin:0}
-.visit{flex:0 0 auto;display:inline-flex;align-items:center;gap:7px;font-size:14px;font-weight:700;color:var(--muted);border:1px solid var(--line);background:#fff;border-radius:999px;padding:5px 12px 5px 9px;cursor:pointer;user-select:none;margin-top:3px}
-.visit input{width:17px;height:17px;accent-color:#3f8f4f;margin:0;cursor:pointer}
-.place.done .visit{background:#e3f1e6;border-color:#b9dcc1;color:#2f6b3c}
-.place.done figure{filter:saturate(.55)}
-.prog{font-weight:700}
-.prog.full{background:#e3f1e6!important;border-color:#b9dcc1!important;color:#2f6b3c}
-nav.days a.full::after,.toc a.full b::after{content:" ✓";color:#3f8f4f}
-nav.days a.full.on::after{color:#bfe6c8}
-.tools{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;align-items:center}
-.tools button{font:700 14px Manrope,sans-serif;border:1px solid var(--line);background:#fff;color:var(--sea);border-radius:999px;padding:7px 14px;cursor:pointer}
-.tools button:hover{border-color:var(--sea-2)}
-.tools small{color:var(--muted);font-size:13px}
-.offline{color:#2f6b3c;font-weight:700}
+.visit{flex:0 0 auto;display:inline-flex;align-items:center;gap:9px;font-size:14px;color:var(--muted);cursor:pointer;user-select:none;white-space:nowrap}
+.visit input{appearance:none;-webkit-appearance:none;width:20px;height:20px;border:1px solid var(--gold);border-radius:50%;margin:0;cursor:pointer;display:grid;place-content:center;background:transparent}
+.visit input::after{content:"";width:10px;height:10px;border-radius:50%;background:var(--gold);transform:scale(0);transition:transform .2s}
+.visit input:checked::after{transform:scale(1)}
+.place.done .visit{color:var(--gold-ink)}
+.place.done figure img{filter:saturate(.5)}
+.prog.full{color:var(--gold-ink)}
+nav.days a.full::after{content:"";display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--gold);margin-left:4px;vertical-align:super}
+.toc a.full b::after{content:" ✓";font-size:16px}
+.tools{display:flex;flex-wrap:wrap;gap:8px 26px;margin-top:28px;align-items:center}
+.tools button{font:500 15px var(--text);border:0;border-bottom:1px solid var(--gold);background:none;color:var(--lapis);padding:2px 0;cursor:pointer}
+.tools button:hover{color:var(--gold-ink)}
+.tools small{color:var(--muted);font-size:14px}
+.offline{color:var(--olive);font-weight:600}
 
 @media print{
   @page{margin:14mm}
-  body{background:#fff;font-size:11pt;line-height:1.45}
+  body{background:#fff;font-size:10.5pt;line-height:1.45}
   .hero{min-height:0;color:var(--ink);background:none}
-  .hero .wrap{padding:0 0 10px}
-  .stat{background:none;border-color:#ccc;backdrop-filter:none}
+  .hero .wrap{padding:0 0 10px}.hero h1{font-size:54pt;animation:none}.hero p,.stat,.kicker{color:var(--ink);animation:none}
+  .stats{animation:none;border-color:var(--rule)}.stat{border-color:var(--rule)}.stat b{color:var(--lapis)}
   nav.days,#map,.dayfilter,.daymap,.dayroute,.maplink,.visit,.tools,.leaflet-container{display:none!important}
-  .day{page-break-before:always;padding-top:0;border:0}
-  .place,.plan,.food,.box,.tip{break-inside:avoid;box-shadow:none}
-  .place figure{height:160px}
+  .day{page-break-before:always;padding-top:0}
+  .num{font-size:90px}
+  .place,.plan,.food,.box,.tip{break-inside:avoid}
+  .place{margin-bottom:28px}.place figure{aspect-ratio:auto;height:150px}
   .place figcaption{display:none}
-  .grid{grid-template-columns:1fr 1fr}
+  .food{background:none;color:var(--ink);border:1px solid var(--gold);padding:14px}.food h4{color:var(--gold-ink)}
+  footer{background:none;color:var(--muted)}
   a{color:inherit;text-decoration:none}
-  .toc a{padding:4px 10px}
 }
 
-@media (max-width:720px){
+@media (max-width:760px){
   body{font-size:16px}
-  .dayhead{flex-direction:column;gap:4px}
-  .num{font-size:54px}
-  .day h3{font-size:27px}
-  .place figure{height:230px}
-  .pbody{padding:18px}
-  .place h4{font-size:22px}
-  .facts dl{grid-template-columns:1fr;gap:2px}
-  .facts dd{margin-bottom:8px}
-  .plan li{grid-template-columns:62px 1fr}
-  .toc a{grid-template-columns:44px 1fr}
+  .wrap{padding:0 20px}
+  .hero .wrap{padding-bottom:44px}
+  .hero p{font-size:17px}
+  .hero h1 span{font-size:.44em}
+  .stats{gap:14px 0}.stat{padding:0 14px;font-size:13px}.stat b{font-size:22px}
+  .stat:nth-child(3){padding-left:0;border-left:0}
+  .dayhead{grid-template-columns:1fr;gap:10px}
+  .num{font-size:112px}
+  .num small{margin-bottom:14px}
+  .day{padding-top:84px}
+  .intro{font-size:17px}
+  .meta{flex-direction:column;gap:4px}
+  .meta span{padding:0;border-left:0}
+  nav.days a{min-width:32px;padding-left:5px;padding-right:5px}
+  .facts dl{grid-template-columns:1fr}
+  .facts dt{border-bottom:0;padding-bottom:0;font-size:14px}
+  .facts dd{padding-top:2px}
+  .see ul{columns:1}
+  .plan li{grid-template-columns:58px 1fr}
+  .toc a{grid-template-columns:44px 1fr;gap:12px}
   .toc small{grid-column:2;white-space:normal}
   .toc a>span{min-width:0}
-  #map{height:380px}
-  .ph{flex-direction:column;gap:6px}
-  .daymap{height:240px}
+  #map{height:400px}
+  .ph{flex-direction:column;gap:8px}
+  .daymap{height:260px}
+  .food{padding:24px 22px}
+  .place{margin-bottom:56px}
 }
 </style>
 </head>
@@ -176,14 +223,14 @@ nav.days a.full.on::after{color:#bfe6c8}
 
 <header class="hero">
   <div class="wrap">
-    <div class="kicker">Подробный путеводитель · база в Лимассоле</div>
-    <h1>Кипр за&nbsp;14&nbsp;дней</h1>
+    <div class="kicker">Путеводитель с одной базой — в Лимассоле</div>
+    <h1>Кипр<span>за четырнадцать дней</span></h1>
     <p>Четырнадцать однодневных поездок из Лимассола: от морских пещер Айя-Напы до горных монастырей Троодоса, мозаик Пафоса и готических соборов Фамагусты. У каждой локации — история, что смотреть, как добраться, часы работы, цены и советы.</p>
     <div class="stats">
-      <span class="stat">🏨 Живём в Лимассоле все 14 ночей</span>
-      <span class="stat" id="totalkm">🚗 ≈ 2000 км за две недели</span>
-      <span class="stat">🏛 3 объекта ЮНЕСКО</span>
-      <span class="stat">🛂 3 дня на Севере</span>
+      <span class="stat"><b>14</b>ночей в Лимассоле</span>
+      <span class="stat"><b id="totalkm">≈ 2150</b>километров за рулём</span>
+      <span class="stat"><b>3</b>объекта ЮНЕСКО</span>
+      <span class="stat"><b>3</b>дня на Севере</span>
     </div>
   </div>
 </header>
@@ -195,15 +242,15 @@ nav.days a.full.on::after{color:#bfe6c8}
     <h2>Как устроен маршрут</h2>
     <p class="lead">Лимассол стоит посередине южного побережья, поэтому из него удобно ездить во все стороны: час до гор Троодос, Пафоса и Никосии, 1–1,5 часа до Айя-Напы, Фамагусты и Кирении. Не нужно каждые три дня собирать чемоданы. Дальние поездки чередуются с лёгкими днями рядом с домом, а дни с поездками на Север стоят в конце: в Никосии границу переходят пешком, а в Фамагусту и Кирению едут на машине два дня подряд, чтобы хватило одной страховки.</p>
     <div class="tools">
-      <button type="button" id="printbtn">🖨 Распечатать / сохранить PDF</button>
+      <button type="button" id="printbtn">Распечатать или сохранить в PDF</button>
       <button type="button" id="resetbtn" hidden>Сбросить отметки</button>
       <small id="offstate"></small>
     </div>
     <div class="toc" id="toc"></div>
-    <p style="margin-top:14px;font-size:14px;color:var(--muted)">
-      <span class="lvl l1">лёгкий</span> до 40 минут за рулём в одну сторону ·
-      <span class="lvl l2">средний</span> около часа ·
-      <span class="lvl l3">длинный</span> 1,5 часа и больше, ранний выезд
+    <p class="legend">
+      <span><span class="lvl l1">лёгкий</span>до 40 минут за рулём в одну сторону</span>
+      <span><span class="lvl l2">средний</span>около часа</span>
+      <span><span class="lvl l3">длинный</span>1,5 часа и больше, ранний выезд</span>
     </p>
     <div class="dayfilter" id="dayfilter"></div>
     <div id="map"></div>
@@ -212,21 +259,21 @@ nav.days a.full.on::after{color:#bfe6c8}
   <section class="block">
     <h2>Перед поездкой</h2>
     <div class="grid">
-      <div class="box"><h4>🚗 Машина</h4><p>Без машины этот маршрут не проехать: автобусы в горы и между деревнями ходят редко. Движение левостороннее, руль справа. Права нужны с минимум годом стажа, возраст водителя обычно от 21–25 лет. Бронируйте заранее.</p></div>
-      <div class="box"><h4>🛂 Север острова</h4><p>Дни 12–14 частично проходят на территории непризнанной Турецкой Республики Северного Кипра. Нужен паспорт. Страховка прокатной машины там не действует: на КПП покупают отдельную, ≈ €20–30 на несколько дней. Заранее проверьте, разрешает ли прокатчик выезд на Север.</p></div>
-      <div class="box"><h4>🎟 Билеты в музеи</h4><p>Большинство античных памятников принадлежит Департаменту древностей. Крупные объекты стоят €4,50, небольшие — €2,50. Есть общие абонементы на 1, 3 и 7 дней (€8,50 / €17 / €25), но по этому маршруту выгоднее покупать билеты по отдельности. Дети, студенты и пенсионеры часто проходят бесплатно.</p></div>
-      <div class="box"><h4>🕗 Часы работы</h4><p>У государственных объектов два сезона: 16 апреля — 15 сентября обычно 08:30–19:30, 16 сентября — 15 апреля обычно 08:30–17:00. Закрыты 25 декабря, 1 января и в православную Пасху. Бывают внеплановые закрытия из-за забастовок — проверяйте накануне.</p></div>
-      <div class="box"><h4>☀️ Когда ехать</h4><p>Лучше всего апрель–июнь и сентябрь–октябрь. В июле–августе на побережье +35 °C, на раскопках без тени тяжело: выходите к открытию. Зимой мягко, но в горах бывает снег; зато с ноября по март на солёных озёрах зимуют фламинго.</p></div>
-      <div class="box"><h4>⛪ Церкви и мечети</h4><p>Плечи и колени должны быть закрыты, в мечетях снимают обувь, женщины покрывают голову. В расписных церквях Троодоса не фотографируют фрески со вспышкой. Смотрителю обычно оставляют пожертвование.</p></div>
+      <div class="box"><h4>Машина</h4><p>Без машины этот маршрут не проехать: автобусы в горы и между деревнями ходят редко. Движение левостороннее, руль справа. Права нужны с минимум годом стажа, возраст водителя обычно от 21–25 лет. Бронируйте заранее.</p></div>
+      <div class="box"><h4>Север острова</h4><p>Дни 12–14 частично проходят на территории непризнанной Турецкой Республики Северного Кипра. Нужен паспорт. Страховка прокатной машины там не действует: на КПП покупают отдельную, ≈ €20–30 на несколько дней. Заранее проверьте, разрешает ли прокатчик выезд на Север.</p></div>
+      <div class="box"><h4>Билеты в музеи</h4><p>Большинство античных памятников принадлежит Департаменту древностей. Крупные объекты стоят €4,50, небольшие — €2,50. Есть общие абонементы на 1, 3 и 7 дней (€8,50 / €17 / €25), но по этому маршруту выгоднее покупать билеты по отдельности. Дети, студенты и пенсионеры часто проходят бесплатно.</p></div>
+      <div class="box"><h4>Часы работы</h4><p>У государственных объектов два сезона: 16 апреля — 15 сентября обычно 08:30–19:30, 16 сентября — 15 апреля обычно 08:30–17:00. Закрыты 25 декабря, 1 января и в православную Пасху. Бывают внеплановые закрытия из-за забастовок — проверяйте накануне.</p></div>
+      <div class="box"><h4>Когда ехать</h4><p>Лучше всего апрель–июнь и сентябрь–октябрь. В июле–августе на побережье +35 °C, на раскопках без тени тяжело: выходите к открытию. Зимой мягко, но в горах бывает снег; зато с ноября по март на солёных озёрах зимуют фламинго.</p></div>
+      <div class="box"><h4>Церкви и мечети</h4><p>Плечи и колени должны быть закрыты, в мечетях снимают обувь, женщины покрывают голову. В расписных церквях Троодоса не фотографируют фрески со вспышкой. Смотрителю обычно оставляют пожертвование.</p></div>
     </div>
-    <div class="warnbox"><b>⚠️ Актуально на ноябрь 2026:</b> ущелье Авакас на полуострове Акамас закрыто Департаментом лесов с 6 декабря 2025 года из-за камнепадов и подъёма воды. Поэтому в маршрут его не включили. Если до поездки ущелье откроют, его можно добавить в день 10.</div>
+    <div class="warnbox"><b>Актуально на ноябрь 2026.</b> ущелье Авакас на полуострове Акамас закрыто Департаментом лесов с 6 декабря 2025 года из-за камнепадов и подъёма воды. Поэтому в маршрут его не включили. Если до поездки ущелье откроют, его можно добавить в день 10.</div>
   </section>
 
   <div id="days"></div>
 </main>
 
 <footer>
-  Фотографии — Wikimedia Commons, автор и лицензия указаны на каждом фото (по клику открывается страница файла). Карта © участники OpenStreetMap, маршруты — OSRM.<br>
+  Фотографии — Wikimedia Commons, автор и лицензия указаны на каждом фото (по клику открывается страница файла). Карта © участники OpenStreetMap и CARTO, маршруты — OSRM.<br>
   Цены и часы работы собраны по открытым источникам в ноябре 2026 года и могут меняться — проверяйте перед поездкой.
 </footer>
 
@@ -243,7 +290,7 @@ const nav=document.getElementById('nav'), toc=document.getElementById('toc'), bo
 const ROUTES=window.ROUTES||[], PHOTOS=window.PHOTOS||{};
 const HOME=[34.6786,33.0413];
 // 14 различимых цветов, по кругу от моря к закату
-const COLORS=['#0d6e8c','#c8643b','#3f8f4f','#8e44ad','#d4a017','#1f9e9e','#b03a48','#5b6fd6','#7a8b2e','#e07b9c','#2c3e50','#d35400','#16a085','#9c640c'];
+const COLORS=['#1f3d6b','#a8844a','#4f6b4a','#7b3f5e','#2f7a86','#b2603a','#3d4f8f','#8a7a2e','#5c3d73','#3f7f63','#9a4a4a','#4a6f9a','#6b5a3a','#2d5c55'];
 const col=i=>COLORS[i%COLORS.length];
 const wikiTitles=new Set();
 const stops=d=>d.places.filter(p=>p.ll&&!p.nomap);
@@ -254,8 +301,8 @@ const gmapsDay=d=>{
 
 DAYS.forEach((d,i)=>{
   const n=i+1, r=ROUTES[i], c=col(i);
-  nav.insertAdjacentHTML('beforeend',`<a href="#d${n}">День ${n}</a>`);
-  toc.insertAdjacentHTML('beforeend',`<a href="#d${n}"><b style="color:${c}">${n}</b><span>${esc(d.title)} <span class="lvl ${LEVEL[d.level]||'l2'}">${esc(d.level)}</span></span><small>🚗 ${r?`≈ ${r.km} км за день`:esc(d.drive.split(',')[0])}</small></a>`);
+  nav.insertAdjacentHTML('beforeend',`<a href="#d${n}" aria-label="День ${n}">${n}</a>`);
+  toc.insertAdjacentHTML('beforeend',`<a href="#d${n}"><b>${n}</b><span>${esc(d.title)} <span class="lvl ${LEVEL[d.level]||'l2'}">${esc(d.level)}</span></span><small>${r?`${r.km} км`:esc(d.drive.split(',')[0])}</small></a>`);
 
   const plan=d.plan.map(p=>`<li><b>${esc(p[0])}</b><span>${esc(p[1])}</span></li>`).join('');
   const places=d.places.map((p,k)=>{
@@ -273,8 +320,8 @@ DAYS.forEach((d,i)=>{
     const see=p.see&&p.see.length?`<div class="see"><h5>Что посмотреть</h5><ul>${p.see.map(s=>`<li>${esc(s)}</li>`).join('')}</ul></div>`:'';
     const fk=Object.entries(p.facts||{});
     const facts=fk.length?`<div class="facts"><h5>Практическое</h5><dl>${fk.map(([k,v])=>`<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join('')}</dl></div>`:'';
-    const tip=p.tip?`<div class="tip">💡 ${esc(p.tip)}</div>`:'';
-    const ml=p.ll&&!p.nomap?`<a class="maplink" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination=${p.ll[0]},${p.ll[1]}">Маршрут в Google Картах →</a>`:'';
+    const tip=p.tip?`<div class="tip"><b>Совет.</b> ${esc(p.tip)}</div>`:'';
+    const ml=p.ll&&!p.nomap?`<a class="maplink" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination=${p.ll[0]},${p.ll[1]}">Маршрут до места в Google Картах</a>`:'';
     const vid=`${n}-${k}`, chk=p.nomap?'':`<label class="visit"><input type="checkbox" data-v="${vid}"> Посетил</label>`;
     return `<article class="place${fig?'':' nophoto'}" data-v="${p.nomap?'':vid}">${fig}<div class="pbody"><div class="ph"><h4>${esc(p.name)}</h4>${chk}</div><p>${esc(p.text)}</p>${see}${facts}${tip}${ml}</div></article>`;
   }).join('');
@@ -285,18 +332,18 @@ DAYS.forEach((d,i)=>{
       <div class="num"><small>День</small>${n}</div>
       <div><h3>${esc(d.title)}</h3><div class="daysub">${esc(d.sub)}</div></div>
     </div>
-    <div class="meta"><span>🚗 ${esc(d.drive)}</span>${r?`<span>🛣 ≈ ${r.km} км за день</span>`:''}<span class="lvl ${LEVEL[d.level]||'l2'}" style="font-size:13px;padding:6px 12px;margin:0">${esc(d.level)} день</span><span class="prog" id="p${n}"></span></div>
+    <div class="meta"><span>${esc(d.drive)}</span>${r?`<span>${r.km} км за день</span>`:''}<span><span class="lvl ${LEVEL[d.level]||'l2'}">${esc(d.level)} день</span></span><span class="prog" id="p${n}"></span></div>
     <p class="intro">${esc(d.intro)}</p>
     <div class="plan"><h4>План дня</h4><ol>${plan}</ol></div>
     <div class="daymap" id="m${n}" data-day="${i}"></div>
-    <a class="dayroute" target="_blank" rel="noopener" href="${gmapsDay(d)}">🧭 Весь день в Google Картах</a>
+    <a class="dayroute" target="_blank" rel="noopener" href="${gmapsDay(d)}">Открыть маршрут дня в Google Картах</a>
     ${places}
-    <div class="food"><h4>🍽 Где и что поесть</h4><p>${esc(d.food)}</p></div>
+    <div class="food"><h4>Где и что поесть</h4><p>${esc(d.food)}</p></div>
   </section>`);
 });
 
 const total=ROUTES.reduce((a,r)=>a+(r?r.km:0),0);
-if(total) document.getElementById('totalkm').textContent=`🚗 ≈ ${Math.round(total/50)*50} км за две недели`;
+if(total) document.getElementById('totalkm').textContent=`≈ ${Math.round(total/50)*50}`;
 
 // ---------- запасная загрузка фото из Википедии ----------
 async function loadWiki(titles){
@@ -325,8 +372,8 @@ function noPhoto(img){ const a=img.closest('.place'); if(a) a.classList.add('nop
 loadWiki([...wikiTitles]);
 
 // ---------- карты ----------
-const tiles=()=>L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18,attribution:'© OpenStreetMap · маршруты OSRM'});
-const homeMarker=()=>L.marker(HOME,{icon:L.divIcon({className:'',html:'<div class="pin home">🏨</div>',iconSize:[32,32]}),zIndexOffset:1000}).bindPopup('<b>Лимассол</b><br>ваша база на все 14 дней');
+const tiles=()=>L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{maxZoom:19,subdomains:'abcd',attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> © <a href="https://carto.com/attributions">CARTO</a>, маршруты OSRM'});
+const homeMarker=()=>L.marker(HOME,{icon:L.divIcon({className:'',html:'<div class="pin home">Л</div>',iconSize:[30,30]}),zIndexOffset:1000}).bindPopup('<b>Лимассол</b><br>ваша база на все 14 дней');
 function pin(label,c){ return L.divIcon({className:'',html:`<div class="pin" style="background:${c}">${label}</div>`,iconSize:[26,26]}); }
 
 function dayLayer(i,{numbered}){
@@ -337,7 +384,7 @@ function dayLayer(i,{numbered}){
   L.polyline(path,{color:c,weight:4,opacity:.9}).addTo(g);
   stops(d).forEach((p,k)=>{
     L.marker(p.ll,{icon:pin(numbered?k+1:i+1,c)}).addTo(g)
-     .bindPopup(`<b>${esc(p.name)}</b><br>День ${i+1}: ${esc(d.title)}${numbered?'':`<br><a href="#d${i+1}">Читать →</a>`}`);
+     .bindPopup(`<b>${esc(p.name)}</b><br>День ${i+1}: ${esc(d.title)}${numbered?'':`<br><a href="#d${i+1}">Читать о дне</a>`}`);
   });
   return g;
 }
@@ -393,7 +440,7 @@ function refreshVisited(){
     const n=i+1, ids=d.places.map((p,k)=>p.nomap?null:`${n}-${k}`).filter(Boolean);
     const got=ids.filter(v=>visited.has(v)).length, full=ids.length&&got===ids.length;
     const el=document.getElementById('p'+n);
-    el.textContent=`✅ ${got} из ${ids.length}`; el.style.display=got?'':'none'; el.classList.toggle('full',!!full);
+    el.textContent=`посещено ${got} из ${ids.length}`; el.style.display=got?'':'none'; el.classList.toggle('full',!!full);
     document.querySelectorAll(`a[href="#d${n}"]`).forEach(a=>a.classList.toggle('full',!!full));
   });
   document.getElementById('resetbtn').hidden=!visited.size;
@@ -416,7 +463,7 @@ document.getElementById('printbtn').onclick=()=>{
 const off=document.getElementById('offstate');
 if('serviceWorker' in navigator && location.protocol==='https:'){
   navigator.serviceWorker.register('sw.js').then(()=>navigator.serviceWorker.ready).then(()=>{
-    off.innerHTML='<span class="offline">✓ Доступно офлайн</span> — открытые карты и фото тоже сохраняются';
+    off.innerHTML='<span class="offline">Доступно без интернета.</span> Открытые карты и фото тоже сохраняются.';
   }).catch(()=>{});
 }
 document.querySelectorAll('.daymap').forEach(el=>dayIO.observe(el));
