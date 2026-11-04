@@ -1,6 +1,6 @@
-// Офлайн-режим путеводителя: страница, данные и фото кэшируются при первом открытии,
-// фото из Википедии и куски карты — по мере просмотра.
-const VERSION = 'cyprus-v4';
+// Офлайн-режим путеводителя. Страница и данные всегда берутся из сети (кэш — только без интернета),
+// фото и куски карты — из кэша, если уже сохранены.
+const VERSION = 'cyprus-v5';
 const CORE = [
   './', 'index.html', 'data1.js', 'data2.js', 'data3.js', 'routes.js', 'photos.js', 'manifest.webmanifest',
   'img/cape_greco.jpg', 'img/kourion.jpg', 'img/larnaca.jpg', 'img/hala_sultan_tekke.jpg',
@@ -12,7 +12,7 @@ const TILES = 'cyprus-tiles-v2'; // v1 содержал заглушки CARTO �
 const MAX_TILES = 1500;
 
 self.addEventListener('install', e => {
-  e.waitUntil(caches.open(VERSION).then(c => Promise.all(CORE.map(u => c.add(u).catch(() => {})))));
+  e.waitUntil(caches.open(VERSION).then(c => Promise.all(CORE.map(u => c.add(new Request(u, { cache: 'reload' })).catch(() => {})))));
   self.skipWaiting();
 });
 
@@ -51,7 +51,17 @@ self.addEventListener('fetch', e => {
     return;
   }
 
-  // всё остальное (страница, данные, фото, шрифты, Leaflet): отдаём из кэша и обновляем в фоне
+  // свои страница, данные и скрипты: сначала сеть (в обход HTTP-кэша), без интернета — кэш
+  const own = url.origin === location.origin && (req.mode === 'navigate' || /\.(html|js|webmanifest)$|\/$/.test(url.pathname));
+  if (own) {
+    e.respondWith(fetch(req, { cache: 'no-cache' }).then(res => {
+      if (res.ok) { const copy = res.clone(); caches.open(VERSION).then(c => c.put(req, copy)); }
+      return res;
+    }).catch(() => caches.match(req, { ignoreSearch: true })));
+    return;
+  }
+
+  // остальное (фото, шрифты, Leaflet): из кэша, обновляем в фоне
   e.respondWith(caches.open(VERSION).then(async c => {
     const hit = await c.match(req, { ignoreSearch: url.origin === location.origin });
     const net = fetch(req).then(res => {
