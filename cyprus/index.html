@@ -12,6 +12,10 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#0d4f6c">
+<link rel="icon" type="image/png" href="img/icon-192.png">
+<link rel="apple-touch-icon" href="img/icon-192.png">
 <style>
 :root{
   --sea:#0d4f6c; --sea-2:#1b7a9a; --foam:#e8f3f5; --sand:#f6efe4; --clay:#c8643b;
@@ -115,6 +119,39 @@ section.block h2{font-size:36px;margin-bottom:14px}
 .warnbox{background:#fbe3da;border:1px solid #f0c3b2;border-radius:14px;padding:16px 20px;margin-top:18px}
 footer{text-align:center;color:var(--muted);font-size:13px;padding:40px 20px 60px}
 
+/* отметки «посетил» */
+.ph{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:10px}
+.ph h4{margin:0}
+.visit{flex:0 0 auto;display:inline-flex;align-items:center;gap:7px;font-size:14px;font-weight:700;color:var(--muted);border:1px solid var(--line);background:#fff;border-radius:999px;padding:5px 12px 5px 9px;cursor:pointer;user-select:none;margin-top:3px}
+.visit input{width:17px;height:17px;accent-color:#3f8f4f;margin:0;cursor:pointer}
+.place.done .visit{background:#e3f1e6;border-color:#b9dcc1;color:#2f6b3c}
+.place.done figure{filter:saturate(.55)}
+.prog{font-weight:700}
+.prog.full{background:#e3f1e6!important;border-color:#b9dcc1!important;color:#2f6b3c}
+nav.days a.full::after,.toc a.full b::after{content:" ✓";color:#3f8f4f}
+nav.days a.full.on::after{color:#bfe6c8}
+.tools{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;align-items:center}
+.tools button{font:700 14px Manrope,sans-serif;border:1px solid var(--line);background:#fff;color:var(--sea);border-radius:999px;padding:7px 14px;cursor:pointer}
+.tools button:hover{border-color:var(--sea-2)}
+.tools small{color:var(--muted);font-size:13px}
+.offline{color:#2f6b3c;font-weight:700}
+
+@media print{
+  @page{margin:14mm}
+  body{background:#fff;font-size:11pt;line-height:1.45}
+  .hero{min-height:0;color:var(--ink);background:none}
+  .hero .wrap{padding:0 0 10px}
+  .stat{background:none;border-color:#ccc;backdrop-filter:none}
+  nav.days,#map,.dayfilter,.daymap,.dayroute,.maplink,.visit,.tools,.leaflet-container{display:none!important}
+  .day{page-break-before:always;padding-top:0;border:0}
+  .place,.plan,.food,.box,.tip{break-inside:avoid;box-shadow:none}
+  .place figure{height:160px}
+  .place figcaption{display:none}
+  .grid{grid-template-columns:1fr 1fr}
+  a{color:inherit;text-decoration:none}
+  .toc a{padding:4px 10px}
+}
+
 @media (max-width:720px){
   body{font-size:16px}
   .dayhead{flex-direction:column;gap:4px}
@@ -130,6 +167,7 @@ footer{text-align:center;color:var(--muted);font-size:13px;padding:40px 20px 60p
   .toc small{grid-column:2;white-space:normal}
   .toc a>span{min-width:0}
   #map{height:380px}
+  .ph{flex-direction:column;gap:6px}
   .daymap{height:240px}
 }
 </style>
@@ -156,6 +194,11 @@ footer{text-align:center;color:var(--muted);font-size:13px;padding:40px 20px 60p
   <section class="block" id="overview">
     <h2>Как устроен маршрут</h2>
     <p class="lead">Лимассол стоит посередине южного побережья, поэтому из него удобно ездить во все стороны: час до гор Троодос, Пафоса и Никосии, 1–1,5 часа до Айя-Напы, Фамагусты и Кирении. Не нужно каждые три дня собирать чемоданы. Дальние поездки чередуются с лёгкими днями рядом с домом, а дни с поездками на Север стоят в конце: в Никосии границу переходят пешком, а в Фамагусту и Кирению едут на машине два дня подряд, чтобы хватило одной страховки.</p>
+    <div class="tools">
+      <button type="button" id="printbtn">🖨 Распечатать / сохранить PDF</button>
+      <button type="button" id="resetbtn" hidden>Сбросить отметки</button>
+      <small id="offstate"></small>
+    </div>
     <div class="toc" id="toc"></div>
     <p style="margin-top:14px;font-size:14px;color:var(--muted)">
       <span class="lvl l1">лёгкий</span> до 40 минут за рулём в одну сторону ·
@@ -215,7 +258,7 @@ DAYS.forEach((d,i)=>{
   toc.insertAdjacentHTML('beforeend',`<a href="#d${n}"><b style="color:${c}">${n}</b><span>${esc(d.title)} <span class="lvl ${LEVEL[d.level]||'l2'}">${esc(d.level)}</span></span><small>🚗 ${r?`≈ ${r.km} км за день`:esc(d.drive.split(',')[0])}</small></a>`);
 
   const plan=d.plan.map(p=>`<li><b>${esc(p[0])}</b><span>${esc(p[1])}</span></li>`).join('');
-  const places=d.places.map(p=>{
+  const places=d.places.map((p,k)=>{
     const ph=PHOTOS[p.name];
     const enHref=p.wiki?`https://en.wikipedia.org/wiki/${encodeURIComponent(p.wiki.replace(/ /g,'_'))}`:'';
     let fig='';
@@ -232,7 +275,8 @@ DAYS.forEach((d,i)=>{
     const facts=fk.length?`<div class="facts"><h5>Практическое</h5><dl>${fk.map(([k,v])=>`<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join('')}</dl></div>`:'';
     const tip=p.tip?`<div class="tip">💡 ${esc(p.tip)}</div>`:'';
     const ml=p.ll&&!p.nomap?`<a class="maplink" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination=${p.ll[0]},${p.ll[1]}">Маршрут в Google Картах →</a>`:'';
-    return `<article class="place${fig?'':' nophoto'}">${fig}<div class="pbody"><h4>${esc(p.name)}</h4><p>${esc(p.text)}</p>${see}${facts}${tip}${ml}</div></article>`;
+    const vid=`${n}-${k}`, chk=p.nomap?'':`<label class="visit"><input type="checkbox" data-v="${vid}"> Посетил</label>`;
+    return `<article class="place${fig?'':' nophoto'}" data-v="${p.nomap?'':vid}">${fig}<div class="pbody"><div class="ph"><h4>${esc(p.name)}</h4>${chk}</div><p>${esc(p.text)}</p>${see}${facts}${tip}${ml}</div></article>`;
   }).join('');
 
   box.insertAdjacentHTML('beforeend',`
@@ -241,7 +285,7 @@ DAYS.forEach((d,i)=>{
       <div class="num"><small>День</small>${n}</div>
       <div><h3>${esc(d.title)}</h3><div class="daysub">${esc(d.sub)}</div></div>
     </div>
-    <div class="meta"><span>🚗 ${esc(d.drive)}</span>${r?`<span>🛣 ≈ ${r.km} км за день</span>`:''}<span class="lvl ${LEVEL[d.level]||'l2'}" style="font-size:13px;padding:6px 12px;margin:0">${esc(d.level)} день</span></div>
+    <div class="meta"><span>🚗 ${esc(d.drive)}</span>${r?`<span>🛣 ≈ ${r.km} км за день</span>`:''}<span class="lvl ${LEVEL[d.level]||'l2'}" style="font-size:13px;padding:6px 12px;margin:0">${esc(d.level)} день</span><span class="prog" id="p${n}"></span></div>
     <p class="intro">${esc(d.intro)}</p>
     <div class="plan"><h4>План дня</h4><ol>${plan}</ol></div>
     <div class="daymap" id="m${n}" data-day="${i}"></div>
@@ -333,6 +377,48 @@ const dayIO=new IntersectionObserver(es=>es.forEach(e=>{
 }),{rootMargin:'300px 0px'});
 
 initMap();
+
+// ---------- отметки «посетил» (хранятся в этом браузере) ----------
+const VKEY='cyprus-visited';
+let visited=new Set();
+try{ visited=new Set(JSON.parse(localStorage.getItem(VKEY)||'[]')); }catch(e){}
+function saveVisited(){ try{ localStorage.setItem(VKEY,JSON.stringify([...visited])); }catch(e){} }
+function refreshVisited(){
+  document.querySelectorAll('article.place[data-v]').forEach(a=>{
+    const v=a.dataset.v; if(!v) return;
+    const on=visited.has(v); a.classList.toggle('done',on);
+    const cb=a.querySelector('input[data-v]'); if(cb) cb.checked=on;
+  });
+  DAYS.forEach((d,i)=>{
+    const n=i+1, ids=d.places.map((p,k)=>p.nomap?null:`${n}-${k}`).filter(Boolean);
+    const got=ids.filter(v=>visited.has(v)).length, full=ids.length&&got===ids.length;
+    const el=document.getElementById('p'+n);
+    el.textContent=`✅ ${got} из ${ids.length}`; el.style.display=got?'':'none'; el.classList.toggle('full',!!full);
+    document.querySelectorAll(`a[href="#d${n}"]`).forEach(a=>a.classList.toggle('full',!!full));
+  });
+  document.getElementById('resetbtn').hidden=!visited.size;
+}
+box.addEventListener('change',e=>{
+  const cb=e.target.closest('input[data-v]'); if(!cb) return;
+  cb.checked?visited.add(cb.dataset.v):visited.delete(cb.dataset.v);
+  saveVisited(); refreshVisited();
+});
+document.getElementById('resetbtn').onclick=()=>{ if(!visited.size) return; visited.clear(); saveVisited(); refreshVisited(); };
+refreshVisited();
+
+// ---------- печать ----------
+document.getElementById('printbtn').onclick=()=>{
+  document.querySelectorAll('img[loading="lazy"]').forEach(i=>i.loading='eager');
+  setTimeout(()=>window.print(),400);
+};
+
+// ---------- офлайн: страница, данные, фото и просмотренные куски карты сохраняются ----------
+const off=document.getElementById('offstate');
+if('serviceWorker' in navigator && location.protocol==='https:'){
+  navigator.serviceWorker.register('sw.js').then(()=>navigator.serviceWorker.ready).then(()=>{
+    off.innerHTML='<span class="offline">✓ Доступно офлайн</span> — открытые карты и фото тоже сохраняются';
+  }).catch(()=>{});
+}
 document.querySelectorAll('.daymap').forEach(el=>dayIO.observe(el));
 
 // ---------- подсветка дня в навигации ----------
