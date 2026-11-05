@@ -13,6 +13,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Prata&family=Golos+Text:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
 <link rel="manifest" href="manifest.webmanifest">
+<link rel="stylesheet" href="demo.css">
 <meta name="theme-color" content="#142b4f">
 <link rel="icon" type="image/png" href="img/icon-192.png">
 <link rel="apple-touch-icon" href="img/icon-192.png">
@@ -53,6 +54,33 @@ img{display:block;max-width:100%}
   @keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
 }
 
+/* демо в обложке: телефон справа, уходит за нижний край */
+.hero{overflow:hidden}
+.hero-demo{display:block;position:relative;width:100%;max-width:400px;height:340px;margin:0 auto;overflow:hidden}
+
+.hero-demo .ss-stage{background:transparent!important}
+.hero-demo .cd-wash{display:none}
+@media (max-width:1099px){.hero{flex-direction:column;justify-content:flex-end;align-items:stretch}.hero .wrap{padding-bottom:28px}}
+@media (min-width:1100px){
+  .hero-demo{position:absolute;margin:0;overflow:visible;right:max(0px,calc((100vw - 1040px)/2 - 140px));bottom:-150px;width:400px;height:520px;z-index:1}
+  .hero .wrap{position:relative;z-index:2}
+  .stats{max-width:760px}
+}
+/* bento в блоке «Перед поездкой»: три плитки, один кадр */
+.bento{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:auto auto;gap:16px;margin-top:34px}
+.tile{background:var(--paper);border:1px solid var(--rule);border-radius:18px;padding:28px 28px 0;overflow:hidden;display:flex;flex-direction:column}
+.tile h3{font-size:26px;color:var(--lapis);margin-bottom:8px}
+.tile p{margin:0;font-size:16px;line-height:1.5;color:var(--muted);max-width:30em}
+.tile-pic{margin-top:22px;width:100%}
+.tile--hours{grid-column:1 / 3}
+.tile--visited{grid-column:3;grid-row:1 / 3}
+.tile--price{grid-column:1 / 3;padding-bottom:28px;justify-content:center}
+.tile--price .lead-in{font-size:16px;color:var(--muted);margin-bottom:2px}
+.tile--price .big{font:400 clamp(64px,9vw,104px)/1 var(--display);color:var(--lapis);letter-spacing:-.02em;white-space:nowrap;margin:2px 0 14px;font-variant-numeric:lining-nums}
+@media (max-width:900px){
+  .bento{grid-template-columns:1fr}
+  .tile--hours,.tile--visited,.tile--price{grid-column:1;grid-row:auto}
+}
 /* навигация по дням */
 nav.days{position:sticky;top:0;z-index:1000;background:rgba(241,242,239,.94);backdrop-filter:blur(10px);border-bottom:1px solid var(--rule)}
 nav.days .in{max-width:1040px;margin:0 auto;padding:0 20px;display:flex;gap:2px;overflow-x:auto;scrollbar-width:none}
@@ -235,6 +263,7 @@ nav.days a.full::after{content:"";display:inline-block;width:5px;height:5px;bord
       <span class="stat"><b>3</b>дня на Севере</span>
     </div>
   </div>
+  <div id="cyprus-demo" class="hero-demo" aria-hidden="true"></div>
 </header>
 
 <nav class="days"><div class="in" id="nav"><a href="#overview">Обзор</a></div></nav>
@@ -260,6 +289,23 @@ nav.days a.full::after{content:"";display:inline-block;width:5px;height:5px;bord
 
   <section class="block">
     <h2>Перед поездкой</h2>
+    <div class="bento">
+      <article class="tile tile--hours">
+        <h3>Часы работы по сезонам</h3>
+        <p>Летом музеи и раскопки открыты дольше, зимой закрываются раньше.</p>
+        <div id="cyprus-hours" class="tile-pic" aria-hidden="true"></div>
+      </article>
+      <article class="tile tile--visited">
+        <h3>Отмечайте посещённое</h3>
+        <p>Галочки хранятся в браузере и работают без сети.</p>
+        <div id="cyprus-visited" class="tile-pic" aria-hidden="true"></div>
+      </article>
+      <article class="tile tile--price">
+        <div class="lead-in">Билет в крупный музей</div>
+        <div class="big">€4,50</div>
+        <p>Небольшие объекты стоят €2,50. Абонементы на 1, 3 и 7 дней начинаются от €8,50.</p>
+      </article>
+    </div>
     <div class="grid">
       <div class="box"><h4>Машина</h4><p>Без машины этот маршрут не проехать: автобусы в горы и между деревнями ходят редко. Движение левостороннее, руль справа. Права нужны с минимум годом стажа, возраст водителя обычно от 21–25 лет. Бронируйте заранее.</p></div>
       <div class="box"><h4>Север острова</h4><p>Дни 12–14 частично проходят на территории непризнанной Турецкой Республики Северного Кипра. Нужен паспорт. Страховка прокатной машины там не действует: на КПП покупают отдельную, ≈ €20–30 на несколько дней. Заранее проверьте, разрешает ли прокатчик выезд на Север.</p></div>
@@ -279,6 +325,7 @@ nav.days a.full::after{content:"";display:inline-block;width:5px;height:5px;bord
   Цены и часы работы собраны по открытым источникам в ноябре 2026 года и могут меняться — проверяйте перед поездкой.
 </footer>
 
+<script src="demo.js" defer></script>
 <script src="data1.js"></script>
 <script src="data2.js"></script>
 <script src="data3.js"></script>

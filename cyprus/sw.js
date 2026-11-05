@@ -1,8 +1,8 @@
 // Офлайн-режим путеводителя. Страница и данные всегда берутся из сети (кэш — только без интернета),
 // фото и куски карты — из кэша, если уже сохранены.
-const VERSION = 'cyprus-v6';
+const VERSION = 'cyprus-v7';
 const CORE = [
-  './', 'index.html', 'data1.js', 'data2.js', 'data3.js', 'routes.js', 'photos.js', 'manifest.webmanifest',
+  './', 'index.html', 'data1.js', 'data2.js', 'data3.js', 'routes.js', 'photos.js', 'demo.js', 'demo.css', 'manifest.webmanifest',
   'img/cape_greco.jpg', 'img/kourion.jpg', 'img/larnaca.jpg', 'img/hala_sultan_tekke.jpg',
   'img/ayia_napa.jpg', 'img/nicosia.jpg', 'img/icon-192.png',
   'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css',
