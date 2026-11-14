@@ -2,10 +2,12 @@ name: Cyprus guide — download photos
 # Скачивает фото мест с Wikimedia Commons в cyprus/img/w/ и пишет cyprus/photos.js
 # (автор и лицензия каждого фото). Запускается вручную и при правках данных путеводителя.
 on:
+  # Сайт отключён: папка переименована в _cyprus (не публикуется). Автозапуск выключен.
+  # Чтобы включить обратно: git mv _cyprus cyprus, раскомментировать ссылку в index.html и триггер push.
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths: ['cyprus/data*.js', 'tools/build_cyprus.py']
+  # push:
+  #   branches: [main]
+  #   paths: ['cyprus/data*.js', 'tools/build_cyprus.py']
 permissions:
   contents: write
 concurrency:
