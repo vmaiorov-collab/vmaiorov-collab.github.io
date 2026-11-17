@@ -426,7 +426,9 @@ function vHomework(){const k=SEL,hw=S.hw[k],c=hwContext(k);
     if(!sample)h+=`<p class="mini">⚠️ ${aiErr({code:"no_ai"})}</p>`;
     h+=hwBusy?`<p><span class="spin"></span> ИИ составляет задания… (до минуты)</p>`:`<button class="btn" ${sample?"":"disabled"} onclick="genHW('${k}')">✨ Создать домашку</button>`;
     if(hwErr)h+=`<p style="color:#C92A2A">${esc(hwErr)}</p>`;h+=`</div>`}
-  else{const d=normHW(hw.data),done=hw.score!=null;
+  else{const old=!hw.data.sat||hw.max<15;
+    h+=`<div class="card" style="margin-bottom:14px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;${old?"background:#FFF8E1;border-color:#FFE08A":""}"><div style="flex:1;min-width:220px">${old?"<b>⚠️ Это старая короткая домашка.</b> Удали её — ИИ сделает новую, большую.":"<b>Хочешь другую домашку?</b> <span class=\"mini\">Старая удалится, ИИ составит новую.</span>"}</div><button class="btn ${old?"":"s ghost"}" ${sample&&!hwBusy?"":"disabled"} onclick="regenHW('${k}')">🗑 Удалить и создать заново</button></div>`;
+    const d=normHW(hw.data),done=hw.score!=null;
     const qH=(id,q,n)=>{const a=hw.ans[id];return`<div class="q"><div class="qt">${n}. ${esc(q.q)}</div>${q.options.map((o,i)=>{let c="opt";if(done){if(i===q.answer)c+=" right";else if(a===i)c+=" wrong"}else if(a===i)c+=" pick";return`<button class="${c}" onclick="pick('${k}','${id}',${i})">${"ABCD"[i]})&nbsp; ${esc(o)}</button>`}).join("")}${done?`<div class="exp">${a===q.answer?"✅":"❌"} ${esc(q.explain||"")}</div>`:""}</div>`};
     const cnt=ids=>{const qs=allQs(hw).filter(([id])=>ids(id));return done?`<span class="pill ${qs.every(([id,q])=>hw.ans[id]===q.answer)?"g":"y"}">${qs.filter(([id,q])=>hw.ans[id]===q.answer).length}/${qs.length}</span>`:`<span class="pill gr">${qs.filter(([id])=>hw.ans[id]!=null).length}/${qs.length}</span>`};
     if(done)h+=`<div class="card" style="display:flex;align-items:center;gap:20px;margin-bottom:16px"><div class="score">${hw.score}/${hw.max}</div><div><b>${hw.score===hw.max?"Идеально! 🎉":hw.score>=hw.max*.7?"Отлично, почти всё верно!":"Разбери ошибки ниже — так и учатся."}</b><div class="mini">Объяснения под каждым вопросом. Не забудь сочинение внизу.</div></div></div>`;
@@ -439,12 +441,12 @@ function vHomework(){const k=SEL,hw=S.hw[k],c=hwContext(k);
     <div class="sec"><h2>✍️ Сочинение</h2></div><div class="card"><b>${esc(d.writing.task)}</b><div class="mini" style="margin:4px 0 10px">💡 ${esc(d.writing.hint||"")}</div>
     <textarea id="wIn" placeholder="Пиши по-английски…">${esc(hw.writing)}</textarea><div style="margin-top:8px">${wBusy?'<span class="spin"></span> ИИ проверяет…':`<button class="btn s" ${sample?"":"disabled"} onclick="checkWriting('${k}')">🤖 Проверить текст</button>`}</div>
     ${hw.fb?`<div class="exp md" style="margin-top:10px">${md(hw.fb)}</div>`:""}</div>
-    <div style="margin-top:14px"><button class="btn s ghost" onclick="if(confirmNew())regenHW('${k}')">↻ Новая домашка на этот день</button></div></div></div>`}
+</div></div>`}
   const past=Object.keys(S.hw).filter(x=>S.hw[x].score!=null).sort().reverse().slice(0,10);
   if(past.length)h+=`<h2 style="margin-top:26px">История</h2><div class="card"><table class="wtable"><tr><th>День</th><th>Результат</th><th></th></tr>${past.map(x=>`<tr><td>${fmtShort(x)}</td><td><span class="pill ${S.hw[x].score/S.hw[x].max>=.7?"g":"y"}">${S.hw[x].score}/${S.hw[x].max}</span></td><td><button class="btn s ghost" onclick="go('${x}')">Открыть</button></td></tr>`).join("")}</table></div>`;
   $("#main").innerHTML=h}
 let confirmFlag=false;function confirmNew(){if(confirmFlag){confirmFlag=false;return true}confirmFlag=true;toast("Нажми ещё раз, чтобы заменить домашку");setTimeout(()=>confirmFlag=false,3000);return false}
-function regenHW(k){delete S.hw[k];save(hwDocName(k));genHW(k)}
+function regenHW(k){const x=Object.assign({},S.hw);delete x[k];S.hw=x;save(hwDocName(k));if(sample)genHW(k);else render()}
 
 // ================= ARTICLE =================
 const TOPICS=[["🔬","Наука","science"],["🌍","Природа и климат","nature, ecology and climate"],["🏛","История","world history"],["🚀","Космос","space exploration and astronomy"],["🧠","Психология","psychology and the human brain"],["💻","Технологии","technology and AI"],["🎨","Искусство и культура","art, music and culture"],["💰","Экономика","economics and society"],["🧬","Биология и здоровье","biology and medicine"],["📚","Литература","literature and famous writers"]];
