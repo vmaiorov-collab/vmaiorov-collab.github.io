@@ -469,6 +469,35 @@ Requirements: "glossary" 8–10 harder words actually used in the article. "ques
     S.art=Object.assign({},S.art,{[k]:{data:v,ans:{},score:null,max:v.questions.length+v.tf.length,open:"",fb:"",t0:Date.now()}});save(artDocName(k))}
   catch(e){artErr=e&&e.code==="bad"?"ИИ вернул что-то не то — нажми ещё раз.":aiErr(e)}
   artBusy=false;render();scrollTo(0,0)}
+let artMode="real";
+function splitParas(t){let ps=t.replace(/\r/g,"").split(/\n\s*\n/).map(x=>x.replace(/\s*\n\s*/g," ").trim()).filter(x=>x.length>0);
+  if(ps.length<3)ps=t.replace(/\r/g,"").split(/\n/).map(x=>x.trim()).filter(Boolean);
+  ps=ps.filter(p=>p.split(/\s+/).length>=6||ps.length<4);
+  const out=[];let n=0;for(const p of ps){const w=p.split(/\s+/);if(n+w.length>2200){out.push(w.slice(0,Math.max(0,2200-n)).join(" ")+" …");break}out.push(p);n+=w.length}return out.filter(Boolean)}
+async function genFromText(k){if(artBusy)return;const raw=($("#artText")||{}).value||"",title=(($("#artTitle")||{}).value||"").trim(),url=(($("#artUrl")||{}).value||"").trim();
+  const paras=splitParas(raw),wc=paras.join(" ").split(/\s+/).length;
+  if(wc<150){toast("Вставь текст статьи целиком (минимум ~150 слов)");return}
+  artBusy=true;artErr="";const keep={raw,title,url};window._artKeep=keep;render();
+  const prompt=`A 9th-grade student (English B1+/B2, native Russian) preparing for the SAT has read this real article${title?` titled "${title}"`:""}. Paragraphs are numbered.
+"""
+${paras.map((p,i)=>`[${i+1}] ${p}`).join("\n\n")}
+"""
+Write varied comprehension questions in digital SAT style, based ONLY on this text.
+Return ONLY valid JSON, no markdown:
+{"title":"the article's title (use the given one if present, otherwise infer a short one)","topic":"short topic name in Russian",
+"glossary":[{"w":"word from the article","ru":"Russian translation"}],
+"questions":[{"type":"main idea","q":"","options":["","","",""],"answer":0,"explain":""}],
+"tf":[{"s":"statement about the article","answer":"True","explain":""}],
+"open":{"q":"","hint":""}}
+Requirements: "glossary" 8–10 harder words actually used in the text. "questions" exactly 10, types in this order: 2 "main idea"/"purpose", 3 "detail" (refer to paragraph numbers), 2 "words in context" (quote the sentence, ask the meaning of a word as used), 2 "inference", 1 "text structure". Each has 4 options, exactly one correct, correct answers spread across A–D; "answer" is the 0-based index. "tf": exactly 4 statements, "answer" one of "True", "False", "Not given" (each used at least once). "open": one discussion question to answer in 3–4 sentences in English; "hint" in Russian. All "explain": 1–2 sentences in simple Russian, mention the paragraph number.`;
+  try{const v=await sample.json(prompt,{modelTier:"default",cache:false});
+    const okQ=q=>q&&typeof q.q==="string"&&Array.isArray(q.options)&&q.options.length===4&&Number.isInteger(q.answer)&&q.answer>=0&&q.answer<4;
+    if(!v||!Array.isArray(v.questions)||!v.questions.length||!v.questions.every(okQ))throw{code:"bad"};
+    v.tf=(Array.isArray(v.tf)?v.tf:[]).filter(x=>x&&x.s&&["True","False","Not given"].includes(x.answer));v.glossary=Array.isArray(v.glossary)?v.glossary.filter(g=>g&&g.w):[];
+    v.paragraphs=paras;v.title=title||v.title||"Статья";v.src=/^https?:\/\//.test(url)?url:"";v.real=true;
+    S.art=Object.assign({},S.art,{[k]:{data:v,ans:{},score:null,max:v.questions.length+v.tf.length,open:"",fb:"",t0:Date.now()}});save(artDocName(k));window._artKeep=null}
+  catch(e){artErr=e&&e.code==="bad"?"ИИ вернул что-то не то — нажми ещё раз.":aiErr(e)}
+  artBusy=false;render();scrollTo(0,0)}
 const TF=["True","False","Not given"],TF_RU=["Верно","Неверно","Не сказано"];
 function artQs(a){return[...a.data.questions.map((q,i)=>["q"+i,q.answer]),...a.data.tf.map((t,i)=>["t"+i,TF.indexOf(t.answer)])]}
 function pickArt(k,id,i){const a=S.art[k];if(!a||a.score!=null)return;a.ans=Object.assign({},a.ans,{[id]:i});save(artDocName(k));const y=scrollY;render();scrollTo(0,y)}
@@ -482,15 +511,29 @@ async function checkOpen(k){const a=S.art[k],txt=($("#openIn")||{}).value||"";if
   try{const r=await ask(`An English teacher checks a 9th-grade student's answer (English B1+/B2, native Russian). Article title: "${a.data.title}". Article:\n${a.data.paragraphs.join("\n")}\n\nQuestion: "${a.data.open.q}"\nStudent's answer:\n"""${txt}"""\nGive feedback in Russian: оценка из 5 (content + language), исправленный вариант (English, fixes in **bold**), 2 главные ошибки с правилом, что можно было добавить из статьи. Under 170 words.`,{modelTier:"default"});a.fb=r.text}catch(e){a.fb="⚠️ "+aiErr(e)}
   openBusy=false;save(artDocName(k));const y2=scrollY;render();scrollTo(0,y2)}
 function vArticle(){const k=SEL,a=S.art[k];
-  let h=`<h1>Статья дня</h1><p class="sub">${esc(fmtLong(k))} · ИИ пишет статью в стиле National Geographic, а потом разные вопросы по ней, как на SAT.</p>
+  let h=`<h1>Статья дня</h1><p class="sub">${esc(fmtLong(k))} · Читаешь статью — настоящую или от ИИ — и отвечаешь на разные вопросы по ней, как на SAT.</p>
   <div class="toolbar"><button class="btn s ghost" onclick="go(addD(SEL,-1))">← день</button><button class="btn s ghost" onclick="go(TODAY)">Сегодня</button><button class="btn s ghost" onclick="go(addD(SEL,1))">день →</button></div>`;
-  if(!a){h+=`<div class="card"><div style="text-align:center;padding:10px 0 4px"><div style="font-size:46px">📰</div><h2>Выбери тему статьи</h2><p class="mini">Статья ~450 слов · 10 вопросов (главная мысль, детали, слова в контексте, выводы, структура) · 4 «Верно / Неверно / Не сказано» · вопрос с развёрнутым ответом и проверкой ИИ. ~25 минут.</p></div>
-    <div class="chips" style="justify-content:center;margin:12px 0">${TOPICS.map(([ic,n,en])=>`<button class="chip" style="padding:8px 14px;font-size:14px" ${sample&&!artBusy?"":"disabled"} onclick="genArticle('${k}','${en}')">${ic} ${n}</button>`).join("")}</div>
-    <div style="text-align:center">${artBusy?'<p><span class="spin"></span> ИИ пишет статью и вопросы… (до минуты)</p>':`<button class="btn" ${sample?"":"disabled"} onclick="genArticle('${k}')">🎲 Случайная тема</button>`}
-    ${sample?"":`<p class="mini">⚠️ ${aiErr({code:"no_ai"})}</p>`}${artErr?`<p style="color:#C92A2A">${esc(artErr)}</p>`:""}</div></div>`;$("#main").innerHTML=h;return}
+  if(!a){const rd=reading(k),kp=window._artKeep||{};
+    const SRC=[["News in Levels","лёгкие новости, уровень 2–3",L.NIL],["BBC Learning English","статьи и уроки",L.BBC],["Newsela","новости разной сложности",L.NEWSELA],["Science News Explores","наука для подростков",L.SNE],["National Geographic","наука, природа, история",L.NG],["Smithsonian Magazine","история и культура",L.SM],["The Conversation","статьи учёных простым языком","https://theconversation.com"],["Wikipedia: избранные статьи","лучшие статьи Википедии","https://en.wikipedia.org/wiki/Wikipedia:Featured_articles"]];
+    h+=`<div class="toolbar"><div class="seg"><button class="${artMode==="real"?"on":""}" onclick="artMode='real';render()">📰 Настоящая статья</button><button class="${artMode==="ai"?"on":""}" onclick="artMode='ai';render()">✨ Статья от ИИ</button></div></div>`;
+    if(artMode==="real"){
+      h+=`<div class="grid gmain"><div class="card"><h2>Вставь настоящую статью — ИИ сделает вопросы</h2>
+      <ol class="mini" style="margin:0 0 12px;padding-left:18px;line-height:1.7"><li>Открой статью на одном из сайтов справа (сегодня по плану: <b>${esc(rd.t)}</b>).</li><li>Выдели весь текст статьи и скопируй (⌘C / Ctrl+C).</li><li>Вставь сюда и нажми «Сделать вопросы».</li></ol>
+      <div class="grid g2" style="gap:10px;margin-bottom:10px"><input type="text" id="artTitle" placeholder="Название (необязательно)" value="${esc(kp.title||"")}"><input type="text" id="artUrl" placeholder="Ссылка на статью (необязательно)" value="${esc(kp.url||"")}"></div>
+      <textarea id="artText" style="min-height:260px;font-family:Georgia,serif;font-size:15px" placeholder="Вставь сюда текст статьи на английском…" oninput="const n=this.value.trim().split(/\\s+/).filter(Boolean).length;document.getElementById('artWc').textContent=n+' слов'+(n<150?' · нужно минимум 150':'')">${esc(kp.raw||"")}</textarea>
+      <div style="display:flex;align-items:center;gap:12px;margin-top:10px;flex-wrap:wrap">${artBusy?'<span><span class="spin"></span> ИИ читает статью и пишет вопросы… (до минуты)</span>':`<button class="btn" ${sample?"":"disabled"} onclick="genFromText('${k}')">✨ Сделать вопросы</button>`}<span class="mini" id="artWc"></span></div>
+      ${sample?"":`<p class="mini">⚠️ ${aiErr({code:"no_ai"})}</p>`}${artErr?`<p style="color:#C92A2A">${esc(artErr)}</p>`:""}
+      <p class="mini" style="margin-top:10px">Будет: 10 вопросов как на SAT · 4 «Верно / Неверно / Не сказано» · развёрнутый ответ с проверкой ИИ · словарик. Лучше брать статьи на 400–1000 слов.</p></div>
+      <div class="card links"><h2>Где взять статью</h2>${SRC.map(([n,d,u])=>`<a class="lk" href="${u}" target="_blank" rel="noopener" style="${u===rd.u?"border-color:#7C4DFF;background:#F5F3FF":""}"><span><b>${n}</b>${u===rd.u?' <span class="pill p">сегодня</span>':""}<br><span class="mini">${d}</span></span><span>↗</span></a>`).join("")}</div></div>`;
+    }else{
+      h+=`<div class="card"><div style="text-align:center;padding:10px 0 4px"><div style="font-size:46px">✨</div><h2>Выбери тему — ИИ напишет статью</h2><p class="mini">Статья ~450 слов · 10 вопросов · 4 «Верно / Неверно / Не сказано» · развёрнутый ответ с проверкой ИИ. ~25 минут.</p></div>
+      <div class="chips" style="justify-content:center;margin:12px 0">${TOPICS.map(([ic,n,en])=>`<button class="chip" style="padding:8px 14px;font-size:14px" ${sample&&!artBusy?"":"disabled"} onclick="genArticle('${k}','${en}')">${ic} ${n}</button>`).join("")}</div>
+      <div style="text-align:center">${artBusy?'<p><span class="spin"></span> ИИ пишет статью и вопросы… (до минуты)</p>':`<button class="btn" ${sample?"":"disabled"} onclick="genArticle('${k}')">🎲 Случайная тема</button>`}
+      ${sample?"":`<p class="mini">⚠️ ${aiErr({code:"no_ai"})}</p>`}${artErr?`<p style="color:#C92A2A">${esc(artErr)}</p>`:""}</div></div>`}
+    $("#main").innerHTML=h;return}
   const d=a.data,done=a.score!=null,wc=d.paragraphs.join(" ").split(/\s+/).length;
   h+=`<div class="grid" style="grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);align-items:start" id="artGrid"><div style="position:sticky;top:16px">
-   <div class="card" style="padding:28px 30px;max-height:calc(100vh - 32px);overflow:auto"><span class="pill p">${esc(d.topic||"")}</span> <span class="pill gr">${wc} слов · ~${Math.max(2,Math.round(wc/120))} мин</span>
+   <div class="card" style="padding:28px 30px;max-height:calc(100vh - 32px);overflow:auto"><span class="pill p">${esc(d.topic||"")}</span> <span class="pill gr">${wc} слов · ~${Math.max(2,Math.round(wc/120))} мин</span> ${d.real?'<span class="pill g">настоящая статья</span>':'<span class="pill gr">написано ИИ</span>'}${d.src?` <a class="mini" href="${esc(d.src)}" target="_blank" rel="noopener">Источник ↗</a>`:""}
    <h1 style="font-size:28px;margin:12px 0 14px;line-height:1.2">${esc(d.title)}</h1>
    <div style="font-family:Georgia,serif;font-size:16.5px;line-height:1.75;color:#222">${d.paragraphs.map((p,i)=>`<p style="margin:0 0 14px"><span style="font:700 11px Inter;color:#7C4DFF;vertical-align:2px;margin-right:6px">${i+1}</span>${esc(p)}</p>`).join("")}</div>
    ${d.glossary.length?`<div style="border-top:1px solid var(--line);padding-top:12px;margin-top:6px"><h3>📒 Словарик</h3><div class="chips">${d.glossary.map(g=>`<span class="chip" title="${esc(g.ru)}"><b>${esc(g.w)}</b> — ${esc(g.ru)}</span>`).join("")}</div></div>`:""}</div></div><div>`;
